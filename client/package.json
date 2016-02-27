@@ -1,0 +1,21 @@
+{
+  "name": "grade",
+  "version": "0.1.0",
+  "description": "",
+  "main": "index.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "react": "^0.14.7"
+  },
+  "devDependencies": {
+    "webpack": "^1.12.14",
+    "webpack-dev-server": "^1.14.1",
+    "webpack-merge": "^0.7.3"
+  },
+  "scripts": {
+    "build": "webpack",
+    "start": "webpack-dev-server --colors --port 8081"
+  }
+}
