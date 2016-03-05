@@ -1,3 +1,4 @@
+/* sample: https://github.com/feross/eslint-config-standard/blob/master/eslintrc.json */
 {
   "name": "grade",
   "version": "0.1.0",
