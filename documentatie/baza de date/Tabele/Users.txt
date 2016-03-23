@@ -1,0 +1,19 @@
+db.createCollection( "Users",
+   {
+      validator: { $and:
+         [
+            { user: { $regex: /@info\.uaic\.ro$/ } },
+            { password: { $type: "string" } },
+            { nume: { $type: "string" } },
+            { prenume: { $type: "string" } },
+           !!! { permissions: { $type: TODO "array of permissions" } },
+           !!! - se va face reuniunea cu Permissions
+           - OBS: daca nu exista permisiuni, se va intoarce un mesaj
+            { apiKey: { $type: "string" } },
+            { keyExpires: { $type: "date" } }
+         ]
+      }
+   }
+)
+
+-- user sa fie unic si index pe el

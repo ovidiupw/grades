@@ -1,0 +1,14 @@
+db.createCollection( "Permissions",
+   {
+      validator: { $and:
+         [
+            { name: { $type: "string" } },
+            !!! { actions: { TODO:$type: "array" } }
+            -- pathurile din api care pot fi accesate
+            (ex: email:add, studenti:adaugaNota, studenti:2:A4:vizualizeazaNote)
+         ]
+      }
+   }
+)
+
+-- name sa fie unic si index pe el

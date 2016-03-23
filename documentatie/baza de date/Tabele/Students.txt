@@ -1,0 +1,17 @@
+db.createCollection( "Students",
+   {
+      validator: { $and:
+         [
+            { user: { $regex: /@info\.uaic\.ro$/ } },
+            { nrMatricol: { $type: "string" } },
+            { dataNastere: { $type: "date" } },
+            { an: { $type: "string" } },
+            { grupa: { $type: "string" } },
+            { primesteEmail: { $type: "bool" } }
+         ]
+      }
+   }
+)
+
+-- user si nrMatricol sa fie unice si index pe user
+-- index pe an si grupa pentru a intoarce toate notele pussse de un profesor la o anumita grupa

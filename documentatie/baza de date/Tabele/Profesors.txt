@@ -1,0 +1,14 @@
+db.createCollection( "Profesors",
+   {
+      validator: { $and:
+         [
+            { user: { $regex: /@info\.uaic\.ro$/ } },
+            { gradDidactic: { $type: "string" } },
+            { course: { $type: "string" } },
+            !!! etc.
+         ]
+      }
+   }
+)
+
+-- user sa fie unic si index pe el

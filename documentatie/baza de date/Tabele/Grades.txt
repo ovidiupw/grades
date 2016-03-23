@@ -1,0 +1,17 @@
+db.createCollection( "Grades",
+   {
+      validator: { $and:
+         [
+            { nrMatricol: { $type: "string" } },
+           -- perechi unice nr_matricol, curs unde in fiecare curs e un array cu toate notele\\\
+            { dataNotare: { $type: "date" } },
+            { promovat: {$type: "bool"}}
+         ]
+      }
+   }
+)
+
+-- nrMatricol sa fie unic si index pe el si pe idCurs
+!!! evaluare
+
+array de cursuri: fiecare curs sa aiba un obiect cu statusul evaluarii la acel curs (un anumit format al evaluarii pana in momentu ala)
