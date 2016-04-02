@@ -32,6 +32,7 @@
   },
   "scripts": {
     "start": "webpack-dev-server --progress --colors --watch",
+    "jsdoc": "./node_modules/.bin/jsdoc",
     "build": "webpack"
   }
 }

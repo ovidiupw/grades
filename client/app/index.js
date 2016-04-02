@@ -5,7 +5,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
 import { createStore, combineReducers, applyMiddleware } from 'redux'
-import GradesApp from './components/GradesApp'
+import GradesApp from './containers/GradesApp'
 
 import reducers from './reducers/reducers'
 

@@ -1,7 +1,9 @@
+import * as Actions from '../constants/actionTypes'
+
 let nextTodoId = 0
 export const addTodo = (text) => {
   return {
-    type: 'ADD_TODO',
+    type: Actions.ADD_TODO,
     id: nextTodoId++,
     text
   }
