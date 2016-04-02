@@ -1,6 +1,0 @@
-Probleme pentru student:
-- nu are un cont de la facultate (sau are probleme cu el), cum se autentifica?
-- daca un profesor nu aproba sau respinge cererea unui student de transfer la o alta grupa, ce se intampla cu cererea acestuia?
-
-Probleme pentru profesor:
-- 

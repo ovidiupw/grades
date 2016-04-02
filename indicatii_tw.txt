@@ -1,7 +1,0 @@
-in momentul in care debifam un eveniment importat(uaic) si  vrem sa alegem alta data pt acel eveniment sa putem verifica(vedea) toate grupele care au materia respectiva in data respectiva(si ora)
-
-Saptamana 9 - evaluare:
-- diagrame uml
-- diagrame use-case
-- arhitectura aplicatiei (wireframe) -> schite pt toate paginile aplicatiei (pot fi direct implementate sau desenate de mana si scanate)
-- specificatii in legatura cu ce a facut fiecare membru al echipei
