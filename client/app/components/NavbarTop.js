@@ -1,4 +1,5 @@
 import { connect } from 'react-redux'
+import React from 'react'
 
 let NavbarTop = React.createClass ({
   render() {
@@ -11,4 +12,4 @@ let NavbarTop = React.createClass ({
 
 NavbarTop = connect()(NavbarTop)
 
-export default FilterLink
+export default NavbarTop

@@ -1,0 +1,1 @@
+Separate worker thread to cleanup database (e.g. for users that have identityConfirmed = false and apiToken expired)

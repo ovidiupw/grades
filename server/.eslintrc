@@ -12,7 +12,7 @@
         },
     },
     "rules": {
-       "indent": [2, "tab", { "SwitchCase": 1 }],
+       // "indent": [2, "tab", { "SwitchCase": 1 }],
        "semi": 2,
        "no-mixed-spaces-and-tabs": 1
     }
