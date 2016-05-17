@@ -2,19 +2,23 @@
   "name": "node-api",
   "main": "server.js",
   "dependencies": {
+    "async": "^2.0.0-rc.3",
     "body-parser": "1.0.2",
     "express": "4.0.0",
     "gulp": "3.9.1",
     "mongodb": "2.1.11",
     "mongoose": "^4.4.10",
+    "nodemailer": "^2.3.2",
     "passport": "^0.3.2",
-    "passport-facebook": "^2.1.0"
+    "passport-facebook": "^2.1.0",
+    "randomstring": "^1.1.4"
   },
   "devDependencies": {
     "babel-eslint": "^6.0.0",
     "chai": "^3.5.0",
     "eslint": "^2.5.1",
     "expect.js": "^0.3.1",
+    "express-logger": "0.0.3",
     "mocha": "^2.4.5",
     "morgan": "^1.7.0",
     "should": "^8.3.0",

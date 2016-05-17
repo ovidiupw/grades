@@ -4,25 +4,27 @@ const assert = require('assert');
 const should = require('should');
 const chai = require('chai');
 
-const DB = require('../app/config/database');
+const DB = require('../../app/config/database');
 const Mongoose = require('mongoose');
 
-const User = require('../app/entities/user');
+const User = require('../../app/entities/user');
 
 Mongoose.connect(DB.TEST_DB);
 
-describe('User entity database operations', function() {
-  describe('Basic Serialization and Deserialization', function() {
+describe('User entity database operations', function () {
+  describe('Basic Serialization and Deserialization', function () {
 
     /* Test preparation */
 
     const SAMPLE_USER = 'ahmedkamakoulkjashdj286731jbhnbjksd';
+    const SAMPLE_USER_2 = '123456@facebook';
+
     let userModel = User.model;
     let user = new userModel({
       user: SAMPLE_USER
     });
 
-    let handleRemoveResult = function(err, removeResult) {
+    let handleRemoveResult = function (err, removeResult) {
       if (err) throw err;
       if (removeResult.result.n !== 0) {
         console.log(`OK. Removed sample user. Cleanup successful!`);
@@ -31,22 +33,21 @@ describe('User entity database operations', function() {
 
     /* Test execution */
 
-    before(function() {
-      userModel.remove({
-        user: SAMPLE_USER
-      }, handleRemoveResult);
+    before(function () {
+      removeSampleUser(SAMPLE_USER);
+      removeSampleUser(SAMPLE_USER_2);
 
-      user.save(function(err) {
+      user.save(function (err) {
         if (err) throw err;
       });
     });
 
     /*******************************************************/
 
-    it('Finds the user in the database', function(done) {
+    it('Finds the user in the database', function (done) {
       userModel.findOne({
         user: SAMPLE_USER
-      }, function(err, foundUser) {
+      }, function (err, foundUser) {
         if (err) throw err;
         assert.equal(foundUser.user, SAMPLE_USER);
         done();
@@ -55,20 +56,20 @@ describe('User entity database operations', function() {
 
     /*******************************************************/
 
-    it('Should require at least the user field on insertion', function(done) {
+    it('Should require at least the user field on insertion', function (done) {
       /* Test for both null and undefined */
 
       user.user = undefined;
-      user.save(function(err) {
+      user.save(function (err) {
         if (!err) {
-          should.fail('User should be required. Check the schema!');
+          done(err);
         }
       });
 
       user.user = null;
-      user.save(function(err) {
+      user.save(function (err) {
         if (!err) {
-          should.fail('User should be required. Check the schema!');
+          done(err);
         }
       });
 
@@ -77,22 +78,20 @@ describe('User entity database operations', function() {
 
     /*******************************************************/
 
-    it('Should insert a new record in the databse, just like a login', function(done) {
+    it('Should insert a new record in the databse, just like a login', function (done) {
       /* Test for both null and undefined */
       let apiKeyExpiration = new Date();
       apiKeyExpiration.setHours(apiKeyExpiration.getHours() + 1);
-      const userIdentity = "123213@facebook";
 
       user = new userModel({
-        user: userIdentity,
-        apiKey: "12345",
+        user: SAMPLE_USER_2,
         keyExpires: apiKeyExpiration,
         identityConfirmed: false
       });
 
-      user.save(function(err) {
+      user.save(function (err) {
         if (err) {
-          should.fail('Save to database failed!');
+          done(err);
         }
       });
 
@@ -101,14 +100,37 @@ describe('User entity database operations', function() {
 
     /*******************************************************/
 
-    after(function() {
-      userModel.remove({
-        user: SAMPLE_USER
-      }, handleRemoveResult);
+    it('Should not validate a facultyIdentity under minimum length.', function (done) {
 
-      userModel.remove({
-        user: "123213@facebook"
-      }, handleRemoveResult);
+      user = new userModel({
+        user: 'abc',
+        facultyIdentity: 'ba' /* Should fail when trying to save */
+      });
+
+      user.save(function (err) {
+        if (!err) {
+          done(err);
+        }
+      });
+
+      done();
     });
+
+    /*******************************************************/
+
+    after(function () {
+      removeSampleUser(SAMPLE_USER);
+      removeSampleUser(SAMPLE_USER_2);
+
+      Mongoose.connection.close();
+      done();
+    });
+
+    let removeSampleUser = function (userName) {
+      userModel.remove({
+        user: userName
+      }, handleRemoveResult);
+    };
+
   });
 });

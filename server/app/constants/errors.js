@@ -35,6 +35,36 @@ const Errors = {
     id: 7,
     message: 'Error: The api key you provided is invalid.',
     data: undefined
+  },
+  IDENTITY_CONFIRMATION_FAILED: {
+    id: 8,
+    message: 'Error: The identity confirmation failed.',
+    data: undefined
+  },
+  ROLE_NOT_FOUND: {
+    id: 9,
+    message: 'Error: The role with the supplied title was not found.',
+    data: undefined
+  },
+  AUTHORIZATION_DATA_NOT_FOUND: {
+    id: 10,
+    message: 'Error: Authorization data not found in request.',
+    data: undefined
+  },
+  NOT_AUTHORIZED: {
+    id: 11,
+    message: 'Error: The supplied user is not authorized to perform this operation.',
+    data: undefined
+  },
+  REGISTRATION_NOT_FOUND: {
+    id: 12,
+    message: 'Error: The registration with the supplied facultyIdentity was not found.',
+    data: undefined
+  },
+  INVALID_ROLE: {
+    id: 13,
+    message: 'Error: A supplied role was invalid - not configured.',
+    data: undefined
   }
 
 };

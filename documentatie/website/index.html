@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="en-RO">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>Grades</title>
+  <link rel="stylesheet" href="scholary.css">
+</head>
+
+<body prefix="schema: http://schema.org/ xsd: http://www.w3.org/2001/XMLSchema# sa: https://ns.science.ai/">
+  <header>
+    <p class="title">Grades</p>
+    <p class="subtitle">University grade management made simple</p>
+  </header>
+
+  <article id="what" typeof="schema:ScholarlyArticle" resource="#">
+    <h1>Grades</h1>
+    <section>
+      <h2></h2>
+      <ol>
+        <li property="schema:author" typeof="sa:ContributorRole">
+          <a property="schema:author" href="#" typeof="schema:Person">
+            <span property="schema:givenName">Ovidiu</span>
+            <span property="schema:familyName">Pricop</span>
+          </a>
+        </li>
+        <li property="schema:author" typeof="sa:ContributorRole">
+          <a property="schema:author" href="#" typeof="schema:Person">
+            <span property="schema:givenName">Adrian</span>
+            <span property="schema:familyName">Butnaru</span>
+          </a>
+        </li>
+        <li property="schema:author" typeof="sa:ContributorRole">
+          <a property="schema:author" href="#" typeof="schema:Person">
+            <span property="schema:givenName">Cristian</span>
+            <span property="schema:familyName">Dorneanu</span>
+          </a>
+        </li>
+        <li property="schema:author" typeof="sa:ContributorRole">
+          <a property="schema:author" href="#" typeof="schema:Person">
+            <span property="schema:givenName">Tiberiu</span>
+            <span property="schema:familyName">Ciuc</span>
+          </a>
+        </li>
+      </ol>
+    </section>
+
+    <section>
+      <h2>Cuprins</h2>
+      <ol role="directory">
+        <li>
+          <a href="#context">
+            Context
+          </a>
+        </li>
+        <li>
+          <a href="#introducere">
+          Introducere
+          </a>
+        </li>
+        <ol>
+          <li>
+            <a href="#motivatie">
+                Motivatie
+              </a>
+          </li>
+          <li>
+            <a href="#actori">
+                Actori
+              </a>
+            <ol>
+              <li>
+                <a href="#studenti">
+                    Studenti
+                  </a>
+              </li>
+              <li>
+                <a href="#profesori">
+                    Profesori
+                  </a>
+              </li>
+              <li>
+                <a href="#administratori">
+                    Administratori
+                  </a>
+              </li>
+            </ol>
+            <li>
+              <a href="#ierarhie-actori">
+                  Ierarhie actori
+                </a>
+            </li>
+          </li>
+        </ol>
+        <li>
+          <a href="#diagrame-use-case">
+              Diagrame use-case
+            </a>
+        </li>
+        <li>
+          <a href="#arhitectura-componentelor">
+              Arhitectura componentelor
+            </a>
+        </li>
+        <li>
+          <a href="#modelarea-bazei-de-date">
+              Modelarea bazei de date
+            </a>
+          <ol>
+            <li>
+              <a href="#context-modelare">
+                  Context
+                </a>
+            </li>
+            <li>
+              <a href="#diagrama-erd">
+                  Diagrama ERD
+                </a>
+            </li>
+            <li>
+              <a href="#colectii">
+                  Colectii
+                </a>
+              <ol>
+                <li>
+                  <a href="#colectie-utilizatori">
+                      Utilizatori
+                    </a>
+                  <ol>
+                    <li>
+                      <a href="#utilizatori-restrictii">
+                          Restrictii
+                        </a>
+                    </li>
+                  </ol>
+                </li>
+                <li>
+                  <a href="#colectie-inregistrari">
+                      Inregistrare
+                    </a>
+                  <ol>
+                    <li>
+                      <a href="#inregistrari-restrictii">
+                          Restrictii
+                        </a>
+                    </li>
+                  </ol>
+                </li>
+                <li>
+                  <a href="#colectie-roluri">
+                      Roluri
+                    </a>
+                  <ol>
+                    <li>
+                      <a href="#roluri-restrictii">
+                          Restrictii
+                        </a>
+                    </li>
+                  </ol>
+                </li>
+                <li>
+                  <a href="#colectie-studenti">
+                      Studenti
+                    </a>
+                  <ol>
+                    <li>
+                      <a href="#studenti-restrictii">
+                          Restrictii
+                        </a>
+                    </li>
+                  </ol>
+                </li>
+                <li>
+                  <a href="#colectie-note">
+                      Note
+                    </a>
+                  <ol>
+                    <li>
+                      <a href="#note-restrictii">
+                          Restrictii
+                        </a>
+                    </li>
+                  </ol>
+                </li>
+                <li>
+                  <a href="#colectie-profesori">
+                      Profesori
+                    </a>
+                  <ol>
+                    <li>
+                      <a href="#profesori-restrictii">
+                          Restrictii
+                        </a>
+                    </li>
+                  </ol>
+                </li>
+                <li>
+                  <a href="#colectie-cursuri">
+                      Cursuri
+                    </a>
+                  <ol>
+                    <li>
+                      <a href="#cursuri-restrictii">
+                          Restrictii
+                        </a>
+                    </li>
+                  </ol>
+                </li>
+                <li>
+                  <a href="#colectie-module">
+                      Module
+                    </a>
+                  <ol>
+                    <li>
+                      <a href="#module-restrictii">
+                          Restrictii
+                        </a>
+                    </li>
+                  </ol>
+                </li>
+            </li>
+            </ol>
+        </li>
+        </ol>
+        </li>
+        <li>
+          <a href="#modelarea-componentelor-aplicatiei">
+            Modelarea componentelor aplicatiei
+          </a>
+          <ol>
+            <li>
+              <a href="#sistemul-de-autentificare">
+                Sistemul de autentificare
+              </a>
+            </li>
+          </ol>
+        </li>
+        </li>
+      </ol>
+    </section>
+
+    <section typeof="sa:Abstract" id="context">
+      <h2>Context</h2>
+      <p>
+        Aplicatia Grades presupune un numar mare de componente functionale pentru a asigura succesul in productie. Este preferabil ca arhitectura sa fie conceputa pe mai multe module. Acest document are ca scop descrierea arhitecturii modulare a aplicatiei Grades,
+        urmarind acoperirea cat mai exhaustiva a modului in care va functiona fiecare unitate a aplicatiei.
+      </p>
+      <p>
+        In prima parte a documentului se va introduce ideea pe care se bazeaza aplicatia Grades. Documentul va continua cu o serie de diagrame care sa prezinte componentele necesare pentru a asigura acoperirea nevoilor sistemului academic in ceea ce priveste
+        notarea studentilor. In final, se va descrie arhitectura fiecarei componente critice pe care se bazeaza aplicatia.
+      </p>
+    </section>
+    <section typeof="sa:Abstract" id="introducere">
+      <h2>Introducere</h2>
+      <section typeof="sa:Abstract" id="motivatie">
+        <h3>Motivatie</h3>
+        <p>
+          În prezent, nu există o platformă rezervată facultății care să centralizeze notele puse de către profesori la evaluările de pe parcursul semestrului și să ofere studenților o modalitate de a le vizualiza. In acest context, se dorește înștiințarea studenților
+          în legătură cu situația academica personală. Se urmareste evitarea situațiilor în care studentul trebuie să viziteze numeroase site-uri ale materiilor în vederea vizualizarii notelor. Informațiile legate de notare se vor transfera în mod eficient
+          în cadrul aplicației.
+        </p>
+        <p>
+          Pe scurt, aplicatia "Grades" propune înlăturarea problemelor din sistemul actual de notare prin punerea la dispozitie a unei platforme web.
+        </p>
+      </section>
+      <section typeof="sa:Abstract" id="actori">
+        <h3>Actori</h3>
+        <p>
+          Aplicatia Grades este destinata mediului academic. Astfel, principalii actori vor fi profesorii, studentii si personalul administrativ (decan, secretar, etc.). In continuare, vom trece in revista ce va reprezenta aplicatia pentru fiecare actor critic
+          in sistemul de evaluare.
+        </p>
+      </section>
+      <section typeof="sa:Abstract" id="studenti">
+        <h4>Studenti</h4>
+        <p>
+          Studentii vor beneficia de aplicatia Grades prin faptul ca isi vor putea urmari situatia evaluarilor intr-un singur loc, evitand situatiile in care ar trebui sa urmareasca mai multe site-uri simultan pentru a-si afla rezultatele de pe parcursul semestrului.
+          De asemenea, studentii vor putea alege sa fie instiintati atunci cand li se va pune o nota, economisind timp prin evitarea verificarii periodice a site-urilor profesorilor pentru a afla daca s-au afisat sau nu rezultatele urmarite.
+        </p>
+        <p>
+          Initial, pentru a accesa aplicatia, studentul va trebui sa se conecteze utilizand un cont personal (Google, Facebook, etc.), iar, apoi, sa isi confirme identitatea in cadrul facultatii (mai multe detalii la sectiunea detaliata a arhitecturii autentificarii).
+          Odata autentificat, studentul va putea sa isi vizualizeze situatia personala la materiile la care este inscris (promovate sau nepromovate), aplicatia permitand utilizatorului sa isi vizualizeze si istoricul.
+        </p>
+        <p>
+          Studentul va avea:
+          <ul>
+            <li>
+              <p>Abilitatea de a alege daca primeste sau nu notificari prin email</p>
+            </li>
+            <li>
+              <p>Posibilitatea de a solicita un transfer de la o grupa la alta</p>
+            </li>
+            <li>
+              <p>Posibilitatea de a solicita reevaluarea unei lucrari</p>
+            </li>
+          </ul>
+        </p>
+        <figure typeof="sa:Image">
+          <img src="./images/student.png">
+          <figcaption>
+            <p class="pcentered">"Diagrama use-case pentru studenti"</p>
+          </figcaption>
+        </figure>
+      </section>
+      <section typeof="sa:Abstract" id="profesori">
+        <h4>Profesori</h4>
+        <p>
+          Fiecare profesor va fi asociat, in prealabil, de catre un administrator, cu o serie de materii si o serie de grupe. De asemenea, fiecare profesor va avea un rol, care va stabili drepturile sale in cadrul evaluarii materiei. Printre rolurile comune, se
+          numara cel de titular al materiei, profesor la curs si profesor la seminar/laborator. De exemplu, profesorul titular va avea dreptul si obligatia de a seta modalitatea de evaluare a materiilor pentru care este responsabil. Profesorul va putea
+          avea, suplimentar (nu si mutual exclusiv) alte roluri, precum cel de profesor la seminar. In mod similar, un profesor de laborator va putea fi si profesor la curs, fara a fi titular.
+        </p>
+        <p>
+          Profesorul va putea pune note studentilor de la grupele pentru care este responsabil si va putea edita notele deja puse (in caz ca doreste sa repete o evaluare, sau in caz ca o nota s-a modificat in urma unei contestatii sau mariri). De asemenea, profesorul
+          va putea, in functie de rol, sa accepte sau sa refuze cereri de transfer si sa fie instiintat despre studentii care doresc sa fie reevaluati. Profesorul va putea opta si pentru notificari prin email de anumite evenimente de interes.
+        </p>
+        <figure typeof="sa:Image">
+          <img src="./images/profesori.png">
+          <figcaption>
+            <p class="pcentered">"Diagrama use-case pentru profesori"</p>
+          </figcaption>
+        </figure>
+      </section>
+      <section typeof="sa:Abstract" id="administratori">
+        <h4>Administratori</h4>
+        <p>
+          Administratorii se vor ocupa de gestionarea profesorilor si studentilor. Administratorii vor avea asociat un rol care le va da anumite drepturi in cadrul aplicatiei. Unul dintre rolurile de baza ale unui administrator va fi cel de a adauga personal in
+          aplicatie. Personalul poate fi reprezentat atat de studenti, cat si de profesori sau alti administratori.
+        </p>
+        <p>
+          Structura initiala ierarhica, bazata pe roluri si permisiuni, va fi stabilita tot de catre un administrator. Astfel, un administrator va putea adauga, actualiza sau sterge studenti sau profesori, alti administratori si va putea stabili in ce an, grupa,
+          etc. este fiecare student si la ce materii preda un profesor (inclusiv rolul de titular, profesor la laborator, etc.).
+        </p>
+        <p>
+          Administratorii vor putea vizualiza situatia notelor studentilor din toti anii, in functie de drepturi (de exemplu, rolul de secretar sau decan).
+        </p>
+        <figure typeof="sa:Image">
+          <img src="./images/administratori.png">
+          <figcaption>
+            <p class="pcentered">"Diagrama use-case pentru administratori"</p>
+          </figcaption>
+        </figure>
+      </section>
+      <section typeof="sa:Abstract" id="ierarhie-actori">
+        <h3>Ierarhie actori</h3>
+        <figure typeof="sa:Image">
+          <img src="./images/ierarhie.png">
+          <figcaption>
+            <p class="pcentered">"Ierarhia utilizatorilor aplicatiei"</p>
+          </figcaption>
+        </figure>
+      </section>
+    </section>
+    <section typeof="sa:Abstract" id="arhitectura-componentelor">
+      <h2>Diagrama Componente</h2>
+      <figure typeof="sa:Image">
+        <img src="./images/DiagramaComponenteGrades.svg">
+        <figcaption>
+          <p class="pcentered">"Arhitectura componentelor aplicatiei"</p>
+        </figcaption>
+      </figure>
+    </section>
+    </section>
+    <section typeof="sa:Abstract" id="modelarea-bazei-de-date">
+      <h2>Modelarea bazei de date</h2>
+      <section typeof="sa:Abstract" id="context-modelare">
+        <h3>Context</h3>
+        <p>
+          Aplicatia Grades lucreaza cu date ce au caracter persistent (date studenti, profesori, permisiuni, situatii evaluari, modalitati evaluari, etc.). Pentru a stoca aceste date, se va utiliza o baza de date modelata special pentru a acomoda cerintele aplicatiei.
+          Baza de date va fi realizata utilizand MongoDB si va cuprinde urmatoarele entitati:
+        </p>
+        <ul>
+          <li>
+            Utilizatori
+          </li>
+          <li>
+            Inregistrari
+          </li>
+          <li>
+            Studenti
+          </li>
+          <li>
+            Profesori
+          </li>
+          <li>
+            Permisiuni
+          </li>
+          <li>
+            Module (evaluare)
+          </li>
+          <li>
+            Note
+          </li>
+          <li>
+            Cursuri
+          </li>
+        </ul>
+        <p>
+          In continuare, vom realiza o scurta prezentare a fiecarei entitati enumerate mai sus.
+        </p>
+      </section>
+      <section typeof="sa:Abstract" id="diagrama-erd">
+        <h3>Diagrama ERD</h3>
+        <figure typeof="sa:Image">
+          <img src="./images/GradesDatabase.svg">
+          <figcaption>
+            <p class="pcentered">"Diagrama ERD"</p>
+          </figcaption>
+        </figure>
+      </section>
+      <section typeof="sa:Abstract" id="colectii">
+        <h3>Colectii</h3>
+        <section typeof="sa:Abstract" id="colectie-utilizatori">
+          <h4>Utilizatori</h4>
+          <p>
+            Indiferent de rolul pe care il are in aplicatie (profesor, student, administrator, etc.), o persoana care foloseste aplicatia este, inainte de toate, un utilizator. Din motive de securitate, fiecare utilizator trebuie sa fie inregistrat si autentificat,
+            inainte sa poata primi drepturi pentru a accesa modulele dorite.
+          </p>
+          <p>
+            Un utilizator nou creat va avea doar campul “user” completat, iar campul “identityConfirmed” va fi fals. Utilizatorul va primi pe adresa furnizata in procesul de logare un email de confirmare ce va contine un cod, in cazul in care emailul este prezent
+            in colectie “Inregistrare” (adica rolurile i-au fost deja configurate). Prin introducerea codului secret primit pe adresa de email ce ii confirma identitatea in facultate, contul utilizatorului va deveni confirmat si i se vor asocia o serie
+            de roluri (permisiuni).
+          </p>
+          <p>
+            Colectia “Utilizatori” este definita astfel:
+          </p>
+          <figure typeof="sa:Table">
+            <table>
+              <tr>
+                <th>Nume atribut</th>
+                <th>Tip atribut</th>
+                <th>Descriere atribut</th>
+              </tr>
+              <tr>
+                <td>user</td>
+                <td>String</td>
+                <td>adresa de email pe care utilizatorul o foloseste la logare</td>
+              </tr>
+              <tr>
+                <td>facultyIdentity</td>
+                <td>String</td>
+                <td>identitatea utilizatorului in cadrul facultatii, adica o adresa de email pe care facultatea si utilizatorul au stabilit-o (de exemplu, webmail); utilizata pentru a asocia un set de roluri unui cont creat si confirmat</td>
+              </tr>
+              <tr>
+                <td>apiKey</td>
+                <td>String</td>
+                <td>odata autentificat, utilizatorului i se va trimite o cheie asociata cu contul sau, care ii va permite serverului sa autorizeze fiecare cerere venita din partea utilizatorului</td>
+              </tr>
+              <tr>
+                <td>keyExpires</td>
+                <td>Date</td>
+                <td>cheia asociata contului utilizatorului este valabila, din motive de securitate, o perioada scurta de timp (de exemplu, o ora)</td>
+              </tr>
+              <tr>
+                <td>idenityConfirmed</td>
+                <td>Boolean</td>
+                <td>contul va fi confirmat doar in cazul in care utilizatorul isi va confirma identitatea in cadrul aplicatiei; confirmarea identitatii se va face printr-un mecanism “2-way authentication”, descris, in acest document, la sectiunea “Autentificare”</td>
+              </tr>
+            </table>
+            <caption>Descriere tabela "Users"</caption>
+          </figure>
+        </section>
+        <section typeof="sa:Abstract" id="utilizatori-restrictii">
+          <h5>Restrictii</h5>
+          <figure typeof="sa:Table">
+            <table>
+              <tr>
+                <th>Unique</th>
+                <th>Required</th>
+                <th>Index</th>
+              </tr>
+              <tr>
+                <td>user</td>
+                <td>user</td>
+                <td>user</td>
+              </tr>
+            </table>
+            <caption>Restrictii tabela "Users"</caption>
+        </section>
+
+        <section typeof="sa:Abstract" id="colectie-inregistrari">
+          <h4>Inregistrare</h4>
+          <p>
+            Fiecare utilizator va trebui sa isi creeze un cont. Identitatea utilizatorului trebuie verificata pentru a fi siguri ca ea concide cu cea inregistrata la facultate. Este necesar un sistem de asociere a identitatii de la facultate cu un rol care sa ofere
+            permisiuni utilizatorului cu acea identitate. Verificarea presupune, doar la crearea unui cont nou, o metoda de tip “2-way-authentication” care verifica identitatea utilizatorului prin intermediul unui cont de email inregistrat de facultate,
+            unde va fi trimisa un cod de confirmare. Codul de confirmare va trebui introdus de catre utilizator pentru a finaliza procedura de inregistrare.
+          </p>
+          <p>
+            Colectia Inregistrari este definita astfel:
+          </p>
+          <figure typeof="sa:Table">
+            <table>
+              <tr>
+                <th>Nume atribut</th>
+                <th>Tip atribut</th>
+                <th>Descriere atribut</th>
+              </tr>
+              <tr>
+                <td>facultyIdentity</td>
+                <td>String</td>
+                <td>identitatea utilizatorului in cadrul facultatii, adica o adresa de email pe care facultatea si utilizatorul au stabilit-o (de exemplu, webmail); utilizata pentru a asocia un set de roluri unui cont creat si confirmat</td>
+              </tr>
+              <tr>
+                <td>roles</td>
+                <td>String</td>
+                <td>rolurile pe care utilizatorul le are in cadrul aplicatiei; unui rol ii sunt asociate o serie de permisiuni; rolul face legatura cu titlul rolului din colectia “Roluri”, unde sunt specificate si actiunile permise; este necesar sa avem mai
+                  multe roluri (o lista) pentru a acoperi cazul in care, de exemplu, un masterand/doctorand este si profesor in cadrul facultatii</td>
+              </tr>
+              <tr>
+                <td>identitySecret</td>
+                <td>String</td>
+                <td>codul secret pe care utilizatorul va trebui sa il introduca, dupa ce s-a autentificat cu un cont personal, pentru a-si confirma identitatea cu cea din facultate</td>
+              </tr>
+            </table>
+            <caption>Descriere tabela "Inregistrari"</caption>
+          </figure>
+        </section>
+        <section typeof="sa:Abstract" id="inregistrari-restrictii">
+          <h5>Restrictii</h5>
+          <figure typeof="sa:Table">
+            <table>
+              <tr>
+                <th>Unique</th>
+                <th>Required</th>
+                <th>Index</th>
+              </tr>
+              <tr>
+                <td>facultyIdentity</td>
+                <td>facultyIdentity</td>
+                <td>facultyIdentity</td>
+              </tr>
+            </table>
+            <caption>Restrictii tabela "Inregistrari"</caption>
+        </section>
+        <section typeof="sa:Abstract" id="colectie-roluri">
+          <h4>Roluri</h4>
+          <p>
+            Fiecare utilizator al aplicatiei are anumite drepturi. Aceste drepturi ii permit unui utilizator sa acceseze anumite sub-categorii ale api-ului pus la dispozitie de catre aplicatie. Un rol reprezinta o grupare de drepturi (permisiuni), careia ii este
+            asociata un nume.
+          </p>
+          <p>
+            Colectia Roluri este definita astfel:
+          </p>
+          <figure typeof="sa:Table">
+            <table>
+              <tr>
+                <th>Nume atribut</th>
+                <th>Tip atribut</th>
+                <th>Descriere atribut</th>
+              </tr>
+              <tr>
+                <td>title</td>
+                <td>String</td>
+                <td>titlul rolului; reprezinta doar un alias pentru seria de permisiuni (actiuni) asociate</td>
+              </tr>
+              <tr>
+                <td>actions</td>
+                <td>Array</td>
+                <td>[verb (String, ex: GET, PUT, etc.), resource (String, ex: /studenti/:id/note)] - permisiunile (actiunile) asociate acestui titlu de rol; permisiunile reprezinta siruri de caractere prin care aplicatia sa poata extrage informatii precum
+                  “rolul x are permisiune de GET si PUT pe resursa /studenti/note</td>
+              </tr>
+            </table>
+            <caption>Descriere tabela "Roluri"</caption>
+          </figure>
+        </section>
+        <section typeof="sa:Abstract" id="roluri-restrictii">
+          <h5>Restrictii</h5>
+          <figure typeof="sa:Table">
+            <table>
+              <tr>
+                <th>Unique</th>
+                <th>Required</th>
+                <th>Index</th>
+              </tr>
+              <tr>
+                <td>title</td>
+                <td>title</td>
+                <td>title</td>
+              </tr>
+            </table>
+            <caption>Restrictii tabela "Roluri"</caption>
+        </section>
+        <section typeof="sa:Abstract" id="colectie-studenti">
+          <h4>Studenti</h4>
+          <p>
+            Studentii reprezinta o categorie speciala de utilizatori, ei reprezentand un actor “critic” in cadrul aplicatiei (aplicatia nu ar avea sens fara studenti). Fiecare student este identificat in mod unic prin numarul sau matricol si trebuie sa apartina unui
+            an (de exemplu licenta_1,master_2) si unei grupe (de exemplu A4, X1). Un student poate avea atribute aditionale precum “data nasterii”.
+          </p>
+          <p>
+            Colectia Studenti este definita astfel:
+          </p>
+          <figure typeof="sa:Table">
+            <table>
+              <tr>
+                <th>Nume atribut</th>
+                <th>Tip atribut</th>
+                <th>Descriere atribut</th>
+              </tr>
+              <tr>
+                <td>facultyIdentity</td>
+                <td>String</td>
+                <td>fiecare student va avea asociat un cont de email stabilit de comun acord cu facultatea care va stabili identitatea studentului in cadrul facultatii</td>
+              </tr>
+              <tr>
+                <td>registrationNumber</td>
+                <td>String</td>
+                <td>numarul matricol al studentului</td>
+              </tr>
+              <tr>
+                <td>birthDate</td>
+                <td>date</td>
+                <td>data nasterii studentului</td>
+              </tr>
+              <tr>
+                <td>academicYear</td>
+                <td>String</td>
+                <td>anul in care se afla studentul; este un sir de caractere precum “licenta_1”, “master_2” sau “doctorat_1”</td>
+              </tr>
+              <tr>
+                <td>academicGroup</td>
+                <td>String</td>
+                <td>grupa in care este studentul; exemple: “A4”, “X1”</td>
+              </tr>
+            </table>
+            <caption>Descriere tabela "Studenti"</caption>
+          </figure>
+        </section>
+        <section typeof="sa:Abstract" id="studenti-restrictii">
+          <h5>Restrictii</h5>
+          <figure typeof="sa:Table">
+            <table>
+              <tr>
+                <th>Unique</th>
+                <th>Required</th>
+                <th>Index</th>
+              </tr>
+              <tr>
+                <td>user, registrationNumber</td>
+                <td>facultyIdentity, registrationNumber,birthDate,academicYear,academicGroup</td>
+                <td>User, facultyIdentity, academicYear, academicGroup</td>
+              </tr>
+            </table>
+            <caption>Restrictii tabela "Studenti"</caption>
+        </section>
+        <section typeof="sa:Abstract" id="colectie-note">
+          <h4>Note</h4>
+          <p>
+            Fiecare student va avea o serie de note. Conceptul aplicatiei sustine crearea dinamica a modulelor evaluarii, astfel incat fiecare nota va apartine unei materii si, implicit, unui modul al acelei materii. Notele apartin doar studentilor, iar legatura
+            intre un student si notele sale se face prin intermediul numarului matricol. Un student poate promova sau nu o materie, asa ca acest lucru trebuie inscris in baza de date.
+          </p>
+          <p>
+            Colectia Note este definita astfel:
+          </p>
+          <figure typeof="sa:Table">
+            <table>
+              <tr>
+                <th>Nume atribut</th>
+                <th>Tip atribut</th>
+                <th>Descriere atribut</th>
+              </tr>
+              <tr>
+                <td>registrationNumber</td>
+                <td>String</td>
+                <td>notele pot apartine doar unui student, asa ca vom identifica notele unui student pe baza numarului sau matricol</td>
+              </tr>
+              <tr>
+                <td>courseId</td>
+                <td>String</td>
+                <td>identificatorul cursului (materiei) la care un student a primit o nota</td>
+              </tr>
+              <tr>
+                <td>moduleId</td>
+                <td>String</td>
+                <td>identificatorul modulului cursului (materiei) la care un student a primit on nota</td>
+              </tr>
+              <tr>
+                <td>promoted</td>
+                <td>Boolean</td>
+                <td>indica daca studentul a promovat sau nu modulul cu id-ul moduleId</td>
+              </tr>
+              <tr>
+                <td>grades</td>
+                <td>Array</td>
+                <td>[value (Double, valoarea notei (pozitiva sau negativa)), date (Date, data la care a fost pusa nota] - notele (intr-o lista) obtinute de studentul cu numarul matricol curent, la cursul si modulul curent (cu id-urile specificate)</td>
+              </tr>
+            </table>
+            <caption>Descriere tabela "Note"</caption>
+          </figure>
+        </section>
+        <section typeof="sa:Abstract" id="note-restrictii">
+          <h5>Restrictii</h5>
+          <figure typeof="sa:Table">
+            <table>
+              <tr>
+                <th>Unique</th>
+                <th>Required</th>
+                <th>Index</th>
+              </tr>
+              <tr>
+                <td></td>
+                <td>registrationNumber, courseId, moduleId, grades</td>
+                <td>registrationNumber, (coureId, moduleId) - Index compus, format din cele doua campuri, strict in acea ordine</td>
+              </tr>
+            </table>
+            <caption>Restrictii tabela "Note"</caption>
+        </section>
+        <section typeof="sa:Abstract" id="colectie-profesori">
+          <h4>Profesori</h4>
+          <p>
+            Profesorii reprezinta o categorie speciala de utilizatori. Entitatea “Profesori” este speciala in cadrul aplicatiei. Fiecare profesor are asociat un grad didactic, ii este repartizata o materie si o serie de grupe.
+          </p>
+          <p>
+            Colectia Profesori este definita astfel:
+          </p>
+          <figure typeof="sa:Table">
+            <table>
+              <tr>
+                <th>Nume atribut</th>
+                <th>Tip atribut</th>
+                <th>Descriere atribut</th>
+              </tr>
+              <tr>
+                <td>user</td>
+                <td>String</td>
+                <td>un profesor este un utilizator; acest camp face legatura intre utilizator si identitatea sa de profesor</td>
+              </tr>
+              <tr>
+                <td>facultyIdentity</td>
+                <td>String</td>
+                <td>fiecare profesor va avea asociat un cont de email stabilit de comun acord cu facultatea care va stabili identitatea profesorului in cadrul facultatii</td>
+              </tr>
+              <tr>
+                <td>gradDidactic</td>
+                <td>String</td>
+                <td>gradul didactic al profesorului</td>
+              </tr>
+              <tr>
+                <td>courses</td>
+                <td>Array</td>
+                <td>[courseId (String, id-ul cursului predat de profesor), academicGroups (String, grupele (intr-o lista) de la cursul specificat pentru care profesorul este responsabil)]</td>
+              </tr>
+            </table>
+            <caption>Descriere tabela "Profesori"</caption>
+          </figure>
+        </section>
+        <section typeof="sa:Abstract" id="profesori-restrictii">
+          <h5>Restrictii</h5>
+          <figure typeof="sa:Table">
+            <table>
+              <tr>
+                <th>Unique</th>
+                <th>Required</th>
+                <th>Index</th>
+              </tr>
+              <tr>
+                <td>user</td>
+                <td>facultyIdentity, courses, gradDidactic</td>
+                <td>user, facultyIdentity</td>
+              </tr>
+            </table>
+            <caption>Restrictii tabela "Profesori"</caption>
+        </section>
+        <section typeof="sa:Abstract" id="colectie-cursuri">
+          <h4>Cursuri</h4>
+          <p>
+            Fiecare profesor va ave asociate anumite cursuri. In mod similar, fiecare student va fi evaluat la anumite cursuri. Fiecare curs fi identificat unic printr-un id, va avea un titlu asociat, un an si un semestru. Pentru ca un student sa poata fi evaluat
+            la un curs, acel curs va trebui sa aiba o modalitate de evaluare definita anterior.
+          </p>
+          <p>
+            Colectia Cursuri este definita astfel:
+          </p>
+          <figure typeof="sa:Table">
+            <table>
+              <tr>
+                <th>Nume atribut</th>
+                <th>Tip atribut</th>
+                <th>Descriere atribut</th>
+              </tr>
+              <tr>
+                <td>courseId</td>
+                <td>String</td>
+                <td>identificatorul unic al cursurlui</td>
+              </tr>
+              <tr>
+                <td>title</td>
+                <td>String</td>
+                <td>titlul cursului</td>
+              </tr>
+              <tr>
+                <td>year</td>
+                <td>String</td>
+                <td>anul caruia ii este destinat cursul</td>
+              </tr>
+              <tr>
+                <td>evaluation</td>
+                <td>String</td>
+                <td>formula evaluarii; acest camp va cuprinde operatii aritmetice pe identificatori (id-uri) de module (de exemplu: (2*modul_curs + 2*modul_seminar)/4)</td>
+              </tr>
+            </table>
+            <caption>Descriere tabela "Cursuri"</caption>
+          </figure>
+        </section>
+        <section typeof="sa:Abstract" id="cursuri-restrictii">
+          <h5>Restrictii</h5>
+          <figure typeof="sa:Table">
+            <table>
+              <tr>
+                <th>Unique</th>
+                <th>Required</th>
+                <th>Index</th>
+              </tr>
+              <tr>
+                <td>courseId</td>
+                <td>courseId, semester, title, year</td>
+                <td>courseId, (year, semester)</td>
+              </tr>
+            </table>
+            <caption>Restrictii tabela "Cursuri"</caption>
+        </section>
+        <section typeof="sa:Abstract" id="colectie-module">
+          <h4>Module</h4>
+          <p>
+            Intrucat aplicatia va suporta definirea modalitatii de evaluare la un anumit curs de catre profesorul titular corespunzator, este necesara abstractizarea notiunii de modul evaluat. Un modul apartine unui curs si contribuie, prin formula evaluarii acelui
+            curs, la nota finala a studentului. Cand nota finala a studentului depaseste pragul minim pentru fiecare modul, acesta promoveaza materia.
+          </p>
+          <p>
+            Modalitatea de evaluare va putea aplica o formula pe unul sau mai multe module. Un modul are un identificator unic si o formula de evaluare, care poate fi aplicata, precum formula evaluarii cursului, doar ca recursiv, pe alte submodule. De asemenea, un
+            modul va avea un prag minim de promovare si un punctaj maxim.
+          </p>
+          <p>
+            Colectia Module este definita astfel:
+          </p>
+          <figure typeof="sa:Table">
+            <table>
+              <tr>
+                <th>Nume atribut</th>
+                <th>Tip atribut</th>
+                <th>Descriere atribut</th>
+              </tr>
+              <tr>
+                <td>moduleId</td>
+                <td>String</td>
+                <td>identificatorul unic al modulului</td>
+              </tr>
+              <tr>
+                <td>title</td>
+                <td>String</td>
+                <td>denumirea caracteristica a modulului</td>
+              </tr>
+              <tr>
+                <td>minToPromote</td>
+                <td>String</td>
+                <td>punctajul minim care asigura promovarea acestui modul</td>
+              </tr>
+              <tr>
+                <td>formula</td>
+                <td>String</td>
+                <td>formula dupa care se evalueaza punctajul acestui modul (de exemplu 2*alt_modul + ½*sub_modul)</td>
+              </tr>
+              <tr>
+                <td>min</td>
+                <td>Double</td>
+                <td>punctajul minim care poate fi atribuit acestui modul</td>
+              </tr>
+              <tr>
+                <td>max</td>
+                <td>Double</td>
+                <td>punctajul maxim care poate fi atribuit acestui modul</td>
+              </tr>
+            </table>
+            <caption>Descriere tabela "Module"</caption>
+          </figure>
+        </section>
+        <section typeof="sa:Abstract" id="module-restrictii">
+          <h5>Restrictii</h5>
+          <figure typeof="sa:Table">
+            <table>
+              <tr>
+                <th>Unique</th>
+                <th>Required</th>
+                <th>Index</th>
+              </tr>
+              <tr>
+                <td>moduleId</td>
+                <td>moduleId, formula, min, max</td>
+                <td>moduleId</td>
+              </tr>
+            </table>
+            <caption>Restrictii tabela "Module"</caption>
+        </section>
+      </section>
+    </section>
+    <section typeof="sa:Abstract" id="modelarea-componentelor-aplicatiei">
+      <h2>Modelarea componentelor aplicatiei</h2>
+      <section typeof="sa:Abstract" id="sistemul-de-autentificare">
+        <h3>Sistemul de autentificare</h3>
+        <p>
+          Autentificarea se va realiza prin intermediul unui cont extern, via OAuth. Utilizatorul isi va introduce credentialele pentru a accesa contul extern (ex: facebook) si va trebui sa dea permisiuni aplicatiei pentru a-i accesa detaliile publice (id unic
+          al utilizatorului, nume, prenume). Acolo unde este cazul, contul extern trebuie sa fie verificat in prealabil, pentru a evita utilizarea conturilor ‘fantoma’ in cadrul aplicatiei. Odata autentificat cu serviciul extern, utilizatorului i se vor
+          atribui un nume si o cheie pe care o va putea utiliza pentru a accesa aplicatia Grades, cheie ce are valabilitate limitata (ex: o ora). Toate cererile ulterioare catre APIul oferit de aplicatia Grades vor trebui sa contina numele de utilizator
+          si cheia obtinute in procesul de autentificare. Desigur, pentru a putea oferi permisiuni granulare fiecarui utilizator in parte, va trebui ca acestuia sa ii fie asociate roluri. Rolurile se pot obtine prin confirmarea identitatii utilizatorului
+          autentificat printr-un cont valabil, stabilit, in prealabil, cu facultatea. Asadar, un utilizator nu va putea accesa niciun alt endpoint al APIului fara sa isi confirme identitatea. Odata identitatea asociata cu numele de cont, utilizatorul
+          va primi permisiunile ce i-au fost atribuite de catre personalul facultatii.
+        </p>
+        <figure typeof="sa:Image">
+          <img src="./images/Sistemuldelogin.svg" />
+          <figcaption>
+            <p class="pcentered">"Diagrama use-case pentru administratori"</p>
+          </figcaption>
+        </figure>
+      </section>
+      <section typeof="sa:Abstract" id="sistemul-de-permisiuni">
+        <h3>Sistemul de permisiuni</h3>
+        <p>
+          Autentificarea va stabili identitatea utilizatorului in aplicatie. Odata ce aceasta identitate va fi asociata cu o identitate autorizata de facultate (ex: confirmarea contului prin webmail), utilizatorului i se vor da anumite drepturi. Multimea de drepturi
+          trebuie stabilita, in prealabil, de catre personalul administrativ al facultatii si va fi memorata in baza de date. Cand utilizatorul asociaza identitatea proprie cu cea din cadrul facultatii, drepturile ii sunt asociate automat. Pe baza drepturilor
+          sale, utilizatorul poate folosi anumite resurse ale API-ului pus la dispozitie de aplicatia Grades. Caracterul ierarhic al asumarii raspunderilor in cadrul facultatii presupune ca, in fiecare caz, rolurile unui utilizator sa fie stabilite de
+          catre un superior - superiorul este si cel care il adauga pe utilizator in aplicatie (ex: secretariatula adauga studenti, decanul adauga profesori).
+        </p>
+      </section>
+      <section typeof="sa:Abstract" id="sistemul-de-notare">
+        <h3>Sistemul de notare</h3>
+        <p>
+          Avand in vedere caracterul volatil al modalitatilor de notare din cadrul universitar, aplicatia Grades va suporta definirea unui sistem independent de notare pentru fiecare materie in parte, care sa acomodeze exigentele din fisa cerintelor.
+        </p>
+        <p>
+          Componenta principala a sistemului de notare este modulul. Un modul, in cea mai simpla forma, reprezinta o unitate de notare (ex: test-1 laborator POO). Modulul are drept caracteristici o nota minima si o nota maxima (ex: la test se poate lua minim nota
+          0 si maxim nota 60). Evident, in mod real, nu se intalnesc situatii in care nota la o anumita materie sa fie determinata de un singur modul. Prin urmare, aplicatia Grades suporta definirea notei unui modul in functie de alte module prin aplicarea
+          unei formule. Modulul are, in continuare, o nota minima si o nota maxima, dar evaluarea notei se face pe baza unei formule in care variabilele reprezinta alte module. De asemenea, un modul va avea, drept caracteristica, o nota minima de promovare.
+          Daca in urma evaluarii formulei, nota unui student la un anumit modul nu va fi mai mare decat minimul de promovare, studentul nu va promova acel modul.
+        </p>
+      </section>
+    </section>
+  </article>
+</body>
+
+</html>

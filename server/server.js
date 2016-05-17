@@ -2,6 +2,7 @@
 // get the packages we need ============
 // =======================
 var express     = require('express');
+var logger = require('express-logger');
 var app         = express();
 var bodyParser  = require('body-parser');
 var morgan      = require('morgan');
@@ -36,6 +37,7 @@ passport.deserializeUser(function(user, done) {
   done(null, user);
 });
 
+app.use(logger({path: "express_logfile.txt"}));
 /* app.use(app.router) with passport */
 require('./app/routes.js')(app, passport);
 

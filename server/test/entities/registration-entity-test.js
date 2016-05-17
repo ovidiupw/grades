@@ -4,14 +4,14 @@ const assert = require('assert');
 const should = require('should');
 const chai = require('chai');
 
-const DB = require('../app/config/database');
+const DB = require('../../app/config/database');
 const Mongoose = require('mongoose');
 
-const Registration = require('../app/entities/registration');
+const Registration = require('../../app/entities/registration');
 
 Mongoose.connect(DB.TEST_DB);
 
-describe('Registration entity serialization and deserialization', function() {
+describe('Registration entity serialization and deserialization', function () {
   const SAMPLE_IDENTITY = "a.b@c.d";
   const SAMPLE_IDENTITY_2 = "asdkj@.cd.c";
 
@@ -19,7 +19,7 @@ describe('Registration entity serialization and deserialization', function() {
     facultyIdentity: SAMPLE_IDENTITY
   });
 
-  let handleRemoveResult = function(err, removeResult) {
+  let handleRemoveResult = function (err, removeResult) {
     if (err) throw err;
     if (removeResult.result.n !== 0) {
       console.log(`OK. Removed sample identity. Cleanup successful!`);
@@ -28,42 +28,60 @@ describe('Registration entity serialization and deserialization', function() {
 
   /* Test execution */
 
-  before(function() {
+  before(function () {
     Registration.model.remove({
       facultyIdentity: SAMPLE_IDENTITY
     }, handleRemoveResult);
 
-    registration.save(function(err) {
+    registration.save(function (err) {
       if (err) throw err;
     });
   });
 
   /*******************************************************/
 
-  it('Finds the registration via identity in the database', function(done) {
-    Registration.model.findOne({
-      facultyIdentity: SAMPLE_IDENTITY
-    }, function(err, foundRegistration) {
-      if (err) throw err;
-      assert.equal(foundRegistration.facultyIdentity, SAMPLE_IDENTITY);
-      done();
-    });
+  it('Generates a random numeric string correctly in the database', function (done) {
+    registration.generateIdentitySecret(
+      function (err) {
+        if (err) {
+          done(err);
+        }
+      },
+      function () { /* success ignored */
+      }
+    );
+
+    Registration.model.findByFacultyIdentity(
+      registration.facultyIdentity,
+      function (foundRegistration) {
+        if (foundRegistration) {
+          assert(foundRegistration.identitySecret != null);
+          done();
+        } else {
+          done("Registration not found");
+        }
+
+      },
+      function (err) {
+        done(err);
+      }
+    );
   });
 
   /*******************************************************/
 
-  it('Should require at least the faculty identity field on insertion', function(done) {
+  it('Should require at least the faculty identity field on insertion', function (done) {
     /* Test for both null and undefined */
 
     registration.facultyIdentity = undefined;
-    registration.save(function(err) {
+    registration.save(function (err) {
       if (!err) {
         should.fail('Faculty identity should be required. Check the schema!');
       }
     });
 
     registration.facultyIdentity = null;
-    registration.save(function(err) {
+    registration.save(function (err) {
       if (!err) {
         should.fail('User is should be required. Check the schema!');
       }
@@ -74,19 +92,19 @@ describe('Registration entity serialization and deserialization', function() {
 
   /*******************************************************/
 
-  it('Should serialize and deserialze a full registration', function(done) {
+  it('Should serialize and deserialze a full registration', function (done) {
     let registration = new Registration.model({
       facultyIdentity: SAMPLE_IDENTITY_2,
       roles: ["decan", "secretar"],
       identitySecret: ["28374612"]
     });
 
-    registration.save(function(err) {
+    registration.save(function (err) {
       if (err) should.fail('Failed when saving sample_identity_2 in the database.');
     });
 
-    Registration.model.findOne({ facultyIdentity: SAMPLE_IDENTITY_2 },
-      function(err, foundRegistration) {
+    Registration.model.findOne({facultyIdentity: SAMPLE_IDENTITY_2},
+      function (err, foundRegistration) {
         if (err) should.fail('Failed when finding sample_identity_2 in the database.');
         if (!foundRegistration) {
           should.fail('Should have found a registration in the database');
@@ -101,18 +119,34 @@ describe('Registration entity serialization and deserialization', function() {
     );
   });
 
+  /*******************************************************/
+
+  it('Finds a registration based on facultyIdentity using findByFacultyIdentity', function (done) {
+    Registration.model.findByFacultyIdentity(
+      SAMPLE_IDENTITY,
+      function (foundRegistration) {
+        done();
+      },
+      function (err) {
+        done(err);
+      }
+    );
+  });
 
   /*******************************************************/
 
-  after(function() {
+  after(function (done) {
     Registration.model.remove({
       facultyIdentity: SAMPLE_IDENTITY
     }, handleRemoveResult);
+
     Registration.model.remove({
       facultyIdentity: SAMPLE_IDENTITY_2
     }, handleRemoveResult);
-  });
 
+    Mongoose.connection.close();
+    done();
+  });
 
 
 });

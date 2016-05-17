@@ -35,7 +35,7 @@ let FacebookAuth = (function() {
         }, function(err, foundUser) {
           if (err) {
             return done(new Error(
-              Errors.LOGIN_ERROR.id, Errors.LOGIN_ERROR.message), "err");
+              Errors.LOGIN_ERROR.id, Errors.LOGIN_ERROR.message), err);
           }
 
           if (!foundUser) {
@@ -73,11 +73,22 @@ let FacebookAuth = (function() {
           }
         }); /* end User.model.findOne callback */
 
-        return done(null, {
-          user: userIdentity,
-          accessToken: accessToken,
-          accessTokenExpires: apiKeyExpiration,
-          identityConfirmed: identityConfirmed
+        User.model.findOne({
+          user: userIdentity
+        }, function(err, foundUser) {
+          if (err || !foundUser)  {
+            return done(new Error(
+              Errors.LOGIN_ERROR.id, Errors.LOGIN_ERROR.message), err);
+          }
+
+          return done(null, {
+            user: userIdentity,
+            apiKey: accessToken,
+            keyExpires: apiKeyExpiration,
+            identityConfirmed: identityConfirmed,
+            facultyIdentity: foundUser.facultyIdentity // will be undefined if not set in db
+          });
+
         });
 
       });
