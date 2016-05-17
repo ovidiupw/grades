@@ -24,60 +24,64 @@ let Registration = (function() {
         unique: true,
         dropDups: true
       },
-      minLength: SchemaConstraints.facultyIdentityMinLength,
-      maxLength: SchemaConstraints.facultyIdentityMaxLength
+      minlength: SchemaConstraints.facultyIdentityMinLength,
+      maxlength: SchemaConstraints.facultyIdentityMaxLength
     },
     roles: [{
       type: String,
-      minLength: SchemaConstraints.roleTitleMinLength,
-      maxLength: SchemaConstraints.roleTitleMaxLength
+      minlength: SchemaConstraints.roleTitleMinLength,
+      maxlength: SchemaConstraints.roleTitleMaxLength
     }],
     identitySecret: {
       type: String,
-      minLength: SchemaConstraints.identitySecretMinLength,
-      maxLength: SchemaConstraints.identitySecretMaxLength
+      minlength: SchemaConstraints.identitySecretMinLength,
+      maxlength: SchemaConstraints.identitySecretMaxLength
     }
   });
 
   _schema.methods.generateIdentitySecret = function (errCallback, succCallback) {
-    this.model(_SCHEMA_NAME).update({
-      _id: this._id
-    }, {
-      $set: {
-        identitySecret: randomstring.generate({
-          length: 6,
-          charset: 'numeric'
-        })
-      }
-    }, function (error) {
-      if (error) {
-        return errCallback(error);
-      } else {
-        return succCallback();
-      }
+    process.nextTick(() => {
+      this.model(_SCHEMA_NAME).update({
+        _id: this._id
+      }, {
+        $set: {
+          identitySecret: randomstring.generate({
+            length: 6,
+            charset: 'numeric'
+          })
+        }
+      }, function (error) {
+        if (error) {
+          return errCallback(error);
+        } else {
+          return succCallback();
+        }
+      });
     });
   };
 
   _schema.statics.findByFacultyIdentity = function (fid, success, error) {
-    this.findOne({
-      facultyIdentity: fid
-    }, function (err, foundRegistration) {
-      if (err) {
-        return error(new Error(
-          Errors.DATABASE_ACCESS_ERROR.id,
-          Errors.DATABASE_ACCESS_ERROR.message,
-          err
-        ));
-      }
-      if (!foundRegistration) {
-        return error(new Error(
-          Errors.REGISTRATION_NOT_FOUND.id,
-          Errors.REGISTRATION_NOT_FOUND.message,
-          "Registration with facultyIdentity '" + fid + "' could not be found."
-        ));
-      } else {
-        return success(foundRegistration);
-      }
+    process.nextTick(() => {
+      this.findOne({
+        facultyIdentity: fid
+      }, function (err, foundRegistration) {
+        if (err) {
+          return error(new Error(
+            Errors.DATABASE_ACCESS_ERROR.id,
+            Errors.DATABASE_ACCESS_ERROR.message,
+            err
+          ));
+        }
+        if (!foundRegistration) {
+          return error(new Error(
+            Errors.REGISTRATION_NOT_FOUND.id,
+            Errors.REGISTRATION_NOT_FOUND.message,
+            "Registration with facultyIdentity '" + fid + "' could not be found."
+          ));
+        } else {
+          return success(foundRegistration);
+        }
+      });
     });
   };
 

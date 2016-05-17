@@ -6,8 +6,10 @@ const ConfigAuth = require('./auth');
 
 const Errors = require('../constants/errors');
 const Error = require('../modules/error');
+let async = require('async');
 
-let FacebookAuth = (function() {
+
+let FacebookAuth = (function () {
 
   let _facebookStrategy = new FacebookStrategy({
       clientID: ConfigAuth.facebookAuth.appId,
@@ -15,84 +17,135 @@ let FacebookAuth = (function() {
       callbackURL: ConfigAuth.facebookAuth.callbackURL,
       profileFields: ['id', 'name', 'verified'], /* get only these fields from profile */
     },
-    function(accessToken, refreshToken, profile, done) {
+    function (accessToken, refreshToken, profile, done) {
       /* Wait for the next process event loop via process.nextTick */
-      process.nextTick(function() {
+      process.nextTick(() => {
         if (profile._json.verified === false) {
           /* Do not accept unverified facebook profiles */
           return done(new Error(
-            Errors.FB_ACCOUNT_NOT_VERIFIED.id, Errors.FB_ACCOUNT_NOT_VERIFIED.message));
+            Errors.FB_ACCOUNT_NOT_VERIFIED.id,
+            Errors.FB_ACCOUNT_NOT_VERIFIED.message
+          ));
         }
 
         let apiKeyExpiration = new Date();
         apiKeyExpiration.setHours(apiKeyExpiration.getHours() + 1);
+        let userIdentity = profile._json.id + '@' + profile.provider;
 
-        const userIdentity = profile._json.id + '@' + profile.provider;
-        let identityConfirmed = false;
+        return _createOrUpdateUser(userIdentity, accessToken, apiKeyExpiration, done)
+      });
+    });
 
+  let _createNewUserAndSetIdentityConfirmedToFalse = function (
+    userIdentity, accessToken, apiKeyExpiration) {
+    /* User is not in database, add it and set identityConfirmed to false */
+    let user = new User.model({
+      user: userIdentity,
+      apiKey: accessToken,
+      keyExpires: apiKeyExpiration,
+      identityConfirmed: false
+    });
+
+    user.save(function (err) {
+      if (err) {
+        return new Error(
+          Errors.LOGIN_ERROR.id,
+          Errors.LOGIN_ERROR.message
+        );
+      }
+    });
+  };
+
+  let _updateUserWithNewCredentials = function (
+    foundUser, accessToken, apiKeyExpiration) {
+
+    User.model.update({
+      _id: foundUser._id
+    }, {
+      $set: {
+        apiKey: accessToken,
+        keyExpires: apiKeyExpiration
+      }
+    }, function (err) {
+      if (err) {
+        return new Error(
+          Errors.LOGIN_ERROR.id,
+          Errors.LOGIN_ERROR.message
+        );
+      }
+    });
+  };
+
+  let _createOrUpdateUser = function (userIdentity, accessToken, apiKeyExpiration, done) {
+
+    async.waterfall([
+
+      /* Create or update the user */
+
+      function (callback) {
         User.model.findOne({
           user: userIdentity
-        }, function(err, foundUser) {
+        }, function (err, foundUser) {
           if (err) {
-            return done(new Error(
-              Errors.LOGIN_ERROR.id, Errors.LOGIN_ERROR.message), err);
+            return callback(new Error(
+              Errors.LOGIN_ERROR.id,
+              Errors.LOGIN_ERROR.message
+            ));
           }
 
           if (!foundUser) {
-            /* User is not in database, add it and set identityConfirmed to false */
-            let user = new User.model({
-              user: userIdentity,
-              apiKey: accessToken,
-              keyExpires: apiKeyExpiration,
-              identityConfirmed: false
-            });
-            user.save(function(err) {
-              if (err) {
-                return done(new Error(
-                  Errors.LOGIN_ERROR.id, Errors.LOGIN_ERROR.message), err);
-              }
-            });
+            let executionError = _createNewUserAndSetIdentityConfirmedToFalse(
+              userIdentity, accessToken, apiKeyExpiration);
+            if (executionError != undefined) {
+              return callback(executionError)
+            }
 
           } else {
-            /* User already is in database, only update auth credentials */
-            identityConfirmed = foundUser.identityConfirmed;
-
-            User.model.update({
-              _id: foundUser._id
-            }, {
-              $set: {
-                apiKey: accessToken,
-                keyExpires: apiKeyExpiration
-              }
-            }, function(err) {
-              if (err) {
-                return done(new Error(
-                  Errors.LOGIN_ERROR.id, Errors.LOGIN_ERROR.message), err);
-              }
-            });
+            let executionError = _updateUserWithNewCredentials(
+              foundUser, accessToken, apiKeyExpiration);
+            if (executionError != undefined) {
+              return callback(executionError)
+            }
           }
-        }); /* end User.model.findOne callback */
 
+          return callback(null, userIdentity)
+        });
+      },
+
+      /* Return the updated/created user */
+
+      function(userIdentity, callback) {
         User.model.findOne({
           user: userIdentity
-        }, function(err, foundUser) {
-          if (err || !foundUser)  {
-            return done(new Error(
-              Errors.LOGIN_ERROR.id, Errors.LOGIN_ERROR.message), err);
+        }, function (err, foundUser) {
+          if (err || !foundUser) {
+            return callback (new Error(
+              Errors.LOGIN_ERROR.id,
+              Errors.LOGIN_ERROR.message
+            ));
           }
 
-          return done(null, {
+          return callback(null, {
             user: userIdentity,
             apiKey: accessToken,
             keyExpires: apiKeyExpiration,
-            identityConfirmed: identityConfirmed,
-            facultyIdentity: foundUser.facultyIdentity // will be undefined if not set in db
+            identityConfirmed: foundUser.identityConfirmed,
+            facultyIdentity: foundUser.facultyIdentity
           });
 
         });
+      }
 
-      });
+
+    ], function (err, result) {
+      if (err) {
+        return done(err)
+      } else {
+        return done(null, result);
+      }
     });
+
+  };
 
   return ({
     facebookStrategy: _facebookStrategy

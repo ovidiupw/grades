@@ -7,7 +7,7 @@ const SchemaConstraints = require('../constants/schema-constraints');
 let Errors = require('../constants/errors');
 let Error = require('../modules/error');
 
-let User = (function() {
+let User = (function () {
 
   const _SCHEMA_NAME = 'Users';
   /**
@@ -21,18 +21,18 @@ let User = (function() {
         unique: true,
         dropDups: true
       },
-      minLength: SchemaConstraints.userMinLength,
-      maxLength: SchemaConstraints.userMaxLength
+      minlength: SchemaConstraints.userMinLength,
+      maxlength: SchemaConstraints.userMaxLength
     },
     facultyIdentity: {
       type: String,
-      minLength: SchemaConstraints.facultyIdentityMinLength,
-      maxLength: SchemaConstraints.facultyIdentityMaxLength
+      minlength: SchemaConstraints.facultyIdentityMinLength,
+      maxlength: SchemaConstraints.facultyIdentityMaxLength
     },
     apiKey: {
       type: String,
-      minLength: SchemaConstraints.apiKeyMinLength,
-      maxLength: SchemaConstraints.apiKeyMaxLength
+      minlength: SchemaConstraints.apiKeyMinLength,
+      maxlength: SchemaConstraints.apiKeyMaxLength
     },
     keyExpires: {
       type: Date
@@ -43,12 +43,33 @@ let User = (function() {
   });
 
   _schema.statics.addFacultyIdentity = function (docId, facultyIdentity, error) {
-    return this.update({
+    process.nextTick(() => {
+      return this.update({
+          _id: docId
+        }, {
+          facultyIdentity: facultyIdentity
+        },
+        function (err) {
+          if (err) {
+            return error(new Error(
+              Errors.IDENTITY_CONFIRMATION_FAILED.id,
+              Errors.IDENTITY_CONFIRMATION_FAILED.message,
+              err
+            ));
+          }
+        });
+    });
+  };
+
+  _schema.statics.updateFacultyIdentity = function (docId, facultyIdentity, error) {
+    process.nextTick(() => {
+      return this.update({
         _id: docId
       }, {
-        facultyIdentity: facultyIdentity
-      },
-      function (err) {
+        $set: {
+          facultyIdentity: facultyIdentity
+        }
+      }, function (err) {
         if (err) {
           return error(new Error(
             Errors.IDENTITY_CONFIRMATION_FAILED.id,
@@ -57,46 +78,31 @@ let User = (function() {
           ));
         }
       });
-  };
-
-  _schema.statics.updateFacultyIdentity = function (docId, facultyIdentity, error) {
-    return this.update({
-      _id: docId
-    }, {
-      $set: {
-        facultyIdentity: facultyIdentity
-      }
-    }, function (err) {
-      if (err) {
-        return error(new Error(
-          Errors.IDENTITY_CONFIRMATION_FAILED.id,
-          Errors.IDENTITY_CONFIRMATION_FAILED.message,
-          err
-        ));
-      }
     });
   };
 
   _schema.statics.findByUser = function (user, success, error) {
-    return this.findOne({
-      user: user
-    }, function (err, foundUser) {
-      if (err) {
-        return error(new Error(
-          Errors.DATABASE_ACCESS_ERROR.id,
-          Errors.DATABASE_ACCESS_ERROR.message,
-          err
-        ));
-      }
-      if (!foundUser) {
-        return error(new Error(
-          Errors.USER_NOT_FOUND.id,
-          Errors.USER_NOT_FOUND.message,
-          "User " + user + " could not be found."
-        ));
-      } else {
-        return success(foundUser);
-      }
+    process.nextTick(() => {
+      return this.findOne({
+        user: user
+      }, function (err, foundUser) {
+        if (err) {
+          return error(new Error(
+            Errors.DATABASE_ACCESS_ERROR.id,
+            Errors.DATABASE_ACCESS_ERROR.message,
+            err
+          ));
+        }
+        if (!foundUser) {
+          return error(new Error(
+            Errors.USER_NOT_FOUND.id,
+            Errors.USER_NOT_FOUND.message,
+            "User " + user + " could not be found."
+          ));
+        } else {
+          return success(foundUser);
+        }
+      });
     });
   };
 
@@ -107,6 +113,7 @@ let User = (function() {
     schema: _schema,
     model: _model
   });
-})();
+})
+();
 
 module.exports = User;

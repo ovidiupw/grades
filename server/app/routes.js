@@ -64,15 +64,15 @@ let Routes = function (app, passport) {
   /**
    * This function handles adding a new role (specification) in the databse.
    */
-  app.post(RouteNames.ROLES, function (req, res, next) {
-    AddNewRole.invoke(req, res, next);
+  app.post(RouteNames.ROLES, function (req, res) {
+    AddNewRole.invoke(req, res);
   });
 
   /**
    * This function handles registering a new faculty identity.
    */
-  app.post(RouteNames.REGISTER_IDENTITY, function (req, res, next) {
-    RegisterIdentity.invoke(req, res, next);
+  app.post(RouteNames.REGISTER_IDENTITY, function (req, res) {
+    RegisterIdentity.invoke(req, res);
   });
 
   /* Authentication via facebook */

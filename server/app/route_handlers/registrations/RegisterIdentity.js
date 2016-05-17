@@ -1,26 +1,53 @@
 'use strict';
 
+let Errors = require('../../constants/errors');
+let Error = require('../../modules/error');
+let PredefinedErrors = require('../../modules/predefined-errors')
+
 let async = require('async');
 let RequestValidator = require('../../modules/request-validator');
-
-const RouteNames = require('../../constants/routes');
-const HttpVerbs = require('../../constants/http-verbs');
 
 let User = require('../../entities/user');
 let Registration = require('../../entities/registration');
 
-let RegisterIdentity = {
-  invoke: function (req, res, next) {
+/**
+ * Use invoke() method of this closure to register (POST) a new
+ * identity for the calling user (identified in the request body).
+ * 
+ * @type {{invoke}}
+ */
+let RegisterIdentity = (function() {
+
+  let _validateRequest = function (req, errCallback) {
+
+    process.nextTick(() => {
+      if (!RequestValidator.bodyIsValid(req.body)) {
+        return errCallback(PredefinedErrors.getInvalidBodyError());
+      }
+      if (!RequestValidator.requestContainsAuthenticationData(req)) {
+        return errCallback(PredefinedErrors.getAuthorizationDataNotFoundError());
+      }
+      if (req.body.facultyIdentity == undefined) {
+        return errCallback(new Error(
+          Errors.REQ_BODY_INVALID.id,
+          Errors.REQ_BODY_INVALID.message,
+          "Required parameters not supplied. Please add " +
+          "'facultyIdentity' to your request."
+        ));
+      }
+      return errCallback(null);
+    });
+  };
+
+  let _invoke =  function (req, res) {
     async.waterfall([
 
       function (callback) {
-        RequestValidator.validateRequest(
-          req, RouteNames.REGISTER_IDENTITY, HttpVerbs.POST,
-          function (error) {
-            if (error) {
-              callback(error);
+        _validateRequest(req, function (invalidRequest) {
+            if (invalidRequest) {
+              return callback(invalidRequest);
             } else {
-              callback(null);
+              return callback(null);
             }
           });
       },
@@ -28,23 +55,21 @@ let RegisterIdentity = {
       function (callback) {
         User.model.findByUser(req.body.user,
           function (foundUser) {
-            callback(null, foundUser);
+            return callback(null, foundUser);
           },
-          function (error) {
-            callback(error);
+          function (userFindError) {
+            return callback(userFindError);
           }
         );
       },
 
       /* In case of success, the user has been found. */
       function (foundUser, callback) {
-        let _err = false;
-        RequestValidator.validateApiKey(foundUser, req.body.apiKey, function (error) {
-          if (error) {
-            /* In case key expired, this will be executed */
-            callback(error);
+        RequestValidator.validateApiKey(foundUser, req.body.apiKey, function (apiKeyExpired) {
+          if (apiKeyExpired) {
+            return callback(apiKeyExpired);
           } else {
-            callback(null, foundUser);
+            return callback(null, foundUser);
           }
         });
       },
@@ -58,10 +83,10 @@ let RegisterIdentity = {
         Registration.model.findByFacultyIdentity(
           req.body.facultyIdentity,
           function (foundRegistration) {
-            callback(null, foundUser, foundRegistration);
+            return callback(null, foundUser, foundRegistration);
           },
-          function (error) {
-            callback(error);
+          function (findUserError) {
+            return callback(findUserError);
           }
         );
       },
@@ -69,37 +94,32 @@ let RegisterIdentity = {
       /* Api key is valid (not yet expired), so register a new identity with
        *  the user account, just don't confirm it yet. */
       function (foundUser, foundRegistration, callback) {
-        let _err = false;
 
         if (foundUser.facultyIdentity == undefined) {
           User.model.addFacultyIdentity(foundUser._id, req.body.facultyIdentity,
-            function (error) {
-              /* There was an error updating faculty identity */
-              callback(error);
-              _err = true;
+            function (facultyIdentityUpdateError) {
+              return callback(facultyIdentityUpdateError);
             });
         } else {
           User.model.updateFacultyIdentity(foundUser._id, req.body.facultyIdentity,
-            function (error) {
-              /* There was an error updating faculty identity */
-              callback(error);
-              _err = true;
+            function (facultyIdentityUpdateError) {
+              return callback(facultyIdentityUpdateError);
             });
         }
 
-        if (!_err) return callback(null, foundRegistration);
+        callback(null, foundRegistration);
       },
 
       /* Associate an identity secret in order to verify identity by email */
       function (foundRegistration, callback) {
         foundRegistration.generateIdentitySecret(
-          function (error) {
-            if (error) {
-              callback(error);
+          function (identitySecretGenerationError) {
+            if (identitySecretGenerationError) {
+              return callback(identitySecretGenerationError);
             }
           },
-          function () { /* In case of successs */
-            callback(null);
+          function () {
+            return callback(null);
           }
         );
       },
@@ -116,7 +136,11 @@ let RegisterIdentity = {
         res.send(err);
       }
     });
+  };
+
+  return {
+    invoke: _invoke
   }
-};
+})();
 
 module.exports = RegisterIdentity;

@@ -43,8 +43,8 @@ let Role = (function() {
         unique: true,
         dropDups: true
       },
-      minLength: SchemaConstraints.roleTitleMinLength,
-      maxLength: SchemaConstraints.roleTitleMaxLength
+      minlength: SchemaConstraints.roleTitleMinLength,
+      maxlength: SchemaConstraints.roleTitleMaxLength
     },
     actions: [{
       verb: {

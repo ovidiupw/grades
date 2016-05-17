@@ -120,7 +120,6 @@ let RequestValidator = (function () {
     if (req.body.user == undefined || req.body.apiKey == undefined) {
       return false;
     }
-
     return true;
   };
 
@@ -217,38 +216,6 @@ let RequestValidator = (function () {
    * Validates if the supplied request is valid (i.e.
    * has the required body fields and has valid parameters).
    */
-  let _validateRegisterIdentityRequest = function (req, errCallback) {
-    if (!_bodyIsValid(req.body)) {
-      return errCallback(new Error(
-        Errors.REQ_BODY_INVALID.id,
-        Errors.REQ_BODY_INVALID.message,
-        "Unexpected body encoding supplied."
-      ));
-    }
-    if (!_requestContainsAuthenticationData(req)) {
-      return errCallback(new Error(
-        Errors.AUTHORIZATION_DATA_NOT_FOUND.id,
-        Errors.AUTHORIZATION_DATA_NOT_FOUND.message,
-        undefined
-      ));
-    }
-
-    if (req.body.facultyIdentity == undefined) {
-      return errCallback(new Error(
-        Errors.REQ_BODY_INVALID.id,
-        Errors.REQ_BODY_INVALID.message,
-        "Required parameters not supplied. Please add " +
-        "'facultyIdentity' to your request."
-      ));
-    }
-
-    return errCallback(null);
-  };
-
-  /**
-   * Validates if the supplied request is valid (i.e.
-   * has the required body fields and has valid parameters).
-   */
   let _validateRolesPostRequest = function (req, errCallback) {
     if (!_bodyIsValid(req.body)) {
       return errCallback(new Error(
@@ -311,9 +278,6 @@ let RequestValidator = (function () {
    */
   let _validateRequest = function (req, path, verb, errCallback) {
     switch (path + verb) {
-      case RouteNames.REGISTER_IDENTITY + HttpVerbs.POST:
-        _validateRegisterIdentityRequest(req, errCallback);
-        break;
       case RouteNames.ROLES + HttpVerbs.POST:
         _validateRolesPostRequest(req, errCallback);
         break;
@@ -324,32 +288,36 @@ let RequestValidator = (function () {
   };
 
   let _validateApiKey = function (user, requestKey, errCallback) {
-    if (user.apiKey !== requestKey) {
-      return errCallback(new Error(
-        Errors.API_KEY_INVALID.id,
-        Errors.API_KEY_INVALID.message,
-        Errors.API_KEY_INVALID.data
-      ));
-    }
+    process.nextTick(() => {
+      if (user.apiKey !== requestKey) {
+        return errCallback(new Error(
+          Errors.API_KEY_INVALID.id,
+          Errors.API_KEY_INVALID.message,
+          Errors.API_KEY_INVALID.data
+        ));
+      }
 
-    var expirationDate = new Date(user.keyExpires);
-    var currentDate = new Date();
+      var expirationDate = new Date(user.keyExpires);
+      var currentDate = new Date();
 
-    if (currentDate >= expirationDate) {
-      return errCallback(new Error(
-        Errors.API_KEY_EXPIRED.id,
-        Errors.API_KEY_EXPIRED.message,
-        Errors.API_KEY_EXPIRED.data
-      ));
-    }
+      if (currentDate >= expirationDate) {
+        return errCallback(new Error(
+          Errors.API_KEY_EXPIRED.id,
+          Errors.API_KEY_EXPIRED.message,
+          Errors.API_KEY_EXPIRED.data
+        ));
+      }
 
-    return errCallback(null);
+      return errCallback(null);
+    });
   };
 
   return ({
     validateRequest: _validateRequest,
     validateApiKey: _validateApiKey,
-    validateAccessRights: _validateAccessRights
+    validateAccessRights: _validateAccessRights,
+    bodyIsValid: _bodyIsValid,
+    requestContainsAuthenticationData: _requestContainsAuthenticationData
   });
 })();
 

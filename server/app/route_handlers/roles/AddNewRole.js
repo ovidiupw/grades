@@ -10,7 +10,7 @@ let User = require('../../entities/user');
 let Role = require('../../entities/role');
 
 let AddNewRole = {
-  invoke: function (req, res, next) {
+  invoke: function (req, res) {
     async.waterfall([
 
       function (callback) {

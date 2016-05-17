@@ -1,0 +1,33 @@
+DONE / Refactoring:
+-> Auth
+
+-> Register New Identity -> utilizatorul isi asociaza contului sau o identitate confirmata de facultate (configurata de secretariat (exemplu)) -> cod corect? asociaza utilizatorul cu identitatea confirmata, care are anumite roluri configurate => utilizatorul incepe sa aiba drepturi sa acceseze anumite parti ale API-ului
+
+-> Register New Role -> Adauga un nou rol in BD -> rolul are o multime de resurse + pentru fiecare resursa -> actiunile pe care le poate face un utilizator care are configurat in tabela Registrations (aia configurata de facultate (secretariat)) pe acea resursa (pe resursa /v1/studenti are voie sa faca actiunea PUT sau GET)
+
+-> Add Registration -> permite utilizatorilor sa isi asocieze o identitate cu facultatea (confirmata prin mail) - facuta de secretariat
+
+TODO:
+	Students:
+
+	-> Adauga un nou student -> POST pe resursa /v1/students -> {
+	do:
+			validare request (body)
+			validate api key (adica daca user-ul este autentificat)
+			[TO BE INSERTED] validare permisiuni pentru userul x - adica daca are dreptul de a face POST pe 	resursa /v1/.... (de mai sus)
+			adauga student in bd
+			intoarce 200 (succes)
+	}
+
+	-> ListStudents -> intoarce un array cu toti studentii din baza de date -> GET pe resursa /v1/students
+		# paginare!
+
+	-> DeleteStudent -> sterge un student din bd -> DELTE pe resursa /v1/students
+
+	[NOT YET] -> ActualizeazaStudent -> modifica un student in bd -> PUT pe resursa /v1/students/:id
+
+	-> Import students from csv -> upload csv pe server + parsare csv pe server si inserare in baza de date
+		# ce se intampla in caz ca studentul din csv e duplicat -> update? error?
+		# + other use cases
+		
+

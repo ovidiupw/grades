@@ -59,25 +59,27 @@ let Student = (function () {
     });
   };
   _schema.statics.findByUser = function (user, success, error) {
-    this.findOne({
-      user: user
-    }, function (err, foundUser) {
-      if (err) {
-        error(new Error(
-          Errors.DATABASE_ACCESS_ERROR.id,
-          Errors.DATABASE_ACCESS_ERROR.message,
-          err
-        ));
-      }
-      if (!foundUser) {
-        error(new Error(
-          Errors.USER_NOT_FOUND.id,
-          Errors.USER_NOT_FOUND.message,
-          "Student " + user + " could not be found."
-        ));
-      } else {
-        success(foundUser);
-      }
+    process.nextTick(() => {
+      this.findOne({
+        user: user
+      }, function (err, foundUser) {
+        if (err) {
+          error(new Error(
+            Errors.DATABASE_ACCESS_ERROR.id,
+            Errors.DATABASE_ACCESS_ERROR.message,
+            err
+          ));
+        }
+        if (!foundUser) {
+          error(new Error(
+            Errors.USER_NOT_FOUND.id,
+            Errors.USER_NOT_FOUND.message,
+            "Student " + user + " could not be found."
+          ));
+        } else {
+          success(foundUser);
+        }
+      });
     });
   };
 

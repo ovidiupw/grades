@@ -118,7 +118,7 @@ describe('Roles entity serialization and deserialization', function () {
 
   /*******************************************************/
 
-  it('Should not register a role with length(title) < minLength(title) defined in schema.', function () {
+  it('Should not register a role with length(title) < minLength(title) defined in schema.', function (done) {
     let newRole = new Role.model({
       title: "a"
     });
@@ -131,6 +131,8 @@ describe('Roles entity serialization and deserialization', function () {
       if (err) throw err;
       if (foundRole) should.fail("Shouldn't have been able to insert an invalid role.");
     });
+
+    done();
   });
 
   /*******************************************************/
