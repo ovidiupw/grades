@@ -1,2 +1,3 @@
-node_modules/
-database/journal/
+server/node_modules/
+server/database/
+client/node_modules/

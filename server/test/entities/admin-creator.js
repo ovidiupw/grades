@@ -28,6 +28,5 @@ describe('Configuration of admin account', function () {
 });
 
 after(function (done) {
-  Mongoose.connection.close();
   done();
 });

@@ -59,3 +59,5 @@
 ::1 - - [Tue, 17 May 2016 11:08:11 GMT] "POST /v1/register/identity HTTP/1.1" 400 79 "-" "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36"
 ::1 - - [Tue, 17 May 2016 11:08:18 GMT] "POST /v1/register/identity HTTP/1.1" 400 79 "-" "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36"
 ::1 - - [Tue, 17 May 2016 11:08:24 GMT] "POST /v1/register/identity HTTP/1.1" 400 79 "-" "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36"
+::1 - - [Tue, 17 May 2016 12:54:07 GMT] "POST /v1/register/identity HTTP/1.1" 400 79 "-" "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36"
+::1 - - [Tue, 17 May 2016 12:54:13 GMT] "POST /v1/roles HTTP/1.1" 400 76 "-" "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36"

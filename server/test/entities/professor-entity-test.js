@@ -117,7 +117,6 @@ describe('Professor entity database operations', function () {
         user: SAMPLE_USER
       }, handleRemoveResult);
 
-      Mongoose.connection.close();
       done();
     });
   });

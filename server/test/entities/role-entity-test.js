@@ -135,12 +135,11 @@ describe('Roles entity serialization and deserialization', function () {
 
   /*******************************************************/
 
-  after(function () {
+  after(function (done) {
     Role.model.remove({
       title: PredefinedRoles.administrator.title
     }, handleRemoveResult);
 
-    Mongoose.connection.close();
     done();
   });
 

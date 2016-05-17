@@ -118,11 +118,10 @@ describe('User entity database operations', function () {
 
     /*******************************************************/
 
-    after(function () {
+    after(function (done) {
       removeSampleUser(SAMPLE_USER);
       removeSampleUser(SAMPLE_USER_2);
 
-      Mongoose.connection.close();
       done();
     });
 

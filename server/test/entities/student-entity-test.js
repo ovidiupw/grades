@@ -114,7 +114,7 @@ describe('Student entity database operations', function () {
 
     /*******************************************************/
 
-    after(function () {
+    after(function (done) {
       studentModel.remove({
         user: SAMPLE_USER
       }, handleRemoveResult);
@@ -123,7 +123,6 @@ describe('Student entity database operations', function () {
         user: "ciucalete@facebook"
       }, handleRemoveResult);
 
-      Mongoose.connection.close();
       done();
     });
   });

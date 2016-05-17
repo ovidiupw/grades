@@ -144,7 +144,6 @@ describe('Registration entity serialization and deserialization', function () {
       facultyIdentity: SAMPLE_IDENTITY_2
     }, handleRemoveResult);
 
-    Mongoose.connection.close();
     done();
   });
 
