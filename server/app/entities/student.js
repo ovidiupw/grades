@@ -5,6 +5,9 @@ const Schema = Mongoose.Schema;
 const SchemaConstraints = require('../constants/schema-constraints');
 const DB = require('../config/database');
 
+const Errors = require('../constants/errors');
+const Error = require('../modules/error');
+
 Mongoose.createConnection(DB.TEST_DB);
 
 let Student = (function () {

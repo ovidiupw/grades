@@ -46,9 +46,9 @@ const Errors = {
     message: 'Error: The role with the supplied title was not found.',
     data: undefined
   },
-  AUTHORIZATION_DATA_NOT_FOUND: {
+  AUTHENTICATION_DATA_NOT_FOUND: {
     id: 10,
-    message: 'Error: Authorization data not found in request.',
+    message: 'Error: Authentication data not found in request.',
     data: undefined
   },
   NOT_AUTHORIZED: {
@@ -64,6 +64,21 @@ const Errors = {
   INVALID_ROLE: {
     id: 13,
     message: 'Error: A supplied role was invalid - not configured.',
+    data: undefined
+  },
+  INVALID_REQUEST_FIELDS: {
+    id: 14,
+    message: 'The fields of the object you passed in your request did not validate successfully.',
+    data: undefined
+  },
+  IDENTITY_NOT_CONFIRMED: {
+    id: 15,
+    message: 'The account requesting the operation is not confirmed.',
+    data: undefined
+  },
+  AUTHENTICATION_ERROR: {
+    id: 16,
+    message: 'There was an error while authenticating.',
     data: undefined
   }
 

@@ -2,6 +2,10 @@
   <dictionary name="Ovidiu">
     <words>
       <w>chai</w>
+      <w>dups</w>
+      <w>maxlength</w>
+      <w>minlength</w>
+      <w>randomstring</w>
     </words>
   </dictionary>
 </component>

@@ -65,25 +65,27 @@ let Role = (function() {
   };
 
   _schema.statics.findByTitle = function (title, success, error) {
-    this.findOne({
-      title: title
-    }, function (err, foundRole) {
-      if (err) {
-        return error(new Error(
-          Errors.DATABASE_ACCESS_ERROR.id,
-          Errors.DATABASE_ACCESS_ERROR.message,
-          err
-        ));
-      }
-      if (!foundRole) {
-        return error(new Error(
-          Errors.ROLE_NOT_FOUND.id,
-          Errors.ROLE_NOT_FOUND.message,
-          "Role with title " + title + " could not be found."
-        ));
-      } else {
-        return success(foundRole);
-      }
+    process.nextTick(() => {
+      this.findOne({
+        title: title
+      }, function (err, foundRole) {
+        if (err) {
+          return error(new Error(
+            Errors.DATABASE_ACCESS_ERROR.id,
+            Errors.DATABASE_ACCESS_ERROR.message,
+            err
+          ));
+        }
+        if (!foundRole) {
+          return error(new Error(
+            Errors.ROLE_NOT_FOUND.id,
+            Errors.ROLE_NOT_FOUND.message,
+            "Role with title " + title + " could not be found."
+          ));
+        } else {
+          return success(foundRole);
+        }
+      });
     });
   };
 
