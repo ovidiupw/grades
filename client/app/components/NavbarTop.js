@@ -5,7 +5,15 @@ let NavbarTop = React.createClass ({
   render() {
     return (
     <div>
-      <NavbarTop />
+      <nav className="navbar navbar-default">
+        <div className="container-fluid">
+          <div className="navbar-header">
+            <a className="navbar-brand" href="#">
+              <p>TodoApp</p>
+            </a>
+          </div>
+        </div>
+      </nav>
     </div>
   )}
 })

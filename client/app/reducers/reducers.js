@@ -1,38 +1,27 @@
-const todo = (state, action) => {
+import * as ActionTypes from '../constants/actionTypes'
+
+export function todoItems(state = {
+  todoItems: []
+}, action) {
+  console.log(state);
   switch (action.type) {
-    case 'ADD_TODO':
-      return {
+    case ActionTypes.ADD_TODO:
+
+      let newTodoItems = [];
+      state.todoItems.forEach(todoItem => newTodoItems.push(todoItem));
+      newTodoItems.push({
         id: action.id,
-        text: action.text,
-        completed: false
-      }
-    case 'TOGGLE_TODO':
-      if (state.id !== action.id) {
-        return state
-      }
-
-      return Object.assign({}, state, {
-        completed: !state.completed
-      })
+        text: ""
+      });
+      
+      return Object.assign(
+        {},
+        state,
+        {
+          todoItems: newTodoItems
+        }
+      );
     default:
-      return state
+      return state;
   }
 }
-
-const todos = (state = [], action) => {
-  switch (action.type) {
-    case 'ADD_TODO':
-      return [
-        ...state,
-        todo(undefined, action)
-      ]
-    case 'TOGGLE_TODO':
-      return state.map(t =>
-        todo(t, action)
-      )
-    default:
-      return state
-  }
-}
-
-export default todos
