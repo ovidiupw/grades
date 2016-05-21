@@ -8,6 +8,7 @@ const HttpVerbs = require('./constants/http-verbs');
 
 const RegisterIdentity = require('./route_handlers/registrations/RegisterIdentity');
 const AddNewRole = require('./route_handlers/roles/AddNewRole');
+const AddNewProfessor = require('./route_handlers/Professors/AddNewProfessor');
 
 let Routes = function (app, passport) {
 
@@ -60,6 +61,20 @@ let Routes = function (app, passport) {
       }
     );
   });
+
+    /**
+     * This function handles adding a new professor in the database .
+     */
+    app.post(RouteNames.PROFESSORS, function (req, res) {
+        AddNewProfessor.invoke(req, res);
+    });
+
+    /**
+     * This function handles deleting a  professor in the database .
+     */
+    app.delete(RouteNames.PROFESSORS, function (req, res) {
+        AddNewProfessor.invoke(req, res);
+    });
 
   /**
    * This function handles adding a new role (specification) in the databse.

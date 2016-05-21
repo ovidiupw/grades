@@ -65,6 +65,11 @@ const Errors = {
     id: 13,
     message: 'Error: A supplied role was invalid - not configured.',
     data: undefined
+  },
+  USER_ALREADY_EXISTS: {
+    id: 14,
+    message: 'Error: Supplied user already exists.',
+    data: undefined
   }
 
 };

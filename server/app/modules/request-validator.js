@@ -50,7 +50,7 @@ let RequestValidator = (function () {
       /* We managed to obtain user faculty registration with its roles */
 
       for (let roleTitle in _registration.roles) {
-        Roles.model.findByTitle(roleTitle, function (foundRole) {
+        Role.model.findByTitle(roleTitle, function (foundRole) {
             for (let action in foundRole.actions) {
               if ((resource === action.resource || RouteNames.ANY === action.resource) && verb === action.verb) {
                 _authorized = true;
@@ -269,6 +269,7 @@ let RequestValidator = (function () {
 
     return errCallback(null);
   };
+
 
   /**
    * Validates the supplied req - path - verb combination. Calls errCallback
