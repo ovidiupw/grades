@@ -6,6 +6,7 @@ const SchemaConstraints = require('../constants/schema-constraints');
 
 let Errors = require('../constants/errors');
 let Error = require('../modules/error');
+let PredefinedErrors = require('../modules/predefined-errors');
 
 let User = (function () {
 
@@ -42,6 +43,24 @@ let User = (function () {
     }
   });
 
+  _schema.statics.confirmFacultyIdentity = function (docId, error, success) {
+    process.nextTick(() => {
+      return this.update({
+        _id: docId
+      }, {
+        $set: {
+          identityConfirmed: true
+        }
+      }, function (err) {
+        if (err) {
+          return error(PredefinedErrors.getIdentityConfirmationError(err));
+        } else {
+          success();
+        }
+      });
+    });
+  };
+
   _schema.statics.addFacultyIdentity = function (docId, facultyIdentity, error) {
     process.nextTick(() => {
       return this.update({
@@ -51,11 +70,7 @@ let User = (function () {
         },
         function (err) {
           if (err) {
-            return error(new Error(
-              Errors.IDENTITY_CONFIRMATION_FAILED.id,
-              Errors.IDENTITY_CONFIRMATION_FAILED.message,
-              err
-            ));
+            return error(PredefinedErrors.getIdentityConfirmationError(err));
           }
         });
     });
@@ -71,11 +86,7 @@ let User = (function () {
         }
       }, function (err) {
         if (err) {
-          return error(new Error(
-            Errors.IDENTITY_CONFIRMATION_FAILED.id,
-            Errors.IDENTITY_CONFIRMATION_FAILED.message,
-            err
-          ));
+          return error(PredefinedErrors.getIdentityConfirmationError(err));
         }
       });
     });

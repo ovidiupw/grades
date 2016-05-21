@@ -485,6 +485,12 @@
             unde va fi trimisa un cod de confirmare. Codul de confirmare va trebui introdus de catre utilizator pentru a finaliza procedura de inregistrare.
           </p>
           <p>
+         	Fiecare utilizator inregistrat (caruia i s-a asociat, in prealabil, o identitate in cadrul facultatii) va face parte din cel putin una sau mai multe clase de utilizatori, descrise de campul "facultyStatus". Acest camp va fi utilizat pentru a comunica interfetei grafice a aplicatiei ce functionalitati sa se afiseze pentru configuratia utilizatorului curent.
+          </p>
+          <p>
+          Campul "facultyStatus" nu are legatura cu permisiunile unui utilizator in cadrul aplicatiei. In cazul in care, spre exemplu, un secretar va dori sa creeze un nou rol care sa aiba statusul "administrator" (peste nivelul de secretar, din punct de vedere ierarhic), secretarul, totusi, nu va putea asocia si un rol de administrator, deoarece nu va avea permisiunile potrivite.
+          </p>
+          <p>
             Colectia Inregistrari este definita astfel:
           </p>
           <figure typeof="sa:Table">
@@ -499,6 +505,24 @@
                 <td>String</td>
                 <td>identitatea utilizatorului in cadrul facultatii, adica o adresa de email pe care facultatea si utilizatorul au stabilit-o (de exemplu, webmail); utilizata pentru a asocia un set de roluri unui cont creat si confirmat</td>
               </tr>
+               <tr>
+                <td>facultyStatus</td>
+                <td>Object</td>
+                <td>
+            		camp utilizat pentru a realiza o delimitare clara a claselor de utilizatori (actorii sistemului). Au fost identificate trei clase de utilizatori:
+            		<ul>
+	            		<li>
+	            			Administratori (ex. roluri: decan, secretar)
+	            		</li>
+	            		<li>
+	            			Profesori (ex. roluri: titular, curs, laborator)
+	            		</li>
+	            		<li>
+	            			Studenti (ex. roluri: licenta, master, doctorat)
+	            		</li>
+            		</ul> 
+                </td>
+              </tr>
               <tr>
                 <td>roles</td>
                 <td>String</td>
@@ -508,7 +532,9 @@
               <tr>
                 <td>identitySecret</td>
                 <td>String</td>
-                <td>codul secret pe care utilizatorul va trebui sa il introduca, dupa ce s-a autentificat cu un cont personal, pentru a-si confirma identitatea cu cea din facultate</td>
+                <td>
+                codul secret pe care utilizatorul va trebui sa il introduca, dupa ce s-a autentificat cu un cont personal, pentru a-si confirma identitatea cu cea din facultate; acest cod va fi trimis catre adresa de email indicata de campul "facultyIdentity" atunci cand un utilizator incearca sa isi asocieze respectivul "facultyIdentity" contului propriu
+                </td>
               </tr>
             </table>
             <caption>Descriere tabela "Inregistrari"</caption>
@@ -525,9 +551,9 @@
               </tr>
               <tr>
                 <td>facultyIdentity</td>
+                <td>facultyIdentity, facultyStatus</td>
                 <td>facultyIdentity</td>
-                <td>facultyIdentity</td>
-              </tr>
+              </tr> 
             </table>
             <caption>Restrictii tabela "Inregistrari"</caption>
         </section>
@@ -914,8 +940,11 @@
           Autentificarea va stabili identitatea utilizatorului in aplicatie. Odata ce aceasta identitate va fi asociata cu o identitate autorizata de facultate (ex: confirmarea contului prin webmail), utilizatorului i se vor da anumite drepturi. Multimea de drepturi
           trebuie stabilita, in prealabil, de catre personalul administrativ al facultatii si va fi memorata in baza de date. Cand utilizatorul asociaza identitatea proprie cu cea din cadrul facultatii, drepturile ii sunt asociate automat. Pe baza drepturilor
           sale, utilizatorul poate folosi anumite resurse ale API-ului pus la dispozitie de aplicatia Grades. Caracterul ierarhic al asumarii raspunderilor in cadrul facultatii presupune ca, in fiecare caz, rolurile unui utilizator sa fie stabilite de
-          catre un superior - superiorul este si cel care il adauga pe utilizator in aplicatie (ex: secretariatula adauga studenti, decanul adauga profesori).
+          catre un superior - superiorul este si cel care il adauga pe utilizator in aplicatie (ex: secretariatul adauga studenti, decanul adauga profesori).
         </p>
+        <h5>Drepturi asupra configurarii permisiunilor</h5>
+
+
       </section>
       <section typeof="sa:Abstract" id="sistemul-de-notare">
         <h3>Sistemul de notare</h3>

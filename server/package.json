@@ -11,7 +11,8 @@
     "nodemailer": "^2.3.2",
     "passport": "^0.3.2",
     "passport-facebook": "^2.1.0",
-    "randomstring": "^1.1.4"
+    "randomstring": "^1.1.4",
+    "emailjs": "^1.0.4"
   },
   "devDependencies": {
     "babel-eslint": "^6.0.0",

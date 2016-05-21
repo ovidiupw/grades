@@ -5,12 +5,12 @@ let User = require('./entities/user');
 const Errors = require('./constants/errors');
 const Error = require('./modules/error');
 
-let RequestValidator = require('./modules/request-validator');
 const RouteNames = require('./constants/routes');
-const HttpVerbs = require('./constants/http-verbs');
 
 const RegisterIdentity = require('./route_handlers/registrations/RegisterIdentity');
 const AddNewRole = require('./route_handlers/roles/AddNewRole');
+const ConfirmIdentity = require('./route_handlers/registrations/ConfirmIdentity');
+const AddNewRegistration = require('./route_handlers/registrations/AddNewRegistration');
 
 let Routes = function (app, passport) {
 
@@ -23,45 +23,14 @@ let Routes = function (app, passport) {
     res.send(response);
   });
 
+  /**
+   * This function handles creating a new registration in the database.
+   */
   app.post(RouteNames.REGISTRATIONS, function (req, res) {
-    let _error = false;
-    RequestValidator.validateRequest(
-      req, RouteNames.REGISTRATIONS, HttpVerbs.POST,
-      function (error) {
-
-        res.status(400);
-        res.send(error);
-        _error = true;
-      });
-    if (_error) return;
-
-    User.model.findByUser(req.body.user,
-      function (foundUser) {
-        RequestValidator.validateApiKey(foundUser, req.body.apiKey, function (error) {
-          /* In case key expired, this will be executed */
-          res.status(400);
-          res.send(error);
-          _error = true;
-        });
-        if (_error) return;
-
-        /* User credentials are valid at this point - authenticate */
-
-        RequestValidator.validateAccessRights(
-          foundUser, RouteNames.ROLES, HttpVerbs.POST,
-          function (error) {
-            /* In case user does not have permissions to access this resource */
-            res.status(400);
-            res.send(error);
-            _error = true;
-          });
-      },
-      function (err) {
-        res.status(400);
-        res.send(err);
-        _error = true;
-      }
-    );
+    let pathGroup = RouteNames.REGISTRATIONS.exec(req.url);
+    console.log(pathGroup);
+    //TODO continue work
+    AddNewRegistration.invoke(req, res, data);
   });
 
   /**
@@ -69,6 +38,13 @@ let Routes = function (app, passport) {
    */
   app.post(RouteNames.ROLES, function (req, res) {
     AddNewRole.invoke(req, res);
+  });
+
+  /**
+   * This function handles confirming a previously registered identity.
+   */
+  app.put(RouteNames.REGISTER_IDENTITY, function(req, res) {
+    ConfirmIdentity.invoke(req, res);
   });
 
   /**

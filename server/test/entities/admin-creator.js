@@ -9,6 +9,7 @@ const Mongoose = require('mongoose');
 
 const Registration = require('../../app/entities/registration');
 const PredefinedRoles = require('../../app/constants/roles');
+const RegistrationClasses = require('../../app/constants/registration-classes');
 
 Mongoose.connect(DB.PRODUCTION_DB);
 
@@ -16,6 +17,7 @@ describe('Configuration of admin account', function () {
   it('Creates admin faculty identity (registration) with roles', function (done) {
     let adminRegistration = new Registration.model({
       facultyIdentity: "ovidiu.pricop@info.uaic.ro",
+      facultyStatus: RegistrationClasses.DEVELOPER,
       roles: [PredefinedRoles.administrator.title]
     });
 

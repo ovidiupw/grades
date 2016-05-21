@@ -2,6 +2,7 @@
 
 const FacebookStrategy = require('passport-facebook').Strategy;
 const User = require('../entities/user');
+const Registration = require('../entities/registration');
 const ConfigAuth = require('./auth');
 
 const Errors = require('../constants/errors');
@@ -124,16 +125,42 @@ let FacebookAuth = (function () {
               Errors.LOGIN_ERROR.message
             ));
           }
-
-          return callback(null, {
-            user: userIdentity,
-            apiKey: accessToken,
-            keyExpires: apiKeyExpiration,
-            identityConfirmed: foundUser.identityConfirmed,
-            facultyIdentity: foundUser.facultyIdentity
-          });
-
+          return callback(null, foundUser);
         });
+      },
+
+      /* If user has it's identity confirmed, then append facultyStatus to response */
+
+      function(user, callback) {
+        if (user.identityConfirmed === true) {
+          Registration.model.findByFacultyIdentity(
+            user.facultyIdentity,
+            function(foundRegistration) {
+              return callback(null, user, foundRegistration);
+            },
+            function(registrationFindError) {
+              return callback(registrationFindError);
+            })
+        }
+        return callback(null, user, null);
+      },
+
+      function(user, userRegistration, callback) {
+        let responseObject = {
+          user: userIdentity,
+          apiKey: accessToken,
+          keyExpires: apiKeyExpiration,
+          identityConfirmed: user.identityConfirmed,
+          facultyIdentity: user.facultyIdentity
+        };
+
+        if (userRegistration != null) {
+          Object.assign({}, responseObject, {
+            facultyStatus: userRegistration.facultyStatus
+          })
+        }
+
+        callback(null, responseObject);
       }
 
 

@@ -8,6 +8,7 @@ const DB = require('../../app/config/database');
 const Mongoose = require('mongoose');
 
 const Registration = require('../../app/entities/registration');
+const RegistrationClasses = require('../../app/constants/registration-classes');
 
 Mongoose.connect(DB.TEST_DB);
 
@@ -16,7 +17,8 @@ describe('Registration entity serialization and deserialization', function () {
   const SAMPLE_IDENTITY_2 = "asdkj@.cd.c";
 
   let registration = new Registration.model({
-    facultyIdentity: SAMPLE_IDENTITY
+    facultyIdentity: SAMPLE_IDENTITY,
+    facultyStatus: [RegistrationClasses.ADMINISTRATOR]
   });
 
   let handleRemoveResult = function (err, removeResult) {
@@ -35,6 +37,24 @@ describe('Registration entity serialization and deserialization', function () {
 
     registration.save(function (err) {
       if (err) throw err;
+    });
+  });
+
+  /*******************************************************/
+
+  it('Throws error when invalid facultyStatus specified on save', function (done) {
+    let invalidRegistration = new Registration.model({
+      facultyIdentity: "Test_Identity@testIdentity.testIdentity",
+      facultyStatus: ['ahmedakmahid-48941589761523']
+    });
+
+    invalidRegistration.save(function (err) {
+      if (err) {
+        console.log(err);
+        done();
+      } else {
+        done('Error! Should have failed inserting invalid faculty status');
+      }
     });
   });
 
@@ -95,6 +115,7 @@ describe('Registration entity serialization and deserialization', function () {
   it('Should serialize and deserialze a full registration', function (done) {
     let registration = new Registration.model({
       facultyIdentity: SAMPLE_IDENTITY_2,
+      facultyStatus: [RegistrationClasses.ADMINISTRATOR],
       roles: ["decan", "secretar"],
       identitySecret: ["28374612"]
     });
@@ -111,6 +132,7 @@ describe('Registration entity serialization and deserialization', function () {
         }
 
         assert.deepEqual(registration.facultyIdentity, foundRegistration.facultyIdentity);
+        assert.deepEqual(registration.facultyStatus, foundRegistration.facultyStatus);
         assert.deepEqual(registration.roles, foundRegistration.roles);
         assert.deepEqual(registration.identitySecret, foundRegistration.identitySecret);
 

@@ -59,8 +59,10 @@ let Role = (function() {
   });
 
   _schema.methods.insert = function () {
-    this.model(_SCHEMA_NAME).save(function (err) {
-      if (err) throw err;
+    process.nextTick(() => {
+      this.model(_SCHEMA_NAME).save(function (err) {
+        if (err) throw err;
+      });
     });
   };
 

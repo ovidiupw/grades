@@ -9,12 +9,12 @@ let RequestValidator = require('../../modules/request-validator');
 
 let User = require('../../entities/user');
 let Registration = require('../../entities/registration');
+const Mailer = require('../../modules/mailer');
+const EmailMessages = require('../../constants/email-messages');
 
 /**
  * Use invoke() method of this closure to register (POST) a new
  * identity for the calling user (identified in the request body).
- * 
- * @type {{invoke}}
  */
 let RegisterIdentity = (function() {
 
@@ -118,22 +118,36 @@ let RegisterIdentity = (function() {
               return callback(identitySecretGenerationError);
             }
           },
-          function () {
-            return callback(null);
+          function (identitySecret) {
+            return callback(null, foundRegistration, identitySecret);
           }
         );
       },
-
-      function (callback) {
-        /* If it reaches this, the request succeeded. */
-        res.status(200);
-        res.send();
+      
+      /* Once an identity secret has been generated, email it to the provided facultyIdentity */
+      
+      function(registration, identitySecret, callback) {
+        const emailMessage = EmailMessages.getIdentityConfirmationMessage(
+          registration.facultyIdentity, identitySecret);
+        
+        Mailer.sendEmail(
+          emailMessage,
+          function(errorMessage) {
+            return callback(errorMessage);
+          },
+          function() {
+            return callback(null);
+          }
+        )
       }
 
     ], function (err, results) {
       if (err) {
         res.status(400);
         res.send(err);
+      } else {
+        res.status(200);
+        res.send();
       }
     });
   };

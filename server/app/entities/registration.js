@@ -4,13 +4,37 @@ const Mongoose = require('mongoose');
 const Schema = Mongoose.Schema;
 const SchemaConstraints = require('../constants/schema-constraints');
 
-let Errors = require('../constants/errors');
+const Errors = require('../constants/errors');
 let Error = require('../modules/error');
+const RegistrationClasses = require('../constants/registration-classes');
+
+const Utility = require('../modules/utility');
 
 let randomstring = require("randomstring");
 
 
-let Registration = (function() {
+let Registration = (function () {
+
+  let _assertAtLeastOneFacultyStatusExists = {
+    validator: function(facultyStatuses) {
+      return facultyStatuses.length >= 1;
+    },
+    message: `Please supply at least one faculty status from the following: ${ Utility.buildDelimiterSeparatedObjectKeys(RegistrationClasses, ',')}`
+  };
+
+  let _validateFacultyStatus = {
+    validator: function(status) {
+      for (let registrationClass in RegistrationClasses) {
+        if (RegistrationClasses.hasOwnProperty(registrationClass)) {
+          if (status === RegistrationClasses[registrationClass]) {
+            return true;
+          }
+        }
+      }
+      return false;
+    },
+    message: `The supplied facultyStatus was invalid. Please supply one of the following: ${ Utility.buildDelimiterSeparatedObjectKeys(RegistrationClasses, ',')}`
+  };
 
   const _SCHEMA_NAME = 'Registrations';
   /**
@@ -19,13 +43,21 @@ let Registration = (function() {
   const _schema = new Schema({
     facultyIdentity: {
       type: String,
-      required: true,
+      required: [true, "facultyIdentity property is required"],
       index: {
         unique: true,
         dropDups: true
       },
       minlength: SchemaConstraints.facultyIdentityMinLength,
       maxlength: SchemaConstraints.facultyIdentityMaxLength
+    },
+    facultyStatus: {
+      type: [{
+        type: String,
+        validate: _validateFacultyStatus
+      }],
+      required: [true, "facultyStatus property is required."],
+      validate: _assertAtLeastOneFacultyStatusExists
     },
     roles: [{
       type: String,
@@ -40,21 +72,23 @@ let Registration = (function() {
   });
 
   _schema.methods.generateIdentitySecret = function (errCallback, successCallback) {
+    let _generatedIdentitySecret =  randomstring.generate({
+      length: 6,
+      charset: 'numeric'
+    });
+      
     process.nextTick(() => {
       this.model(_SCHEMA_NAME).update({
         _id: this._id
       }, {
         $set: {
-          identitySecret: randomstring.generate({
-            length: 6,
-            charset: 'numeric'
-          })
+          identitySecret: _generatedIdentitySecret
         }
       }, function (error) {
         if (error) {
           return errCallback(error);
         } else {
-          return successCallback();
+          return successCallback(_generatedIdentitySecret);
         }
       });
     });

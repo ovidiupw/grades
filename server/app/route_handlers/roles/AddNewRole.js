@@ -14,6 +14,9 @@ let PredefinedErrors = require('../../modules/predefined-errors');
 
 let util = require('util');
 
+/**
+ * Use invoke() method of this closure to create (POST) a new role.
+ */
 let AddNewRole = (function () {
 
   let _validateRequest = function (req, errCallback) {
@@ -84,14 +87,18 @@ let AddNewRole = (function () {
 
   let _objectContainsValidHttpVerb = function(actionObject) {
     for (let httpVerb in HttpVerbs) {
-      if (actionObject[Roles.VERB] === httpVerb) return true;
+      if (HttpVerbs.hasOwnProperty(httpVerb)) {
+        if (actionObject[Roles.VERB] === httpVerb) return true;
+      }
     }
     return false;
   };
 
   let _objectContainsValidHttpRoute = function(actionObject) {
     for (let routeName in RouteNames) {
-      if (actionObject[Roles.RESOURCE] === RouteNames[routeName]) return true;
+      if (RouteNames.hasOwnProperty(routeName)) {
+        if (actionObject[Roles.RESOURCE] === RouteNames[routeName]) return true;
+      }
     }
     return false;
   };

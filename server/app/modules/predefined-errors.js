@@ -35,6 +35,14 @@ let PredefinedErrors = {
       Errors.INVALID_REQUEST_FIELDS.message,
       data
     )
+  },
+  
+  getIdentityConfirmationError: function(data) {
+    return new Error(
+      Errors.IDENTITY_CONFIRMATION_FAILED.id,
+      Errors.IDENTITY_CONFIRMATION_FAILED.message,
+      data
+    )
   }
   
 };

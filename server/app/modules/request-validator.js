@@ -58,7 +58,7 @@ let RequestValidator = (function () {
     async.waterfall([
 
       function(callback) {
-        if (user.idenityConfirmed == false) {
+        if (user.identityConfirmed == false) {
           return callback(new Error(
             Errors.IDENTITY_NOT_CONFIRMED.id,
             Errors.IDENTITY_NOT_CONFIRMED.message
