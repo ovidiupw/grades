@@ -46,9 +46,9 @@ const Errors = {
     message: 'Error: The role with the supplied title was not found.',
     data: undefined
   },
-  AUTHENTICATION_DATA_NOT_FOUND: {
+  AUTHORIZATION_DATA_NOT_FOUND: {
     id: 10,
-    message: 'Error: Authentication data not found in request.',
+    message: 'Error: Authorization data not found in request.',
     data: undefined
   },
   NOT_AUTHORIZED: {
@@ -66,7 +66,7 @@ const Errors = {
     message: 'Error: A supplied role was invalid - not configured.',
     data: undefined
   },
-  INVALID_REQUEST_FIELDS: {
+INVALID_REQUEST_FIELDS: {
     id: 14,
     message: 'The fields of the object you passed in your request did not validate successfully.',
     data: undefined
@@ -79,6 +79,12 @@ const Errors = {
   AUTHENTICATION_ERROR: {
     id: 16,
     message: 'There was an error while authenticating.',
+    data: undefined
+  },
+
+  USER_ALREADY_EXISTS: {
+    id: 17,
+    message: 'Error: Supplied user already exists.',
     data: undefined
   }
 

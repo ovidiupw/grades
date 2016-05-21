@@ -19,7 +19,9 @@ const Routes = {
   AUTH_FACEBOOK_CALLBACK: '/v1/auth/facebook/callback',
   
   ROLES: '/v1/roles',
+  PROFESSORS: '/v1/professors',
   REGISTRATIONS: new RegExp(`\/v1\/(${bdsok(BasePaths, '|')})\/registrations`)
+  STUDENTS: '/v1/students'
 };
 
 module.exports = Routes;

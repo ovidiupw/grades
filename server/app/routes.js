@@ -9,6 +9,8 @@ const RouteNames = require('./constants/routes');
 
 const RegisterIdentity = require('./route_handlers/registrations/RegisterIdentity');
 const AddNewRole = require('./route_handlers/roles/AddNewRole');
+const AddNewStudent = require('./route_handlers/students/AddNewStudent');
+const AddNewProfessor = require('./route_handlers/Professors/AddNewProfessor');
 const ConfirmIdentity = require('./route_handlers/registrations/ConfirmIdentity');
 const AddNewRegistration = require('./route_handlers/registrations/AddNewRegistration');
 
@@ -47,11 +49,20 @@ let Routes = function (app, passport) {
     ConfirmIdentity.invoke(req, res);
   });
 
+
+
   /**
    * This function handles registering a new faculty identity.
    */
   app.post(RouteNames.REGISTER_IDENTITY, function (req, res) {
     RegisterIdentity.invoke(req, res);
+  });
+
+/**
+   * This function handles adding a new student.
+   */
+  app.post(RouteNames.STUDENTS, function (req, res) {
+    AddNewStudent.invoke(req, res);
   });
 
   /* Authentication via facebook */
