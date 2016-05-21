@@ -4,7 +4,6 @@ const Mongoose = require('mongoose');
 const Schema = Mongoose.Schema;
 const SchemaConstraints = require('../constants/schema-constraints');
 const DB = require('../config/database');
-let Errors = require('../constants/errors');
 
 const Errors = require('../constants/errors');
 const Error = require('../modules/error');
@@ -13,9 +12,9 @@ Mongoose.createConnection(DB.TEST_DB);
 
 let Professor = (function () {
 
-  const _SCHEMA_NAME = 'Professors';
+  const _SCHEMA_NAME = 'professors';
   /**
-   * The 'Professors' collection schema.
+   * The 'professors' collection schema.
    */
   const _schema = new Schema({
     facultyIdentity: {

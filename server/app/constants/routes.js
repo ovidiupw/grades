@@ -20,7 +20,7 @@ const Routes = {
   
   ROLES: '/v1/roles',
   PROFESSORS: '/v1/professors',
-  REGISTRATIONS: new RegExp(`\/v1\/(${bdsok(BasePaths, '|')})\/registrations`)
+  REGISTRATIONS: new RegExp(`\/v1\/(${bdsok(BasePaths, '|')})\/registrations`),
   STUDENTS: '/v1/students'
 };
 

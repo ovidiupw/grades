@@ -7,8 +7,8 @@ let PredefinedErrors = {
   
   getAuthorizationDataNotFoundError: function () {
     return new Error(
-      Errors.AUTHENTICATION_DATA_NOT_FOUND.id,
-      Errors.AUTHENTICATION_DATA_NOT_FOUND.message,
+      Errors.AUTHORIZATION_DATA_NOT_FOUND.id,
+      Errors.AUTHORIZATION_DATA_NOT_FOUND.message,
       undefined
     );
   },

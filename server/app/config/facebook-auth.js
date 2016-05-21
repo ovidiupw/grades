@@ -37,8 +37,7 @@ let FacebookAuth = (function () {
       });
     });
 
-  let _createNewUserAndSetIdentityConfirmedToFalse = function (
-    userIdentity, accessToken, apiKeyExpiration) {
+  let _createNewUserAndSetIdentityConfirmedToFalse = function (userIdentity, accessToken, apiKeyExpiration) {
     /* User is not in database, add it and set identityConfirmed to false */
     let user = new User.model({
       user: userIdentity,
@@ -57,8 +56,7 @@ let FacebookAuth = (function () {
     });
   };
 
-  let _updateUserWithNewCredentials = function (
-    foundUser, accessToken, apiKeyExpiration) {
+  let _updateUserWithNewCredentials = function (foundUser, accessToken, apiKeyExpiration) {
 
     User.model.update({
       _id: foundUser._id
@@ -115,12 +113,12 @@ let FacebookAuth = (function () {
 
       /* Return the updated/created user */
 
-      function(userIdentity, callback) {
+      function (userIdentity, callback) {
         User.model.findOne({
           user: userIdentity
         }, function (err, foundUser) {
           if (err || !foundUser) {
-            return callback (new Error(
+            return callback(new Error(
               Errors.LOGIN_ERROR.id,
               Errors.LOGIN_ERROR.message
             ));
@@ -131,21 +129,22 @@ let FacebookAuth = (function () {
 
       /* If user has it's identity confirmed, then append facultyStatus to response */
 
-      function(user, callback) {
-        if (user.identityConfirmed === true) {
-          Registration.model.findByFacultyIdentity(
-            user.facultyIdentity,
-            function(foundRegistration) {
-              return callback(null, user, foundRegistration);
-            },
-            function(registrationFindError) {
-              return callback(registrationFindError);
-            })
+      function (user, callback) {
+        if (user.identityConfirmed === false) {
+          return callback(null, user, null);
         }
-        return callback(null, user, null);
+        Registration.model.findByFacultyIdentity(
+          user.facultyIdentity,
+          function (foundRegistration) {
+            return callback(null, user, foundRegistration);
+          },
+          function (registrationFindError) {
+            return callback(registrationFindError);
+          });
+
       },
 
-      function(user, userRegistration, callback) {
+      function (user, userRegistration, callback) {
         let responseObject = {
           user: userIdentity,
           apiKey: accessToken,
@@ -155,7 +154,7 @@ let FacebookAuth = (function () {
         };
 
         if (userRegistration != null) {
-          Object.assign({}, responseObject, {
+          responseObject = Object.assign({}, responseObject, {
             facultyStatus: userRegistration.facultyStatus
           })
         }

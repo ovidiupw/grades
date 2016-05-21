@@ -10,7 +10,9 @@ const RouteNames = require('./constants/routes');
 const RegisterIdentity = require('./route_handlers/registrations/RegisterIdentity');
 const AddNewRole = require('./route_handlers/roles/AddNewRole');
 const AddNewStudent = require('./route_handlers/students/AddNewStudent');
-const AddNewProfessor = require('./route_handlers/Professors/AddNewProfessor');
+const DeleteStudent = require('./route_handlers/students/DeleteStudent');
+const AddNewProfessor = require('./route_handlers/professors/AddNewProfessor');
+const DeleteProfessor = require('./route_handlers/professors/DeleteProfessor');
 const ConfirmIdentity = require('./route_handlers/registrations/ConfirmIdentity');
 const AddNewRegistration = require('./route_handlers/registrations/AddNewRegistration');
 
@@ -45,11 +47,9 @@ let Routes = function (app, passport) {
   /**
    * This function handles confirming a previously registered identity.
    */
-  app.put(RouteNames.REGISTER_IDENTITY, function(req, res) {
+  app.put(RouteNames.REGISTER_IDENTITY, function (req, res) {
     ConfirmIdentity.invoke(req, res);
   });
-
-
 
   /**
    * This function handles registering a new faculty identity.
@@ -58,11 +58,26 @@ let Routes = function (app, passport) {
     RegisterIdentity.invoke(req, res);
   });
 
-/**
+  /**
    * This function handles adding a new student.
    */
   app.post(RouteNames.STUDENTS, function (req, res) {
     AddNewStudent.invoke(req, res);
+  });
+  
+  app.delete(RouteNames.STUDENTS, function(req, res) {
+    DeleteStudent.invoke(req, res);
+  });
+
+  /**
+   * This function handles adding a new professor.
+   */
+  app.post(RouteNames.PROFESSORS, function (req, res) {
+    AddNewProfessor.invoke(req, res);
+  });
+
+  app.delete(RouteNames.PROFESSORS, function(req, res) {
+    DeleteProfessor.invoke(req, res);
   });
 
   /* Authentication via facebook */
@@ -74,7 +89,7 @@ let Routes = function (app, passport) {
   );
 
   app.get(RouteNames.AUTH_FACEBOOK_CALLBACK,
-    passport.authenticate('facebook',  { session: false, failureRedirect : '/'}),
+    passport.authenticate('facebook', {session: false, failureRedirect: '/'}),
     function (req, res) {
       // Authentication succeeded, send auth data to user.
       res.status(200);
