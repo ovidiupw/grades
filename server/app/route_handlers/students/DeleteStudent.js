@@ -11,7 +11,7 @@ let Student = require('../../entities/student');
 
 let PredefinedErrors = require('../../modules/predefined-errors');
 
-let AddNewStudent = (function () {
+let DeleteStudent = (function () {
 
   let _validateRequest = function (req, errCallback) {
 
@@ -113,4 +113,4 @@ let AddNewStudent = (function () {
   }
 })();
 
-module.exports = AddNewStudent;
+module.exports = DeleteStudent;
