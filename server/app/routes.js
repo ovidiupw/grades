@@ -11,6 +11,7 @@ const HttpVerbs = require('./constants/http-verbs');
 
 const RegisterIdentity = require('./route_handlers/registrations/RegisterIdentity');
 const AddNewRole = require('./route_handlers/roles/AddNewRole');
+const AddNewStudent = require('./route_handlers/students/AddNewStudent');
 
 let Routes = function (app, passport) {
 
@@ -76,6 +77,13 @@ let Routes = function (app, passport) {
    */
   app.post(RouteNames.REGISTER_IDENTITY, function (req, res) {
     RegisterIdentity.invoke(req, res);
+  });
+
+  /**
+   * This function handles adding a new student.
+   */
+  app.post(RouteNames.STUDENTS, function (req, res) {
+    AddNewStudent.invoke(req, res);
   });
 
   /* Authentication via facebook */

@@ -17,16 +17,6 @@ let Student = (function () {
    * The 'Students' collection schema.
    */
   const _schema = new Schema({
-    user: {
-      type: String,
-      required: true,
-      index: {
-        unique: true,
-        dropDups: true
-      },
-      minlength: SchemaConstraints.userMinLength,
-      maxlength: SchemaConstraints.userMaxLength
-    },
     facultyIdentity: {
       type: String,
       minlength: SchemaConstraints.facultyIdentityMinLength,
