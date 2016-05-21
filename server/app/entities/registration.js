@@ -39,7 +39,7 @@ let Registration = (function() {
     }
   });
 
-  _schema.methods.generateIdentitySecret = function (errCallback, succCallback) {
+  _schema.methods.generateIdentitySecret = function (errCallback, successCallback) {
     process.nextTick(() => {
       this.model(_SCHEMA_NAME).update({
         _id: this._id
@@ -54,7 +54,7 @@ let Registration = (function() {
         if (error) {
           return errCallback(error);
         } else {
-          return succCallback();
+          return successCallback();
         }
       });
     });

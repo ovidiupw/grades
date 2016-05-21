@@ -15,10 +15,10 @@ let FacebookAuth = (function () {
       clientID: ConfigAuth.facebookAuth.appId,
       clientSecret: ConfigAuth.facebookAuth.appSecret,
       callbackURL: ConfigAuth.facebookAuth.callbackURL,
-      profileFields: ['id', 'name', 'verified'], /* get only these fields from profile */
+      profileFields: ['id', 'name', 'verified'] /* get only these fields from profile */
     },
     function (accessToken, refreshToken, profile, done) {
-      /* Wait for the next process event loop via process.nextTick */
+
       process.nextTick(() => {
         if (profile._json.verified === false) {
           /* Do not accept unverified facebook profiles */

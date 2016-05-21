@@ -2,7 +2,7 @@
 
 let Errors = require('../../constants/errors');
 let Error = require('../../modules/error');
-let PredefinedErrors = require('../../modules/predefined-errors')
+let PredefinedErrors = require('../../modules/predefined-errors');
 
 let async = require('async');
 let RequestValidator = require('../../modules/request-validator');

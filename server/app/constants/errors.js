@@ -66,8 +66,24 @@ const Errors = {
     message: 'Error: A supplied role was invalid - not configured.',
     data: undefined
   },
-  USER_ALREADY_EXISTS: {
+INVALID_REQUEST_FIELDS: {
     id: 14,
+    message: 'The fields of the object you passed in your request did not validate successfully.',
+    data: undefined
+  },
+  IDENTITY_NOT_CONFIRMED: {
+    id: 15,
+    message: 'The account requesting the operation is not confirmed.',
+    data: undefined
+  },
+  AUTHENTICATION_ERROR: {
+    id: 16,
+    message: 'There was an error while authenticating.',
+    data: undefined
+  },
+
+  USER_ALREADY_EXISTS: {
+    id: 17,
     message: 'Error: Supplied user already exists.',
     data: undefined
   }

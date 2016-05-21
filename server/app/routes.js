@@ -2,12 +2,16 @@
 
 let User = require('./entities/user');
 
+const Errors = require('./constants/errors');
+const Error = require('./modules/error');
+
 let RequestValidator = require('./modules/request-validator');
 const RouteNames = require('./constants/routes');
 const HttpVerbs = require('./constants/http-verbs');
 
 const RegisterIdentity = require('./route_handlers/registrations/RegisterIdentity');
 const AddNewRole = require('./route_handlers/roles/AddNewRole');
+const AddNewStudent = require('./route_handlers/students/AddNewStudent');
 const AddNewProfessor = require('./route_handlers/Professors/AddNewProfessor');
 
 let Routes = function (app, passport) {
@@ -77,7 +81,7 @@ let Routes = function (app, passport) {
     });
 
   /**
-   * This function handles adding a new role (specification) in the databse.
+   * This function handles adding a new role (specification) in the database.
    */
   app.post(RouteNames.ROLES, function (req, res) {
     AddNewRole.invoke(req, res);
@@ -90,6 +94,13 @@ let Routes = function (app, passport) {
     RegisterIdentity.invoke(req, res);
   });
 
+  /**
+   * This function handles adding a new student.
+   */
+  app.post(RouteNames.STUDENTS, function (req, res) {
+    AddNewStudent.invoke(req, res);
+  });
+
   /* Authentication via facebook */
   app.get(RouteNames.AUTH_FACEBOOK,
     passport.authenticate('facebook', {
@@ -99,7 +110,7 @@ let Routes = function (app, passport) {
   );
 
   app.get(RouteNames.AUTH_FACEBOOK_CALLBACK,
-    passport.authenticate('facebook'),
+    passport.authenticate('facebook',  { session: false, failureRedirect : '/'}),
     function (req, res) {
       // Authentication succeeded, send auth data to user.
       res.status(200);
@@ -107,11 +118,15 @@ let Routes = function (app, passport) {
         profile: req.user
       });
     },
-    function (err, req, res) {
+    function (err, req, res, next) {
       if (err) {
         // Authentication failed, send auth error data to user.
         res.status(400);
-        res.send(err);
+        res.send(new Error(
+          Errors.AUTHENTICATION_ERROR.id,
+          Errors.AUTHENTICATION_ERROR.message,
+          err.message
+        ));
       }
     }
   );

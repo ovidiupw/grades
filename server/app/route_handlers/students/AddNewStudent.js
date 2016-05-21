@@ -7,14 +7,11 @@ const RouteNames = require('../../constants/routes');
 const HttpVerbs = require('../../constants/http-verbs');
 
 let User = require('../../entities/user');
-let Role = require('../../entities/role');
-let Roles = require('../../constants/roles');
+let Student = require('../../entities/student');
 
 let PredefinedErrors = require('../../modules/predefined-errors');
 
-let util = require('util');
-
-let AddNewRole = (function () {
+let AddNewStudent = (function () {
 
   let _validateRequest = function (req, errCallback) {
 
@@ -25,75 +22,18 @@ let AddNewRole = (function () {
       if (!RequestValidator.requestContainsAuthenticationData(req)) {
         return errCallback(PredefinedErrors.getAuthorizationDataNotFoundError());
       }
-      if (req.body.title == undefined || req.body.actions == undefined) {
+      if (req.body.facultyIdentity == undefined ||
+        req.body.registrationNumber == undefined ||
+        req.body.birthDate == undefined ||
+        req.body.academicYear == undefined ||
+        req.body.academicGroup == undefined) {
         return errCallback(PredefinedErrors.getInvalidBodyError(
           "Required parameters not supplied. Please add " +
-          "'title' and 'actions' to your request."));
-      }
-
-      let err = _validateRequestActions(req.body.actions);
-      if (err != null) {
-        return errCallback(err);
+          "'facultyIdentity', 'registrationNumber', 'birthDate', 'academicYear' and 'academicGroup' to your request."));
       }
 
       return errCallback(null);
     });
-  };
-
-  let _validateRequestActions = function (actionsJSON) {
-    let actions;
-    try {
-      actions = JSON.parse(actionsJSON);
-    } catch (ignored) {
-      return PredefinedErrors.getInvalidBodyError("Invalid parameter type for 'actions'. Expected an array.");
-    }
-
-    if (!util.isArray(actions)) {
-      return PredefinedErrors.getInvalidBodyError("Invalid parameter type for 'actions'. Expected an array.");
-    }
-
-    if (actions.length < 1) {
-      return PredefinedErrors.getInvalidBodyError("Actions array must have at least one element.");
-    }
-
-    for (let actionIndex in actions) {
-      if (!util.isObject(actions[actionIndex])
-        || actions[actionIndex].verb == undefined
-        || actions[actionIndex].resource == undefined) {
-
-        return PredefinedErrors.getInvalidBodyError("One of the supplied actions had an invalid format. " +
-          "Each action must be an object with fields {verb, resource}.");
-      }
-
-      if (!_isActionObjectValid(actions[actionIndex])) {
-        return PredefinedErrors.getInvalidBodyError("Invalid action object specified: "
-          + JSON.stringify(actions[actionIndex]));
-      }
-    }
-
-    return null;
-  };
-
-  let _isActionObjectValid = function(actionObject) {
-    if (Object.keys(actionObject).length !== 2) return false;
-    if (!_objectContainsValidHttpVerb(actionObject)) return false;
-    if (!_objectContainsValidHttpRoute(actionObject)) return false;
-
-    return true;
-  };
-
-  let _objectContainsValidHttpVerb = function(actionObject) {
-    for (let httpVerb in HttpVerbs) {
-      if (actionObject[Roles.VERB] === httpVerb) return true;
-    }
-    return false;
-  };
-
-  let _objectContainsValidHttpRoute = function(actionObject) {
-    for (let routeName in RouteNames) {
-      if (actionObject[Roles.RESOURCE] === RouteNames[routeName]) return true;
-    }
-    return false;
   };
 
   let _invoke = function (req, res) {
@@ -135,7 +75,7 @@ let AddNewRole = (function () {
 
       function (user, callback) {
         RequestValidator.validateAccessRights(
-          user, RouteNames.ROLES, HttpVerbs.POST,
+          user, RouteNames.STUDENTS, HttpVerbs.POST,
           function (error) {
             if (error) {
               /* In case user does not have permissions to access this resource */
@@ -149,16 +89,18 @@ let AddNewRole = (function () {
       /* User has permission to access the resource at this point - authorized */
 
       function (callback) {
-        let actions = JSON.parse(req.body.actions); // function catch should have been verified earlier
 
-        let newRole = new Role.model({
-          title: req.body.title,
-          actions: actions
+        let newStudent = new Student.model({
+          facultyIdentity: req.body.facultyIdentity,
+          registrationNumber: req.body.registrationNumber,
+          birthDate: req.body.birthDate,
+          academicYear: req.body.academicYear,
+          academicGroup: req.body.academicGroup
         });
 
-        newRole.save(function (roleSaveError) {
-          if (roleSaveError) {
-            callback(PredefinedErrors.getDatabaseOperationFailedError(roleSaveError));
+        newStudent.save(function (studentSaveError) {
+          if (studentSaveError) {
+            callback(PredefinedErrors.getDatabaseOperationFailedError(studentSaveError));
           } else {
             callback(null);
           }
@@ -184,4 +126,4 @@ let AddNewRole = (function () {
   }
 })();
 
-module.exports = AddNewRole;
+module.exports = AddNewStudent;

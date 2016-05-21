@@ -4,6 +4,9 @@ const RouteNames = require('./routes');
 const HttpVerbs = require('./http-verbs');
 
 const Roles = {
+  VERB: 'verb',
+  RESOURCE: 'resource',
+  
   administrator: {
     title: 'administrator',
     actions: [

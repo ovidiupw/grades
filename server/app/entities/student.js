@@ -5,6 +5,9 @@ const Schema = Mongoose.Schema;
 const SchemaConstraints = require('../constants/schema-constraints');
 const DB = require('../config/database');
 
+const Errors = require('../constants/errors');
+const Error = require('../modules/error');
+
 Mongoose.createConnection(DB.TEST_DB);
 
 let Student = (function () {
@@ -14,16 +17,6 @@ let Student = (function () {
    * The 'Students' collection schema.
    */
   const _schema = new Schema({
-    user: {
-      type: String,
-      required: true,
-      index: {
-        unique: true,
-        dropDups: true
-      },
-      minlength: SchemaConstraints.userMinLength,
-      maxlength: SchemaConstraints.userMaxLength
-    },
     facultyIdentity: {
       type: String,
       minlength: SchemaConstraints.facultyIdentityMinLength,

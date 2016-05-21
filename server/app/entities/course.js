@@ -4,6 +4,9 @@ const Mongoose = require('mongoose');
 const Schema = Mongoose.Schema;
 const DB = require('../config/database');
 
+const Errors = require('../constants/errors');
+const Error = require('../modules/error');
+
 Mongoose.createConnection(DB.TEST_DB);
 
 let Course = (function () {
