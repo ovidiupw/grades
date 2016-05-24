@@ -22,9 +22,20 @@ let Utility = (function() {
     }
     return  commaSeparatedKeys.substring(0, commaSeparatedKeys.length - 1);
   };
+  
+  const _PATH = {
+    VERB: 'verb',
+    RESOURCE: 'resource'
+  };
+  
+  let _actionsEqual = function(a1, a2) {
+    return a1.resource === a2.resource && a1.verb === a2.verb;
+  };
 
   return {
-    buildDelimiterSeparatedObjectKeys: _buildCommaSeparatedKeysString
+    PATH: _PATH,
+    buildDelimiterSeparatedObjectKeys: _buildCommaSeparatedKeysString,
+    actionsEqual: _actionsEqual
   }
 })();
 

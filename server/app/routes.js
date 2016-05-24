@@ -1,7 +1,5 @@
 'use strict';
 
-let User = require('./entities/user');
-
 const Errors = require('./constants/errors');
 const Error = require('./modules/error');
 
@@ -30,11 +28,8 @@ let Routes = function (app, passport) {
   /**
    * This function handles creating a new registration in the database.
    */
-  app.post(RouteNames.REGISTRATIONS, function (req, res) {
-    let pathGroup = RouteNames.REGISTRATIONS.exec(req.url);
-    console.log(pathGroup);
-    //TODO continue work
-    AddNewRegistration.invoke(req, res, data);
+  app.post(RouteNames.REGISTRATIONS, function (req, res) {    
+    AddNewRegistration.invoke(req, res);
   });
 
   /**

@@ -31,7 +31,7 @@ let RequestValidator = (function () {
   };
 
   let _registrationHasPredefinedRole = function (registration, predefinedRole) {
-    return registration.roles.indexOf(predefinedRole.title != -1);
+    return registration.roles.indexOf(predefinedRole.title) != -1;
   };
 
   let _roleIsAuthorizedOnResource = function (predefinedRole, resource, verb) {
@@ -71,7 +71,7 @@ let RequestValidator = (function () {
         Registration.model.findByFacultyIdentity(
           user.facultyIdentity,
           function (foundRegistration) {
-            return callback(null, foundRegistration);
+            return callback(null, foundRegistration._doc);
           },
           function (registrationNotFoundError) {
             return callback(registrationNotFoundError);
@@ -91,8 +91,8 @@ let RequestValidator = (function () {
       function(registration, callback) {
         
         for (let predefinedRole in PredefinedRoles) {
-          if (_registrationHasPredefinedRole(registration, PredefinedRoles[predefinedRole]
-              && _roleIsAuthorizedOnResource(PredefinedRoles[predefinedRole], resource, verb))) {
+          if (_registrationHasPredefinedRole(registration, PredefinedRoles[predefinedRole])
+              && _roleIsAuthorizedOnResource(PredefinedRoles[predefinedRole], resource, verb)) {
             return callback(_SUCCESS_BREAK);
           }
         }

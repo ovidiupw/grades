@@ -81,12 +81,22 @@ INVALID_REQUEST_FIELDS: {
     message: 'There was an error while authenticating.',
     data: undefined
   },
-
   USER_ALREADY_EXISTS: {
     id: 17,
     message: 'Error: Supplied user already exists.',
     data: undefined
+  },
+  INVALID_REQUEST_DATA: {
+    id: 18,
+    message: 'Error: Invalid request data supplied.',
+    data: undefined
+  },
+  USER_REGISTRATION_ERROR: {
+    id: 19,
+    message: 'Error: Registration could not be completed.',
+    data: undefined
   }
+
 
 };
 

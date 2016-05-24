@@ -43,6 +43,14 @@ let PredefinedErrors = {
       Errors.IDENTITY_CONFIRMATION_FAILED.message,
       data
     )
+  },
+
+  getAddNewRegistrationError: function(data) {
+    return new Error(
+      Errors.USER_REGISTRATION_ERROR.id,
+      Errors.USER_REGISTRATION_ERROR.message,
+      data
+    )
   }
   
 };
