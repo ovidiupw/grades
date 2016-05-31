@@ -2,7 +2,7 @@ const merge = require('webpack-merge');
 const webpack = require('webpack');
 const path = require('path');
 const NpmInstallPlugin = require('npm-install-webpack-plugin');
-
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 const TARGET = process.env.npm_lifecycle_event;
 
@@ -20,7 +20,8 @@ const common = {
   },
   output: {
     path: PATHS.build,
-    filename: 'bundle.js'
+    filename: 'bundle.js',
+    publicPath: '/'
   }
 };
 
@@ -86,6 +87,11 @@ module.exports = merge(common, {
     new webpack.HotModuleReplacementPlugin(),
     new NpmInstallPlugin({
       save: true // --save
+    }),
+    new HtmlWebpackPlugin({
+      title: 'Grades',
+      template: 'style/index_template.ejs',
+      favicon: './style/images/favicon.ico'
     })
   ]
 });

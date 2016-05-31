@@ -1,23 +1,32 @@
 import { connect } from 'react-redux'
+import { Link } from 'react-router'
 import React from 'react'
 
-let NavbarTop = React.createClass ({
+let NavBarTop = React.createClass ({
   render() {
     return (
     <div>
       <nav className="navbar navbar-default">
         <div className="container-fluid">
           <div className="navbar-header">
-            <a className="navbar-brand" href="#">
-              <p>TodoApp</p>
-            </a>
+            <Link className="navbar-brand" to={'/home'}>
+              <p>Grades</p>
+            </Link>
           </div>
+          <ul className="nav navbar-nav navbar-right">
+            <li>
+              <a href="http://students.info.uaic.ro/~ovidiu.pricop/index.html"
+                target="_blank">
+                Help
+              </a>
+            </li>
+          </ul>
         </div>
       </nav>
     </div>
   )}
-})
+});
 
-NavbarTop = connect()(NavbarTop)
+NavBarTop = connect()(NavBarTop);
 
-export default NavbarTop
+export default NavBarTop;
