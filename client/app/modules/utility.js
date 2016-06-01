@@ -2,6 +2,9 @@ import {
   updateError,
   showDangerAlert
 } from '../actions/actions';
+import {SESSION_PROBLEM} from '../constants/routes'
+import React from 'react'
+import * as InitialStates from '../constants/initialStates'
 
 import {DEVELOPER} from '../constants/facultyStatuses';
 
@@ -17,8 +20,17 @@ let Utility = {
 
   handleResponseCodeNot200: function (response, dispatch) {
     if (response.status.code === 400) {
+      let data = response.entity.data;
+      if (response.entity.code === 6 || response.entity.code === 7) {
+        data = "Go to home-screen by clicking the top left 'Grades' logo and login again."
+      }
+      console.log(typeof response.entity.data);
+      if (response.entity.errors != undefined) {
+        data = JSON.stringify(response.entity.errors); 
+      }
+
       dispatch(updateError({
-        message: response.entity.message + " - " + response.entity.data
+        message: response.entity.message + " - " + data
       }));
     } else {
       dispatch(updateError({
@@ -31,6 +43,36 @@ let Utility = {
   getRedirectLocation: function (facultyStatuses) {
     if (facultyStatuses.indexOf(DEVELOPER) != -1) {
       return "/developer/home";
+    }
+  },
+
+  redirectOnSessionProblem: function(userAccount, router) {
+    if (userAccount.user == undefined
+      || userAccount.apiKey == undefined
+      || userAccount.keyExpires == undefined
+      || new Date(userAccount.keyExpires) <= new Date()) {
+      router.push(SESSION_PROBLEM);
+    }
+  },
+
+  getHtmlRoleDescription: function(role) {
+    return `<h4>${role.title}</h4> <p>This role has permissions to:</p><ul>`
+      + role.actions.map(action => `<li>${action.verb} on '${action.resource}'</li>`)
+      + '</ul>'
+  },
+
+  persistAddRegistrationForm: function(addRegistrationForm) {
+    localStorage.setItem('addRegistrationForm', JSON.stringify(addRegistrationForm));
+  },
+  
+  getPersistedAddRegistrationForm: function() {
+    try {
+      if (localStorage.getItem('addRegistrationForm') == undefined) throw 'No persisted addRegistrationForm found.';
+      let persistedAddRegistrationForm = JSON.parse(localStorage.getItem('addRegistrationForm'));
+      return persistedAddRegistrationForm;
+    } catch (err) {
+      console.log(err);
+      return InitialStates.addRegistrationForm;
     }
   }
 };

@@ -7,11 +7,12 @@ const RouteNames = require('../../constants/routes');
 const HttpVerbs = require('../../constants/http-verbs');
 
 let User = require('../../entities/user');
-let Registration = require('../../entities/registration');
+let Role = require('../../entities/role');
 
 let PredefinedErrors = require('../../modules/predefined-errors');
+let PredefinedRoles = require('../../constants/roles');
 
-let ListRegistrations = (function () {
+let ListRoles = (function () {
 
   let _validateRequest = function (req, errCallback) {
 
@@ -66,7 +67,7 @@ let ListRegistrations = (function () {
 
       function (user, callback) {
         RequestValidator.validateAccessRights(
-          user, RouteNames.REGISTRATIONS, HttpVerbs.GET,
+          user, RouteNames.ROLES, HttpVerbs.GET,
           function (error) {
             if (error) {
               /* In case user does not have permissions to access this resource */
@@ -78,18 +79,27 @@ let ListRegistrations = (function () {
       },
 
       function (callback) {
-        Registration.model.find({}, function (err, registrations) {
+        Role.model.find({}, function (err, roles) {
           if (err) {
             return callback(err);
           } else {
-            return callback(null, registrations);
+            return callback(null, roles);
           }
         });
       },
 
-      function (registrations, callback) {
+      function(roles, callback) {
+        for (let predefinedRole in PredefinedRoles) {
+          if (PredefinedRoles.hasOwnProperty(predefinedRole)) {
+            roles.push(PredefinedRoles[predefinedRole]);
+          }
+        }
+        callback(null, roles);
+      },
+
+      function (roles, callback) {
         res.status(200);
-        res.send(registrations);
+        res.send(roles);
       }
 
     ], function (err, results) {
@@ -106,4 +116,4 @@ let ListRegistrations = (function () {
   }
 })();
 
-module.exports = ListRegistrations;
+module.exports = ListRoles;

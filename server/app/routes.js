@@ -7,12 +7,14 @@ const RouteNames = require('./constants/routes');
 
 const RegisterIdentity = require('./route_handlers/registrations/RegisterIdentity');
 const AddNewRole = require('./route_handlers/roles/AddNewRole');
+const ListRoles = require('./route_handlers/roles/ListRoles');
 const AddNewStudent = require('./route_handlers/students/AddNewStudent');
 const DeleteStudent = require('./route_handlers/students/DeleteStudent');
 const AddNewProfessor = require('./route_handlers/professors/AddNewProfessor');
 const DeleteProfessor = require('./route_handlers/professors/DeleteProfessor');
 const ConfirmIdentity = require('./route_handlers/registrations/ConfirmIdentity');
 const AddNewRegistration = require('./route_handlers/registrations/AddNewRegistration');
+const ListRegistrations = require('./route_handlers/registrations/ListRegistrations');
 
 let Routes = function (app, passport) {
 
@@ -26,10 +28,24 @@ let Routes = function (app, passport) {
   });
 
   /**
+   * This function handles listing all registrations from the database.
+   */
+  app.get(RouteNames.REGISTRATIONS, function(req, res) {
+    ListRegistrations.invoke(req, res);
+  });
+
+  /**
    * This function handles creating a new registration in the database.
    */
   app.post(RouteNames.REGISTRATIONS, function (req, res) {
     AddNewRegistration.invoke(req, res);
+  });
+
+  /**
+   * This function handles listing all roles from the database.
+   */
+  app.get(RouteNames.ROLES, function(req, res) {
+    ListRoles.invoke(req, res);
   });
 
   /**

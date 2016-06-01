@@ -1,5 +1,39 @@
 import * as Actions from '../constants/actionTypes'
 
+export function updateRegistrationFormFacultyStatuses(facultyStatuses) {
+  return {
+    type: Actions.UPDATE_ADD_REGISTRATION_FORM_FACULTY_STATUSES,
+    facultyStatuses: facultyStatuses
+  }
+}
+
+export function updateRegistrationFormFacultyIdentity(facultyIdentity) {
+  return {
+    type: Actions.UPDATE_ADD_REGISTRATION_FORM_FACULTY_IDENTITY,
+    facultyIdentity: facultyIdentity
+  }
+}
+
+export function removeRegistrationFormRole(role) {
+  return {
+    type: Actions.POP_ADD_REGISTRATION_FORM_ROLE,
+    role: role
+  }
+}
+
+export function addRegistrationFormRole(role) {
+  return {
+    type: Actions.PUSH_ADD_REGISTRATION_FORM_ROLE,
+    role: role
+  }
+}
+
+export function clearRegistrationFormRoles() {
+  return {
+    type: Actions.CLEAR_ADD_REGISTRATION_FORM_ROLES
+  };
+}
+
 export function showSuccessAlert() {
   return {
     type: Actions.SHOW_SUCCESS_ALERT
@@ -66,5 +100,32 @@ export function showIdentityConfirmationForm() {
 export function hideIdentityConfirmationForm() {
   return {
     type: Actions.HIDE_IDENTITY_CONFIRMATION_FORM
+  }
+}
+
+export function setRegistrations(registrations) {
+  return {
+    type: Actions.SET_REGISTRATIONS,
+    registrations: registrations
+  }
+}
+
+
+export function setRoles(roles) {
+  return {
+    type: Actions.SET_ROLES,
+    roles: roles
+  }
+}
+
+export function showAddRegistrationForm() {
+  return {
+    type: Actions.SHOW_ADD_REGISTRATION_FORM
+  }
+}
+
+export function hideAddRegistrationForm() {
+  return {
+    type: Actions.HIDE_ADD_REGISTRATION_FORM
   }
 }

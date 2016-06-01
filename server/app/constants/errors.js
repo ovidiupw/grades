@@ -66,7 +66,7 @@ const Errors = {
     message: 'Error: A supplied role was invalid - not configured.',
     data: undefined
   },
-INVALID_REQUEST_FIELDS: {
+  INVALID_REQUEST_FIELDS: {
     id: 14,
     message: 'The fields of the object you passed in your request did not validate successfully.',
     data: undefined
@@ -94,6 +94,46 @@ INVALID_REQUEST_FIELDS: {
   USER_REGISTRATION_ERROR: {
     id: 19,
     message: 'Error: Registration could not be completed.',
+    data: undefined
+  },
+  INVALID_FACULTY_IDENTITY: {
+    id: 20,
+    message: 'Error: Supplied faculty identity is invalid.',
+    data: undefined
+  },
+  INVALID_BIRTH_DATE: {
+    id: 21,
+    message: 'Error: Supplied student birth date is invalid.',
+    data: undefined
+  },
+  PROFESSOR_NOT_FOUND: {
+    id: 22,
+    message: 'Error: A professor with the supplied facultyIdentity does not exist.',
+    data: undefined
+  },
+  PROFESSOR_MODULE_COURSE_MISMATCH: {
+    id: 23,
+    message: 'Error: The professor can not add a module to this course.',
+    data: undefined
+  },
+  INVALID_FORMULA: {
+    id: 24,
+    message: 'Error: Supplied formula is invalid, please check the modules used in it.',
+    data: undefined
+  },
+  STUDENT_NOT_FOUND: {
+    id: 25,
+    message: 'Error: A student with the supplied facultyIdentity does not exist.',
+    data: undefined
+  },
+  COURSE_NOT_FOUND: {
+    id: 26,
+    message: 'Error: A course with the supplied courseId does not exist.',
+    data: undefined
+  },
+  REQ_HEADER_INVALID: {
+    id: 27,
+    message: 'Error: The request header is invalid.',
     data: undefined
   }
 

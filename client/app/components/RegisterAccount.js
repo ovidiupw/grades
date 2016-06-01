@@ -2,6 +2,7 @@ import {connect} from 'react-redux'
 import React, {PropTypes} from 'react';
 import {REGISTER_ACCOUNT, EMAIL_CONFIRMATION} from '../constants/text';
 import ReactTooltip from 'react-tooltip'
+import Utility from '../modules/utility'
 import Alert from '../components-utility/Alert'
 import Spinner from 'react-spin'
 
@@ -22,7 +23,7 @@ import {
 } from '../actions/thunks';
 
 let RegisterAccount = React.createClass({
-  
+
   hideAlerts() {
     this.props.hideDangerAlert();
     this.props.hideSuccessAlert();
@@ -63,14 +64,21 @@ let RegisterAccount = React.createClass({
     this.props.confirmIdentity(
       this.props.userAccount,
       Object.assign({}, this.props.userAccount, {
-      identitySecret: this.refs.identityConfirmationCode.value
-    }))
+        identitySecret: this.refs.identityConfirmationCode.value
+      }))
   },
 
   /**************************************************/
 
+  contextTypes: {
+    router: React.PropTypes.func.isRequired
+  },
+
+
   componentDidMount() {
     this.hideAlerts();
+    Utility.redirectOnSessionProblem(this.props.userAccount, this.context.router);
+
     if (this.props.userAccount.facultyIdentity != undefined
       && this.props.userAccount.facultyIdentity.length > 0) {
       this.props.showIdentityConfirmationForm();
@@ -145,7 +153,7 @@ let RegisterAccount = React.createClass({
             <label className="col-sm-2 control-label">Code</label>
             <div className="col-sm-10">
               <input className="form-control"
-                     ref="identityConfirmationCode" placeholder="The confirmation code you received by email" />
+                     ref="identityConfirmationCode" placeholder="The confirmation code you received by email"/>
             </div>
           </div>
           <div className="form-group">

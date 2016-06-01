@@ -38,7 +38,7 @@ const AddNewRegistration = (function() {
       }
 
       try {
-        let facultyStatusesArray = JSON.parse(req.body.facultyStatus);
+        let facultyStatusesArray = req.body.facultyStatus;
         if (facultyStatusesArray.constructor !== Array) {
           return errCallback(PredefinedErrors.getInvalidBodyError(
             "facultyStatus must be an array of double quoted strings."));
@@ -57,7 +57,7 @@ const AddNewRegistration = (function() {
       }
 
       try {
-        let rolesArray = JSON.parse(req.body.roles);
+        let rolesArray = req.body.roles;
         if (rolesArray.constructor !== Array) {
           return errCallback(PredefinedErrors.getInvalidBodyError(
             "Roles must be an array of double quoted strings."));
@@ -302,7 +302,7 @@ const AddNewRegistration = (function() {
         if (req.body.roles == undefined)
           return callback(null, user);
         
-        _userIsAllowedToAssignRequestedRoles(registration, JSON.parse(req.body.roles), function (err) {
+        _userIsAllowedToAssignRequestedRoles(registration, req.body.roles, function (err) {
           if (err) {
             return callback(err);
           }

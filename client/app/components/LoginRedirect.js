@@ -1,9 +1,9 @@
 import {connect} from 'react-redux'
 import React, {PropTypes} from 'react';
-import {withRouter} from 'react-router';
 import Utility from '../modules/utility'
 import {REGISTER_ACCOUNT} from '../constants/routes';
 import Alert from '../components-utility/Alert';
+import Authorization from '../modules/authorization';
 
 import {
   updateUserAccountData,
@@ -37,7 +37,7 @@ let LoginRedirect = React.createClass({
               {payload: <hr style={{width:"50%"}}/>, key: 1},
               {payload: <p key="2">{this.props.error.message}</p>, key: 2},
               {payload: <p key="3">{this.props.error.data}</p>, key: 3}
-            ]} display={this.props.dangerAlert.display} />
+            ]} display={this.props.dangerAlert.display}/>
     }
 
     return <Alert type={alertType} onClick={e => this.props.hideSuccessAlert()} content={[
@@ -49,8 +49,10 @@ let LoginRedirect = React.createClass({
   handleNoFacultyStatusAssociatedWithAccount() {
     if (this.authResponse.facultyStatus == undefined
       || this.authResponse.facultyStatus.length < 1) {
-      this.props.updateError({message: "You don't have any faculty statuses associated with your account. " +
-      "Please contact your administrator and ask for a faculty status association."});
+      this.props.updateError({
+        message: "You don't have any faculty statuses associated with your account. " +
+        "Please contact your administrator and ask for a faculty status association."
+      });
       this.props.showDangerAlert();
     }
   },
@@ -80,9 +82,15 @@ let LoginRedirect = React.createClass({
     this.authResponse = this.getResponseFromQueryParams();
 
     if (this.authResponse.error !== true) {
+      Authorization.saveCredentialsToLocalStorage({
+        user: this.authResponse.user,
+        apiKey: this.authResponse.apiKey,
+        keyExpires: this.authResponse.keyExpires,
+        facultyStatus: this.authResponse.facultyStatus
+      });
       this.handleAuthResponseWithoutError();
     } else {
-     this.handleAuthResponseWithError();
+      this.handleAuthResponseWithError();
     }
   },
 

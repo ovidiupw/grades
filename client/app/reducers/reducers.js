@@ -1,4 +1,5 @@
 import * as ActionTypes from '../constants/actionTypes'
+import * as InitialStates from '../constants/initialStates'
 
 export function successAlert(state = {
   display: "none"
@@ -84,7 +85,6 @@ export function error(state = {
   switch (action.type) {
     
     case ActionTypes.UPDATE_ERROR:
-      
       const err = action.errorData;
       return Object.assign({}, state, {
         id: err.id,
@@ -130,6 +130,81 @@ export function identityConfirmationForm(state = {
         display: "none"
       });
 
+    default:
+      return state;
+  }
+}
+
+export function registrations(state = {
+  items: []
+}, action) {
+  switch (action.type) {
+    case ActionTypes.SET_REGISTRATIONS:
+      return Object.assign({}, state, {
+        items: action.registrations    
+      });
+    
+    default:
+      return state;
+  }
+}
+
+export function roles(state = {
+  items: []
+}, action) {
+  switch (action.type) {
+    case ActionTypes.SET_ROLES:
+      return Object.assign({}, state, {
+        items: action.roles
+      });
+
+    default:
+      return state;
+  }
+}
+
+export function addRegistrationForm(state = InitialStates.addRegistrationForm
+  , action) {
+  switch (action.type) {
+
+    case ActionTypes.UPDATE_ADD_REGISTRATION_FORM_FACULTY_STATUSES:
+      return Object.assign({}, state, {
+        facultyStatuses: action.facultyStatuses
+      });
+
+    case ActionTypes.UPDATE_ADD_REGISTRATION_FORM_FACULTY_IDENTITY:
+      return Object.assign({}, state, {
+        facultyIdentity: action.facultyIdentity
+      });
+
+    case ActionTypes.POP_ADD_REGISTRATION_FORM_ROLE:
+      return Object.assign({}, state, {
+        roles: state.roles.filter(role => role.title !== action.role.title)
+      });
+
+    case ActionTypes.PUSH_ADD_REGISTRATION_FORM_ROLE:
+      let rolesWithNewRole = state.roles;
+      rolesWithNewRole.push(action.role);
+
+      return Object.assign({}, state, {
+        roles: rolesWithNewRole
+      });
+
+    case ActionTypes.CLEAR_ADD_REGISTRATION_FORM_ROLES:
+      return Object.assign({}, state, {
+        roles: []
+      });
+
+    case ActionTypes.SHOW_ADD_REGISTRATION_FORM:
+      return Object.assign({}, state, {
+        display: "block"
+      });
+    
+    case ActionTypes.HIDE_ADD_REGISTRATION_FORM:
+      return Object.assign({}, state, {
+        display: "none"
+      });
+    
     default:
       return state;
   }

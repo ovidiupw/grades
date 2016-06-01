@@ -4,6 +4,7 @@ const LOGIN_REDIRECT = "/login-redirect";
 const DEVELOPER_HOME = "/developer/home";
 const DEVELOPER_REGISTRATIONS = "/developer/registrations";
 const DEVELOPER_ROLES = "/developer/roles";
+const SESSION_PROBLEM = "/invalid-session";
 
 export {
   REGISTER_ACCOUNT,
@@ -11,5 +12,6 @@ export {
   LOGIN_REDIRECT,
   DEVELOPER_HOME,
   DEVELOPER_REGISTRATIONS,
-  DEVELOPER_ROLES
+  DEVELOPER_ROLES,
+  SESSION_PROBLEM
 }

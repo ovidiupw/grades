@@ -13,6 +13,11 @@ let Home = React.createClass({
   handleAuthViaFacebook() {
     window.open('http://localhost:8082/v1/auth/facebook', '_self')
   },
+  
+  componentDidMount() {
+    if (window.localStorage == undefined)
+      alert('Your browser needs local-storage support! Please update your browser');
+  },
 
   render() {
     return (

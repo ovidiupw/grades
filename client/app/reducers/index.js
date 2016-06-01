@@ -6,7 +6,10 @@ import {
   error,
   success,
   spinner,
-  identityConfirmationForm
+  identityConfirmationForm,
+  registrations,
+  roles,
+  addRegistrationForm
 } from './reducers'
 
 const reducers = combineReducers({
@@ -16,7 +19,10 @@ const reducers = combineReducers({
   error,
   success,
   spinner,
-  identityConfirmationForm
+  identityConfirmationForm,
+  registrations,
+  roles,
+  addRegistrationForm
 });
 
 export default reducers

@@ -11,16 +11,23 @@ let Registration = require('../../entities/registration');
 
 let PredefinedErrors = require('../../modules/predefined-errors');
 
-let ListRegistrations = (function () {
+let DeleteRegistration = (function () {
 
   let _validateRequest = function (req, errCallback) {
 
     process.nextTick(() => {
-      if (!RequestValidator.headerIsValid(req.headers)) {
-        return errCallback(PredefinedErrors.getInvalidHeaderError());
+      if (!RequestValidator.bodyIsValid(req.body)) {
+        return errCallback(PredefinedErrors.getInvalidBodyError());
       }
-      if (!RequestValidator.requestHeaderContainsAuthenticationData(req)) {
+      if (!RequestValidator.requestContainsAuthenticationData(req)) {
         return errCallback(PredefinedErrors.getAuthorizationDataNotFoundError());
+      }
+      if (req.body.facultyIdentity == undefined) {
+        return errCallback(PredefinedErrors.getInvalidBodyError(
+          "Required parameter is not supplied. Please add 'facultyIdentity'."));
+      }
+      if (!RequestValidator.requestContainsValidFacultyIdentity(req)) {
+        return errCallback(PredefinedErrors.getFacultyIdentityError());
       }
 
       return errCallback(null);
@@ -41,7 +48,7 @@ let ListRegistrations = (function () {
       },
 
       function (callback) {
-        User.model.findByUser(req.headers['user'],
+        User.model.findByFacultyIdentity(req.body.user,
           function (foundUser) {
             return callback(null, foundUser);
           },
@@ -52,7 +59,7 @@ let ListRegistrations = (function () {
       },
 
       function (foundUser, callback) {
-        RequestValidator.validateApiKey(foundUser, req.headers['apikey'], function (apiKeyExpired) {
+        RequestValidator.validateApiKey(foundUser, req.body.apiKey, function (apiKeyExpired) {
           if (apiKeyExpired) {
             return callback(apiKeyExpired);
           } else {
@@ -66,7 +73,7 @@ let ListRegistrations = (function () {
 
       function (user, callback) {
         RequestValidator.validateAccessRights(
-          user, RouteNames.REGISTRATIONS, HttpVerbs.GET,
+          user, RouteNames.REGISTRATIONS, HttpVerbs.DELETE,
           function (error) {
             if (error) {
               /* In case user does not have permissions to access this resource */
@@ -77,19 +84,22 @@ let ListRegistrations = (function () {
           });
       },
 
+      /* User has permission to access the resource at this point - authorized */
+
       function (callback) {
-        Registration.model.find({}, function (err, registrations) {
-          if (err) {
-            return callback(err);
+
+        Registration.model.findOneAndRemove({facultyIdentity: req.body.facultyIdentity}, function (registrationRemoveError) {
+          if (registrationRemoveError) {
+            callback(PredefinedErrors.getDatabaseOperationFailedError(registrationRemoveError));
           } else {
-            return callback(null, registrations);
+            callback(null);
           }
         });
       },
 
-      function (registrations, callback) {
+      function (callback) {
         res.status(200);
-        res.send(registrations);
+        res.send();
       }
 
     ], function (err, results) {
@@ -106,4 +116,4 @@ let ListRegistrations = (function () {
   }
 })();
 
-module.exports = ListRegistrations;
+module.exports = DeleteRegistration;
