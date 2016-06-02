@@ -133,7 +133,7 @@ let FacebookAuth = (function () {
         if (user.identityConfirmed === false) {
           return callback(null, user, null);
         }
-        Registration.model.findByUser(
+        Registration.model.findByFacultyIdentity(
           user.facultyIdentity,
           function (foundRegistration) {
             return callback(null, user, foundRegistration);

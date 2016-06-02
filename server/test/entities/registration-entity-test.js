@@ -71,7 +71,7 @@ describe('Registration entity serialization and deserialization', function () {
       }
     );
 
-    Registration.model.findByUser(
+    Registration.model.findByFacultyIdentity(
       registration.facultyIdentity,
       function (foundRegistration) {
         if (foundRegistration) {
@@ -144,7 +144,7 @@ describe('Registration entity serialization and deserialization', function () {
   /*******************************************************/
 
   it('Finds a registration based on facultyIdentity using findByUser', function (done) {
-    Registration.model.findByUser(
+    Registration.model.findByFacultyIdentity(
       SAMPLE_IDENTITY,
       function (foundRegistration) {
         done();

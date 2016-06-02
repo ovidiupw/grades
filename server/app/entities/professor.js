@@ -1,7 +1,6 @@
 'use strict';
 
 const Mongoose = require('mongoose');
-const uniqueValidator = require('mongoose-unique-validator');
 const Schema = Mongoose.Schema;
 const SchemaConstraints = require('../constants/schema-constraints');
 const DB = require('../config/database');

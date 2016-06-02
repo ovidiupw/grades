@@ -53,7 +53,7 @@ let RegisterIdentity = (function() {
       },
 
       function (callback) {
-        User.model.findByFacultyIdentity(req.body.user,
+        User.model.findByUser(req.body.user,
           function (foundUser) {
             return callback(null, foundUser);
           },
@@ -80,7 +80,7 @@ let RegisterIdentity = (function() {
        The identity MUST be created prior to user registration (association)
        with that identity. */
       function (foundUser, callback) {
-        Registration.model.findByUser(
+        Registration.model.findByFacultyIdentity(
           req.body.facultyIdentity,
           function (foundRegistration) {
             return callback(null, foundUser, foundRegistration);

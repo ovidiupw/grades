@@ -47,7 +47,7 @@ let ConfirmIdentity = (function() {
       },
 
       function (callback) {
-        User.model.findByFacultyIdentity(req.body.user,
+        User.model.findByUser(req.body.user,
           function (foundUser) {
             return callback(null, foundUser);
           },
@@ -77,7 +77,7 @@ let ConfirmIdentity = (function() {
             "No faculty identity was associated with this account."));
         }
 
-        Registration.model.findByUser(
+        Registration.model.findByFacultyIdentity(
           user.facultyIdentity,
           function(foundRegistration) {
             return callback(null, user, foundRegistration);

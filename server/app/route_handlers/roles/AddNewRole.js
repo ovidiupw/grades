@@ -118,7 +118,7 @@ let AddNewRole = (function () {
       },
 
       function (callback) {
-        User.model.findByFacultyIdentity(req.body.user,
+        User.model.findByUser(req.body.user,
           function (foundUser) {
             return callback(null, foundUser);
           },
