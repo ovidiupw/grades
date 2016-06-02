@@ -24,6 +24,9 @@ let Course = (function () {
         dropDups: true
       }
     },
+    modules: [{
+      moduleId: String
+    }],
     title: {
       type: String,
       required: true

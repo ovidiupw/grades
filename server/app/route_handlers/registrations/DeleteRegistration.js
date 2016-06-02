@@ -7,11 +7,11 @@ const RouteNames = require('../../constants/routes');
 const HttpVerbs = require('../../constants/http-verbs');
 
 let User = require('../../entities/user');
-let Student = require('../../entities/student');
+let Registration = require('../../entities/registration');
 
 let PredefinedErrors = require('../../modules/predefined-errors');
 
-let DeleteStudent = (function () {
+let DeleteRegistration = (function () {
 
   let _validateRequest = function (req, errCallback) {
 
@@ -59,6 +59,16 @@ let DeleteStudent = (function () {
       },
 
       function (foundUser, callback) {
+        RequestValidator.requestDoesNotContainOwnFacultyIdentity(foundUser.facultyIdentity, req, function (ownFacultyIdentity) {
+          if (ownFacultyIdentity) {
+            return callback(ownFacultyIdentity);
+          } else {
+            return callback(null, foundUser);
+          }
+        });
+      },
+
+      function (foundUser, callback) {
         RequestValidator.validateApiKey(foundUser, req.body.apiKey, function (apiKeyExpired) {
           if (apiKeyExpired) {
             return callback(apiKeyExpired);
@@ -73,7 +83,7 @@ let DeleteStudent = (function () {
 
       function (user, callback) {
         RequestValidator.validateAccessRights(
-          user, RouteNames.STUDENTS, HttpVerbs.DELETE,
+          user, RouteNames.REGISTRATIONS, HttpVerbs.DELETE,
           function (error) {
             if (error) {
               /* In case user does not have permissions to access this resource */
@@ -88,13 +98,17 @@ let DeleteStudent = (function () {
 
       function (callback) {
 
-        Student.model.findOneAndRemove({facultyIdentity: req.body.facultyIdentity}, function (studentRemoveError) {
-          if (studentRemoveError) {
-            callback(PredefinedErrors.getDatabaseOperationFailedError(studentRemoveError));
-          } else {
-            callback(null);
-          }
-        });
+        Registration.model.findOneAndRemove(
+          {
+            facultyIdentity: req.body.facultyIdentity
+          },
+          function (registrationRemoveError) {
+            if (registrationRemoveError) {
+              callback(PredefinedErrors.getDatabaseOperationFailedError(registrationRemoveError));
+            } else {
+              callback(null);
+            }
+          });
       },
 
       function (callback) {
@@ -116,4 +130,4 @@ let DeleteStudent = (function () {
   }
 })();
 
-module.exports = DeleteStudent;
+module.exports = DeleteRegistration;

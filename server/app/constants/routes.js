@@ -17,6 +17,7 @@ const Routes = {
   AUTH_FACEBOOK_CALLBACK: `/${BasePaths.API_V1}/auth/facebook/callback`,
   
   ROLES: `/${BasePaths.API_V1}/roles`,
+  MODULES: `/${BasePaths.API_V1}/modules`,
   PROFESSORS: `/${BasePaths.API_V1}/${BasePaths.PROFESSORS}`,
   REGISTRATIONS: `/${BasePaths.API_V1}/registrations`,
   STUDENTS: `/${BasePaths.API_V1}/${BasePaths.STUDENTS}`

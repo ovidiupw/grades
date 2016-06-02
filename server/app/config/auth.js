@@ -6,7 +6,7 @@ let Auth = {
   facebookAuth: {
     appId: '848873811924114',
     appSecret: '06393a0e1660d0f52a7fc2f168fe3a0d',
-    callbackURL: 'http://localhost:8082' + RouteNames.AUTH_FACEBOOK_CALLBACK
+    callbackURL:  RouteNames.AUTH_FACEBOOK_CALLBACK
   }
 };
 

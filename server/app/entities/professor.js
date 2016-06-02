@@ -23,7 +23,7 @@ let Professor = (function () {
       maxlength: SchemaConstraints.facultyIdentityMaxLength,
       required: true
     },
-    gradDidactic: {
+    didacticGrade: {
       type: String,
       required: true
     },
@@ -41,10 +41,10 @@ let Professor = (function () {
       if (err) throw err;
     });
   };
-  _schema.statics.findByUser = function (user, success, error) {
+  _schema.statics.findByUser = function (facultyIdentity, success, error) {
     this.findOne({
-      user: user
-    }, function (err, foundUser) {
+      facultyIdentity: facultyIdentity
+    }, function (err, foundProfessor) {
       if (err) {
         error(new Error(
           Errors.DATABASE_ACCESS_ERROR.id,
@@ -52,14 +52,14 @@ let Professor = (function () {
           err
         ));
       }
-      if (!foundUser) {
+      if (!foundProfessor) {
         error(new Error(
-          Errors.USER_NOT_FOUND.id,
-          Errors.USER_NOT_FOUND.message,
-          "Professor " + user + " could not be found."
+          Errors.PROFESSOR_NOT_FOUND.id,
+          Errors.PROFESSOR_NOT_FOUND.message,
+          "Professor " + facultyIdentity + " could not be found."
         ));
       } else {
-        success(foundUser);
+        success(foundProfessor);
       }
     });
   };

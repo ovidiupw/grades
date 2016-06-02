@@ -7,27 +7,20 @@ const RouteNames = require('../../constants/routes');
 const HttpVerbs = require('../../constants/http-verbs');
 
 let User = require('../../entities/user');
-let Student = require('../../entities/student');
+let Role = require('../../entities/role');
 
 let PredefinedErrors = require('../../modules/predefined-errors');
 
-let DeleteStudent = (function () {
+let ListRoles = (function () {
 
   let _validateRequest = function (req, errCallback) {
 
     process.nextTick(() => {
-      if (!RequestValidator.bodyIsValid(req.body)) {
-        return errCallback(PredefinedErrors.getInvalidBodyError());
+      if (!RequestValidator.headerIsValid(req.header)) {
+        return errCallback(PredefinedErrors.getInvalidHeaderError());
       }
-      if (!RequestValidator.requestContainsAuthenticationData(req)) {
+      if (!RequestValidator.requestHeaderContainsAuthenticationData(req)) {
         return errCallback(PredefinedErrors.getAuthorizationDataNotFoundError());
-      }
-      if (req.body.facultyIdentity == undefined) {
-        return errCallback(PredefinedErrors.getInvalidBodyError(
-          "Required parameter is not supplied. Please add 'facultyIdentity'."));
-      }
-      if (!RequestValidator.requestContainsValidFacultyIdentity(req)) {
-        return errCallback(PredefinedErrors.getFacultyIdentityError());
       }
 
       return errCallback(null);
@@ -48,7 +41,7 @@ let DeleteStudent = (function () {
       },
 
       function (callback) {
-        User.model.findByUser(req.body.user,
+        User.model.findByUser(req.header.user,
           function (foundUser) {
             return callback(null, foundUser);
           },
@@ -59,7 +52,7 @@ let DeleteStudent = (function () {
       },
 
       function (foundUser, callback) {
-        RequestValidator.validateApiKey(foundUser, req.body.apiKey, function (apiKeyExpired) {
+        RequestValidator.validateApiKey(foundUser, req.header.apiKey, function (apiKeyExpired) {
           if (apiKeyExpired) {
             return callback(apiKeyExpired);
           } else {
@@ -73,7 +66,7 @@ let DeleteStudent = (function () {
 
       function (user, callback) {
         RequestValidator.validateAccessRights(
-          user, RouteNames.STUDENTS, HttpVerbs.DELETE,
+          user, RouteNames.ROLES, HttpVerbs.GET,
           function (error) {
             if (error) {
               /* In case user does not have permissions to access this resource */
@@ -84,22 +77,19 @@ let DeleteStudent = (function () {
           });
       },
 
-      /* User has permission to access the resource at this point - authorized */
-
       function (callback) {
-
-        Student.model.findOneAndRemove({facultyIdentity: req.body.facultyIdentity}, function (studentRemoveError) {
-          if (studentRemoveError) {
-            callback(PredefinedErrors.getDatabaseOperationFailedError(studentRemoveError));
+        Role.model.find({}, function (err, roles) {
+          if (err) {
+            return callback(err);
           } else {
-            callback(null);
+            return callback(null, roles);
           }
         });
       },
 
-      function (callback) {
+      function (roles, callback) {
         res.status(200);
-        res.send();
+        res.send(roles);
       }
 
     ], function (err, results) {
@@ -116,4 +106,4 @@ let DeleteStudent = (function () {
   }
 })();
 
-module.exports = DeleteStudent;
+module.exports = ListRoles;

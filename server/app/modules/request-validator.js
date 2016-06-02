@@ -3,6 +3,8 @@
 let async = require('async');
 
 let Errors = require('../constants/errors');
+let Domains = require('../constants/domains');
+let SchemaConstraints = require('../constants/schema-constraints');
 let Error = require('../modules/error');
 let PredefinedErrors = require('../modules/predefined-errors');
 
@@ -13,6 +15,8 @@ const Registration = require('../entities/registration');
 const PredefinedRoles = require('../constants/roles');
 
 let util = require('util');
+
+const jsep = require("jsep");
 
 let RequestValidator = (function () {
 
@@ -57,7 +61,7 @@ let RequestValidator = (function () {
 
     async.waterfall([
 
-      function(callback) {
+      function (callback) {
         if (user.identityConfirmed == false) {
           return callback(new Error(
             Errors.IDENTITY_NOT_CONFIRMED.id,
@@ -67,8 +71,8 @@ let RequestValidator = (function () {
         return callback(null);
       },
 
-      function(callback) {
-        Registration.model.findByFacultyIdentity(
+      function (callback) {
+        Registration.model.findByUser(
           user.facultyIdentity,
           function (foundRegistration) {
             return callback(null, foundRegistration._doc);
@@ -79,7 +83,7 @@ let RequestValidator = (function () {
         );
       },
 
-      function(registration, callback) {
+      function (registration, callback) {
         if (registration == undefined || registration.roles == undefined) {
           return callback(PredefinedErrors.getNotAuthorizedError("The user has no associated registration or roles."));
         }
@@ -88,11 +92,11 @@ let RequestValidator = (function () {
 
       /* Verify if user is authorized based on PredefinedRoles */
 
-      function(registration, callback) {
-        
+      function (registration, callback) {
+
         for (let predefinedRole in PredefinedRoles) {
           if (_registrationHasPredefinedRole(registration, PredefinedRoles[predefinedRole])
-              && _roleIsAuthorizedOnResource(PredefinedRoles[predefinedRole], resource, verb)) {
+            && _roleIsAuthorizedOnResource(PredefinedRoles[predefinedRole], resource, verb)) {
             return callback(_SUCCESS_BREAK);
           }
         }
@@ -101,9 +105,9 @@ let RequestValidator = (function () {
 
       /* Verify if user is authorized based on roles associated with its registration */
 
-      function(registration, callback) {
+      function (registration, callback) {
         let roles = registration.roles;
-        
+
         for (let roleTitleIndex in roles) {
 
           if (!registration.hasOwnProperty('roles')) {
@@ -125,7 +129,7 @@ let RequestValidator = (function () {
         }
       }
 
-    ], function(err, results) {
+    ], function (err, results) {
       if (err === _SUCCESS_BREAK || err == null) {
         return errCallback(null);
       }
@@ -144,6 +148,16 @@ let RequestValidator = (function () {
   };
 
   /**
+   * Validates that the supplied header is valid. Invokes the callback if not.
+   */
+  let _headerIsValid = function (header) {
+    if (!header) {
+      return false;
+    }
+    return true;
+  };
+
+  /**
    * Validates that the supplied request is authenticated -
    * The request is authenticated if, for the supplied user,
    * the correct apiKey is provided.
@@ -152,6 +166,108 @@ let RequestValidator = (function () {
     /* Assumes the request body is a valid encoding body */
     return req.body.user != undefined && req.body.apiKey != undefined;
 
+  };
+
+  let _requestHeaderContainsAuthenticationData = function (req) {
+    /* Assumes the request header is a valid encoding header */
+    return req.header.user != undefined && req.header.apiKey != undefined;
+
+  };
+
+  /**
+   * Validates that the supplied request contains a valid faculty identity.
+   */
+  let _requestContainsValidFacultyIdentity = function (req) {
+    var facultyIdentityRegularExpression = new RegExp("[a-z]+\\.[a-z]+@" + Domains.FII + "$");
+    return req.body.facultyIdentity.length > SchemaConstraints.facultyIdentityMinLength &&
+      req.body.facultyIdentity.length < SchemaConstraints.facultyIdentityMaxLength &&
+      facultyIdentityRegularExpression.test(req.body.facultyIdentity);
+  };
+
+  /**
+   * Validates that the supplied request contains a valid birth date.
+   */
+  let _requestContainsValidBirthDate = function (req) {
+    return req.body.birthDate instanceof Date;
+  };
+
+  /**
+   * Validates that a certain course is in a list of courses.
+   */
+  let _requestContainsValidCreatedByIdentity = function (req, courses, errCallback) {
+    process.nextTick(() => {
+      for (let i = 0; i < courses.length; i++) {
+        if (courses[i].courseId === req.body.courseId) {
+          return errCallback(null);
+        }
+      }
+      return errCallback(new Error(
+        Errors.PROFESSOR_MODULE_COURSE_MISMATCH.id,
+        Errors.PROFESSOR_MODULE_COURSE_MISMATCH.message,
+        Errors.PROFESSOR_MODULE_COURSE_MISMATCH.data
+      ));
+    });
+  };
+
+  /**
+   * Array of modules (identifiers) from the tree.
+   */
+  let identifiers = [];
+
+  /**
+   * Gets the modules (identifiers) from the tree.
+   */
+  let _getIdentifiers = function (items, level) {
+    for (var key in items) {
+      if (items.hasOwnProperty(key)) {
+
+        if (key === 'name') {
+          identifiers.push(items[key]);
+        }
+
+        if (items[key] != null && typeof items[key] === "object") {
+          _getIdentifiers(items[key], level + 1);
+        }
+      }
+    }
+  };
+
+  /**
+   * Checks if the formula from the request is valid.
+   */
+  let _requestContainsValidFormula = function (req, modules, errCallback) {
+    process.nextTick(() => {
+      let parse_tree = jsep(req.body.formula);
+
+      _getIdentifiers(parse_tree, 0);
+
+      if (identifiers.length > 0) {
+        for (let i = 0; i < identifiers.length; i++) {
+          if (modules.indexOf(identifiers[i]) == -1) {
+            return errCallback(new Error(
+              Errors.INVALID_FORMULA.id,
+              Errors.INVALID_FORMULA.message,
+              Errors.INVALID_FORMULA.data
+            ));
+          }
+        }
+      }
+      return errCallback(null);
+    });
+  };
+
+  let _requestDoesNotContainOwnFacultyIdentity = function (facultyIdentity, req, errCallback) {
+    process.nextTick(() => {
+      if (facultyIdentity === req.body.facultyIdentity) {
+        return errCallback(new Error(
+          Errors.OWN_FACULTY_IDENTITY.id,
+          Errors.OWN_FACULTY_IDENTITY.message,
+          Errors.OWN_FACULTY_IDENTITY.data
+        ));
+      } else {
+        return errCallback(null);
+      }
+    });
   };
 
   let _validateApiKey = function (user, requestKey, errCallback) {
@@ -182,7 +298,14 @@ let RequestValidator = (function () {
     validateApiKey: _validateApiKey,
     validateAccessRights: _validateAccessRights,
     bodyIsValid: _bodyIsValid,
-    requestContainsAuthenticationData: _requestContainsAuthenticationData
+    headerIsValid: _headerIsValid,
+    requestContainsAuthenticationData: _requestContainsAuthenticationData,
+    requestContainsValidFacultyIdentity: _requestContainsValidFacultyIdentity,
+    requestContainsValidBirthDate: _requestContainsValidBirthDate,
+    requestContainsValidCreatedByIdentity: _requestContainsValidCreatedByIdentity,
+    requestContainsValidFormula: _requestContainsValidFormula,
+    requestHeaderContainsAuthenticationData: _requestHeaderContainsAuthenticationData,
+    requestDoesNotContainOwnFacultyIdentity: _requestDoesNotContainOwnFacultyIdentity
   });
 })();
 

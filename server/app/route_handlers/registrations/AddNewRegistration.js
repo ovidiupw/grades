@@ -18,7 +18,7 @@ const HttpVerbs = require('../../constants/http-verbs');
  * Use invoke() method of this closure to add (POST) a new registration.
  *
  */
-const AddNewRegistration = (function() {
+const AddNewRegistration = (function () {
 
   let _validateRequest = (req, errCallback) => {
 
@@ -51,7 +51,7 @@ const AddNewRegistration = (function() {
           }
         }
 
-      } catch(err) {
+      } catch (err) {
         return errCallback(PredefinedErrors.getInvalidBodyError(
           "Faculty statuses must be an array of double quoted strings."));
       }
@@ -63,7 +63,7 @@ const AddNewRegistration = (function() {
             "Roles must be an array of double quoted strings."));
         }
 
-         _validateSuppliedRoles(rolesArray, function(err) {
+        _validateSuppliedRoles(rolesArray, function (err) {
           if (err) {
             return errCallback(err);
           }
@@ -87,13 +87,13 @@ const AddNewRegistration = (function() {
       return returnCallback(PredefinedErrors.getInvalidBodyError("At least one role must be supplied."));
     }
 
-    async.each(roles, function(roleTitle, callback) {
+    async.each(roles, function (roleTitle, callback) {
       Role.model.findByTitle(
         roleTitle,
-        function() {
+        function () {
           return callback();
         },
-        function(errorFindingRole) {
+        function (errorFindingRole) {
           /* Try to find the role among predefined roles */
           for (let predefinedRole in Roles) {
             if (Roles.hasOwnProperty(predefinedRole)) {
@@ -105,7 +105,7 @@ const AddNewRegistration = (function() {
           return callback(errorFindingRole);
         }
       )
-    }, function(err) {
+    }, function (err) {
       if (err) {
         returnCallback(PredefinedErrors.getInvalidBodyError(err));
       } else {
@@ -124,14 +124,14 @@ const AddNewRegistration = (function() {
    * @private
    */
   let _getRoleActionsByTitles = (roleTitles, finishCallback) => {
-    async.reduce(roleTitles, [], function(roleActions, roleTitle, callback) {
+    async.reduce(roleTitles, [], function (roleActions, roleTitle, callback) {
       Role.model.findByTitle(
         roleTitle,
-        function(foundRole) {
+        function (foundRole) {
           foundRole.actions.forEach(action => roleActions.push(action));
           return callback(null, roleActions);
         },
-        function(errFindingRole) {
+        function (errFindingRole) {
           /* Try to find the role among predefined roles */
           for (let predefinedRole in Roles) {
             if (Roles.hasOwnProperty(predefinedRole)) {
@@ -155,7 +155,7 @@ const AddNewRegistration = (function() {
   /**
    * Returns, depending on the type of the action that was supplied
    * (i.e. database action or predefined action), the underlying action.
-   * 
+   *
    * @param action
    * @returns {*|resource|{type, validate}}
    */
@@ -173,9 +173,9 @@ const AddNewRegistration = (function() {
    * @param finishCb
    * @private
    */
-  let _verifyIfActionsToAssignDoNotEscalateUserActions = function(userActions, actionsToAssign, finishCb) {
-    async.every(userActions, function(userAction, callback) {
-      userAction =  getActionToAssign(userAction);
+  let _verifyIfActionsToAssignDoNotEscalateUserActions = function (userActions, actionsToAssign, finishCb) {
+    async.every(userActions, function (userAction, callback) {
+      userAction = getActionToAssign(userAction);
 
       for (let actionToAssignIndex in actionsToAssign) {
         let actionToAssign = getActionToAssign(actionsToAssign[actionToAssignIndex]);
@@ -187,7 +187,7 @@ const AddNewRegistration = (function() {
       }
       return callback(null, false);
 
-    }, function(err, result) {
+    }, function (err, result) {
       if (result) {
         return finishCb(null);
       }
@@ -209,17 +209,17 @@ const AddNewRegistration = (function() {
    * @private
    */
   let _userIsAllowedToAssignRequestedRoles = (userRegistration, titlesOfRolesToAssign, finishCallback) => {
-    _getRoleActionsByTitles(userRegistration.roles, function(err, userActions) {
+    _getRoleActionsByTitles(userRegistration.roles, function (err, userActions) {
       if (err) {
         return finishCallback(err);
       }
 
-      _getRoleActionsByTitles(titlesOfRolesToAssign, function(err, actionsToAssign) {
+      _getRoleActionsByTitles(titlesOfRolesToAssign, function (err, actionsToAssign) {
         if (err) {
           return finishCallback(err);
         }
 
-        _verifyIfActionsToAssignDoNotEscalateUserActions(userActions, actionsToAssign, function(err) {
+        _verifyIfActionsToAssignDoNotEscalateUserActions(userActions, actionsToAssign, function (err) {
           if (err) {
             return finishCallback(err);
           }
@@ -232,18 +232,8 @@ const AddNewRegistration = (function() {
   };
 
   const _invoke = (req, res) => {
-    
-    async.waterfall([
 
-      function (callback) {
-        _validateRequest(req, function (invalidRequest) {
-          if (invalidRequest) {
-            return callback(invalidRequest);
-          } else {
-            return callback(null);
-          }
-        });
-      },
+    async.waterfall([
 
       function (callback) {
         User.model.findByUser(req.body.user,
@@ -254,6 +244,30 @@ const AddNewRegistration = (function() {
             return callback(userFindError);
           }
         );
+      },
+
+      /*
+       _assertRequestIsValid(callback);
+       */
+
+      function (callback) {
+        /*return RequestValidator.validateRequest(_validateRequest, req, callback);
+         /!*function validateRequest(validator, req, callback) {
+         validator(req, function(invalidRequest) {
+         if (invalidRequest) {
+         return callback(invalidRequest);
+         } else {
+         return callback(null);
+         }
+         })
+         }*!/*/
+        _validateRequest(req, function (invalidRequest) {
+          if (invalidRequest) {
+            return callback(invalidRequest);
+          } else {
+            return callback(null);
+          }
+        });
       },
 
       /* In case of success, the user has been found. */
@@ -267,7 +281,7 @@ const AddNewRegistration = (function() {
           }
         });
       },
-      
+
       /* Validate user's access rights - authorize the user */
 
       function (user, callback) {
@@ -281,27 +295,27 @@ const AddNewRegistration = (function() {
               return callback(null, user);
             }
           });
-        
+
       },
 
-      function(user, callback) {
-        Registration.model.findByFacultyIdentity(
+      function (user, callback) {
+        Registration.model.findByUser(
           user.facultyIdentity,
-          function(registration) {
+          function (registration) {
             return callback(null, user, registration);
           },
-          function(registrationFindError) {
+          function (registrationFindError) {
             return callback(registrationFindError);
           });
       },
-      
+
       /* After retrieving user registration, make sure that the user is assigning */
       /* Permissions that he is allowed to assign */
-      
-      function(user, registration, callback) {
+
+      function (user, registration, callback) {
         if (req.body.roles == undefined)
           return callback(null, user);
-        
+
         _userIsAllowedToAssignRequestedRoles(registration, JSON.parse(req.body.roles), function (err) {
           if (err) {
             return callback(err);
@@ -313,7 +327,7 @@ const AddNewRegistration = (function() {
       /* We made sure that user assigned the new registration roles to resource it had access to. */
       /* At this point, the user is authorized to create a new registration. */
 
-      function(user, callback) {
+      function (user, callback) {
         const registration = new Registration.model({
           facultyIdentity: req.body.facultyIdentity,
           facultyStatus: req.body.facultyStatus,
@@ -328,8 +342,8 @@ const AddNewRegistration = (function() {
           }
         });
       }
-      
-    ], function(err, results) {
+
+    ], function (err, results) {
       if (err) {
         res.status(400);
         res.send(err);

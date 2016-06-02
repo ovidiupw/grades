@@ -17,12 +17,7 @@ let Registration = (function () {
 
   let _assertAtLeastOneFacultyStatusExists = {
     validator: function (facultyStatuses) {
-      try {
-        let statusesArray = JSON.parse(facultyStatuses);
-        return statusesArray.length >= 1;
-      } catch (ignored) {
-        return false;
-      }
+      return facultyStatuses.length >= 1;
     },
     message: 'Please supply an array containing at least one faculty' +
     'status (as a string) from the following: ' +
@@ -30,17 +25,15 @@ let Registration = (function () {
   };
 
   let _validateFacultyStatus = {
-    validator: function (facultyStatuses) {
-      let statusesArray = JSON.parse(facultyStatuses);
+    validator: function (facultyStatus) {
 
-      for (let statusIndex in statusesArray) {
-        for (let registrationClass in RegistrationClasses) {
-          if (RegistrationClasses.hasOwnProperty(registrationClass)) {
-            if (statusesArray[statusIndex].toLowerCase() === RegistrationClasses[registrationClass]) {
-              return true;
-            }
+      for (let registrationClass in RegistrationClasses) {
+        if (RegistrationClasses.hasOwnProperty(registrationClass)) {
+          if (facultyStatus.toLowerCase() === RegistrationClasses[registrationClass]) {
+            return true;
           }
         }
+
       }
       return false;
     },
@@ -107,7 +100,7 @@ let Registration = (function () {
     });
   };
 
-  _schema.statics.findByFacultyIdentity = function (fid, success, error) {
+  _schema.statics.findByUser = function (fid, success, error) {
     process.nextTick(() => {
       this.findOne({
         facultyIdentity: fid
@@ -123,7 +116,7 @@ let Registration = (function () {
           return error(new Error(
             Errors.REGISTRATION_NOT_FOUND.id,
             Errors.REGISTRATION_NOT_FOUND.message,
-            "Registration with facultyIdentity '" + fid + "' could not be found."
+            "Registration with facultyIdentity #" + fid + "# could not be found."
           ));
         } else {
           return success(foundRegistration);

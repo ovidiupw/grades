@@ -51,11 +51,11 @@ let Student = (function () {
       if (err) throw err;
     });
   };
-  _schema.statics.findByUser = function (user, success, error) {
+  _schema.statics.findByUser = function (facultyIdentity, success, error) {
     process.nextTick(() => {
       this.findOne({
-        user: user
-      }, function (err, foundUser) {
+        facultyIdentity: facultyIdentity
+      }, function (err, foundStudent) {
         if (err) {
           error(new Error(
             Errors.DATABASE_ACCESS_ERROR.id,
@@ -63,14 +63,14 @@ let Student = (function () {
             err
           ));
         }
-        if (!foundUser) {
+        if (!foundStudent) {
           error(new Error(
-            Errors.USER_NOT_FOUND.id,
-            Errors.USER_NOT_FOUND.message,
-            "Student " + user + " could not be found."
+            Errors.STUDENT_NOT_FOUND.id,
+            Errors.STUDENT_NOT_FOUND.message,
+            "Student " + facultyIdentity + " could not be found."
           ));
         } else {
-          success(foundUser);
+          success(foundStudent);
         }
       });
     });

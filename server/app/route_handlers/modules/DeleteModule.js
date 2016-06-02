@@ -7,11 +7,11 @@ const RouteNames = require('../../constants/routes');
 const HttpVerbs = require('../../constants/http-verbs');
 
 let User = require('../../entities/user');
-let Student = require('../../entities/student');
+let Module = require('../../entities/module');
 
 let PredefinedErrors = require('../../modules/predefined-errors');
 
-let DeleteStudent = (function () {
+let DeleteModule = (function () {
 
   let _validateRequest = function (req, errCallback) {
 
@@ -22,12 +22,9 @@ let DeleteStudent = (function () {
       if (!RequestValidator.requestContainsAuthenticationData(req)) {
         return errCallback(PredefinedErrors.getAuthorizationDataNotFoundError());
       }
-      if (req.body.facultyIdentity == undefined) {
+      if (req.body.moduleId == undefined) {
         return errCallback(PredefinedErrors.getInvalidBodyError(
-          "Required parameter is not supplied. Please add 'facultyIdentity'."));
-      }
-      if (!RequestValidator.requestContainsValidFacultyIdentity(req)) {
-        return errCallback(PredefinedErrors.getFacultyIdentityError());
+          "Required parameter is not supplied. Please add 'moduleId'."));
       }
 
       return errCallback(null);
@@ -73,7 +70,7 @@ let DeleteStudent = (function () {
 
       function (user, callback) {
         RequestValidator.validateAccessRights(
-          user, RouteNames.STUDENTS, HttpVerbs.DELETE,
+          user, RouteNames.MODULES, HttpVerbs.DELETE,
           function (error) {
             if (error) {
               /* In case user does not have permissions to access this resource */
@@ -84,13 +81,13 @@ let DeleteStudent = (function () {
           });
       },
 
-      /* User has permission to access the resource at this point - authorized */
+      /* User has permission to delete the module at this point - authorized */
 
       function (callback) {
 
-        Student.model.findOneAndRemove({facultyIdentity: req.body.facultyIdentity}, function (studentRemoveError) {
-          if (studentRemoveError) {
-            callback(PredefinedErrors.getDatabaseOperationFailedError(studentRemoveError));
+        Module.model.findOneAndRemove({moduleId: req.body.moduleId}, function (moduleRemoveError) {
+          if (moduleRemoveError) {
+            callback(PredefinedErrors.getDatabaseOperationFailedError(moduleRemoveError));
           } else {
             callback(null);
           }
@@ -116,4 +113,4 @@ let DeleteStudent = (function () {
   }
 })();
 
-module.exports = DeleteStudent;
+module.exports = DeleteModule;

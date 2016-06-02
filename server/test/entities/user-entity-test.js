@@ -11,7 +11,6 @@ const User = require('../../app/entities/user');
 
 Mongoose.connect(DB.TEST_DB);
 
-
 describe('Basic Serialization and Deserialization', function () {
 
   /* Test preparation */
