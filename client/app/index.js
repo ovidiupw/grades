@@ -36,7 +36,8 @@ const loggerMiddleware = createLogger();
 const initialState = {
   reducers: {
     userAccount: Authorization.loadCredentialsFromLocalStorage(),
-    addRegistrationForm: Utility.getPersistedAddRegistrationForm()
+    addRegistrationForm: Utility.getPersistedAddRegistrationForm(),
+    addRoleForm: Utility.getPersistedAddRoleForm()
   }
 };
 

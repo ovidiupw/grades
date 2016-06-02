@@ -4,3 +4,9 @@ export const addRegistrationForm = {
   facultyIdentity: "",
   facultyStatuses: []
 };
+
+export const addRoleForm = {
+  display: "block",
+  title: undefined,
+  actions: []
+};

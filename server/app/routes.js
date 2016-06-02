@@ -15,6 +15,9 @@ const DeleteProfessor = require('./route_handlers/professors/DeleteProfessor');
 const ConfirmIdentity = require('./route_handlers/registrations/ConfirmIdentity');
 const AddNewRegistration = require('./route_handlers/registrations/AddNewRegistration');
 const ListRegistrations = require('./route_handlers/registrations/ListRegistrations');
+const DeleteRegistration = require('./route_handlers/registrations/DeleteRegistration');
+const ListApiResources = require('./route_handlers/resources/ListApiResources');
+
 
 let Routes = function (app, passport) {
 
@@ -25,6 +28,21 @@ let Routes = function (app, passport) {
     };
     res.status(200);
     res.send(response);
+  });
+
+  /**
+   * This function handles deleting a registration from the database.
+   */
+  app.get(RouteNames.API_RESOURCES, function(req, res) {
+    ListApiResources.invoke(req, res);
+  });
+
+
+  /**
+   * This function handles deleting a registration from the database.
+   */
+  app.delete(RouteNames.REGISTRATIONS, function(req, res) {
+    DeleteRegistration.invoke(req, res);
   });
 
   /**

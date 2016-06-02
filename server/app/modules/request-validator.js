@@ -20,6 +20,20 @@ const jsep = require("jsep");
 
 let RequestValidator = (function () {
 
+  let _requestDoesNotContainOwnFacultyIdentity = function (facultyIdentity, req, errCallback) {
+    process.nextTick(() => {
+      if (facultyIdentity === req.body.facultyIdentity) {
+        return errCallback(new Error(
+          Errors.OWN_FACULTY_IDENTITY.id,
+          Errors.OWN_FACULTY_IDENTITY.message,
+          Errors.OWN_FACULTY_IDENTITY.data
+        ));
+      } else {
+        return errCallback(null);
+      }
+    });
+  };
+
   let _isAllowedAccessBasedOnRoleActions = function (roleActions, resource, verb) {
     for (let actionIndex in roleActions) {
       if (!roleActions[actionIndex].hasOwnProperty('resource') || !roleActions[actionIndex].hasOwnProperty('verb')) {
@@ -178,10 +192,10 @@ let RequestValidator = (function () {
    * Validates that the supplied request contains a valid faculty identity.
    */
   let _requestContainsValidFacultyIdentity = function (req) {
-    var facultyIdentityRegularExpression = new RegExp("[a-z]+\\.[a-z]+@" + Domains.FII + "$");
+    //var facultyIdentityRegularExpression = new RegExp("[a-z]+\\.[a-z]+@" + Domains.FII + "$");
     return req.body.facultyIdentity.length > SchemaConstraints.facultyIdentityMinLength &&
-      req.body.facultyIdentity.length < SchemaConstraints.facultyIdentityMaxLength &&
-      facultyIdentityRegularExpression.test(req.body.facultyIdentity);
+      req.body.facultyIdentity.length < SchemaConstraints.facultyIdentityMaxLength ;
+      //&& facultyIdentityRegularExpression.test(req.body.facultyIdentity);
   };
 
   /**
@@ -290,7 +304,8 @@ let RequestValidator = (function () {
     requestContainsValidBirthDate: _requestContainsValidBirthDate,
     requestContainsValidCreatedByIdentity: _requestContainsValidCreatedByIdentity,
     requestContainsValidFormula: _requestContainsValidFormula,
-    requestHeaderContainsAuthenticationData: _requestHeaderContainsAuthenticationData
+    requestHeaderContainsAuthenticationData: _requestHeaderContainsAuthenticationData,
+    requestDoesNotContainOwnFacultyIdentity: _requestDoesNotContainOwnFacultyIdentity
   });
 })();
 

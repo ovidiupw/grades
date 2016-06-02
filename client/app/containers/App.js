@@ -9,10 +9,15 @@ let App = React.createClass({
     return (
       <div>
         <NavBarTop />
+
         {/* Now add the passed prop content */}
-        {this.props.children}
+        <div className="container-fluid">
+          {this.props.children}
+        </div>
+
       </div>
-    )}
+    )
+  }
 });
 
 export default App;

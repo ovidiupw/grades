@@ -1,5 +1,5 @@
-import { connect } from 'react-redux'
-import React, { PropTypes } from 'react';
+import {connect} from 'react-redux'
+import React, {PropTypes} from 'react';
 
 let TableHeader = React.createClass({
 
@@ -11,7 +11,10 @@ let TableHeader = React.createClass({
   render() {
     return (
       <tr>
-        {this.props.columns.map((columnName, i) => <th key={i}>{this.props.columnNames[columnName]}</th>)}
+        {this.props.columns.map((columnName, i) =>
+          <th key={i} style={this.props.style}>
+            {this.props.columnNames[columnName]}
+          </th>)}
       </tr>
     )
   }
@@ -24,8 +27,7 @@ const mapStateToProps = (state) => {
 };
 
 const mapDispatchToProps = (dispatch) => {
-  return {
-  }
+  return {}
 };
 
 TableHeader = connect(

@@ -61,7 +61,8 @@ export function userAccount(state = {
 }
 
 export function success(state = {
-  message: undefined
+  message: undefined,
+  data: undefined,
 }, action) {
   switch (action.type) {
 
@@ -69,7 +70,8 @@ export function success(state = {
 
       const succ = action.successData;
       return Object.assign({}, state, {
-        message: succ.message
+        message: succ.message,
+        data: succ.data
       });
 
     default:
@@ -156,6 +158,44 @@ export function roles(state = {
     case ActionTypes.SET_ROLES:
       return Object.assign({}, state, {
         items: action.roles
+      });
+
+    default:
+      return state;
+  }
+}
+
+export function addRoleForm(state = InitialStates.addRoleForm
+  , action) {
+  switch (action.type) {
+
+    case ActionTypes.UPDATE_ADD_ROLE_FORM_TITLE:
+      return Object.assign({}, state, { 
+        title: action.title
+      });
+
+    case ActionTypes.POP_ADD_ROLE_FORM_ACTION:
+      return Object.assign({}, state, {
+        actions: state.actions.filter(action =>
+          action.verb !== action.action.verb || action.resource !== action.action.resource)
+      });
+
+    case ActionTypes.PUSH_ADD_ROLE_FORM_ACTION:
+      let actionsWithNewAction = state.actions;
+      actionsWithNewAction.push(action.action);
+
+      return Object.assign({}, state, {
+        actions: actionsWithNewAction
+      });
+
+    case ActionTypes.SHOW_ADD_ROLE_FORM:
+      return Object.assign({}, state, {
+        display: "block"
+      });
+
+    case ActionTypes.HIDE_ADD_ROLE_FORM:
+      return Object.assign({}, state, {
+        display: "none"
       });
 
     default:

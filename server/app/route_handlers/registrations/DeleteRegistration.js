@@ -48,7 +48,7 @@ let DeleteRegistration = (function () {
       },
 
       function (callback) {
-        User.model.findByFacultyIdentity(req.body.user,
+        User.model.findByUser(req.body.user,
           function (foundUser) {
             return callback(null, foundUser);
           },
@@ -56,6 +56,16 @@ let DeleteRegistration = (function () {
             return callback(PredefinedErrors.getDatabaseOperationFailedError(error));
           }
         );
+      },
+
+      function (foundUser, callback) {
+        RequestValidator.requestDoesNotContainOwnFacultyIdentity(foundUser.facultyIdentity, req, function (ownFacultyIdentity) {
+          if (ownFacultyIdentity) {
+            return callback(ownFacultyIdentity);
+          } else {
+            return callback(null, foundUser);
+          }
+        });
       },
 
       function (foundUser, callback) {
@@ -88,13 +98,17 @@ let DeleteRegistration = (function () {
 
       function (callback) {
 
-        Registration.model.findOneAndRemove({facultyIdentity: req.body.facultyIdentity}, function (registrationRemoveError) {
-          if (registrationRemoveError) {
-            callback(PredefinedErrors.getDatabaseOperationFailedError(registrationRemoveError));
-          } else {
-            callback(null);
-          }
-        });
+        Registration.model.findOneAndRemove(
+          {
+            facultyIdentity: req.body.facultyIdentity
+          },
+          function (registrationRemoveError) {
+            if (registrationRemoveError) {
+              callback(PredefinedErrors.getDatabaseOperationFailedError(registrationRemoveError));
+            } else {
+              callback(null);
+            }
+          });
       },
 
       function (callback) {

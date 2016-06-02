@@ -9,7 +9,8 @@ import {
   identityConfirmationForm,
   registrations,
   roles,
-  addRegistrationForm
+  addRegistrationForm,
+  addRoleForm
 } from './reducers'
 
 const reducers = combineReducers({
@@ -22,7 +23,8 @@ const reducers = combineReducers({
   identityConfirmationForm,
   registrations,
   roles,
-  addRegistrationForm
+  addRegistrationForm,
+  addRoleForm
 });
 
 export default reducers

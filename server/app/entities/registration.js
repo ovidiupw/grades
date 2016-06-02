@@ -44,7 +44,7 @@ let Registration = (function () {
 
   const _SCHEMA_NAME = 'Registrations';
   /**
-   * The 'Registrations' collection schema.
+   * The 'Roles' collection schema.
    */
   const _schema = new Schema({
     facultyIdentity: {

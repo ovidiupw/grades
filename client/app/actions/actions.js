@@ -28,6 +28,27 @@ export function addRegistrationFormRole(role) {
   }
 }
 
+export function updateRoleFormTitle(title) {
+  return {
+    type: Actions.UPDATE_ADD_ROLE_FORM_TITLE,
+    title: title
+  }
+}
+
+export function removeRoleFormAction(action) {
+  return {
+    type: Actions.POP_ADD_ROLE_FORM_ACTION,
+    action: action
+  }
+}
+
+export function addRoleFormAction(action) {
+  return {
+    type: Actions.PUSH_ADD_ROLE_FORM_ACTION,
+    action: action
+  }
+}
+
 export function clearRegistrationFormRoles() {
   return {
     type: Actions.CLEAR_ADD_REGISTRATION_FORM_ROLES
@@ -127,5 +148,17 @@ export function showAddRegistrationForm() {
 export function hideAddRegistrationForm() {
   return {
     type: Actions.HIDE_ADD_REGISTRATION_FORM
+  }
+}
+
+export function showAddRoleForm() {
+  return {
+    type: Actions.SHOW_ADD_ROLE_FORM
+  }
+}
+
+export function hideAddRoleForm() {
+  return {
+    type: Actions.HIDE_ADD_ROLE_FORM
   }
 }

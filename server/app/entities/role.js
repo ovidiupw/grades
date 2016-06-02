@@ -90,7 +90,7 @@ let Role = (function() {
       });
     });
   };
-
+  
   const _model = Mongoose.model(_SCHEMA_NAME, _schema);
 
   return ({

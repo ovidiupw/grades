@@ -7,24 +7,35 @@ import {
   showSpinner,
   hideSpinner,
   updateError,
+  updateSuccess,
   showIdentityConfirmationForm,
   hideIdentityConfirmationForm,
   setRegistrations,
   setRoles,
-  hideAddRegistrationForm
+  hideAddRegistrationForm,
+  hideDangerAlert,
+  hideSuccessAlert,
+  showSuccessAlert
 } from './actions';
 
 let client = rest.wrap(mime, {
   mime: 'application/json'
 });
 
-export function addRegistration(registration, userAccount) {
+let showSpinnerAndHideAlerts = function (dispatch) {
+  dispatch(showSpinner());
+  dispatch(hideDangerAlert());
+  dispatch(hideSuccessAlert());
+};
+
+export function deleteRegistration(registrationWithAuthData, userAccount) {
   return dispatch => {
-    dispatch(showSpinner());
+    showSpinnerAndHideAlerts(dispatch);
+
     client({
-      method: 'POST',
+      method: 'DELETE',
       path: 'http://localhost:8082/v1/registrations',
-      entity: registration
+      entity: registrationWithAuthData
     })
       .then(
         response => {
@@ -33,6 +44,53 @@ export function addRegistration(registration, userAccount) {
           } else {
             dispatch(fetchRegistrations(userAccount));
             dispatch(hideAddRegistrationForm());
+            dispatch(updateSuccess({
+              message: "The following registration has been successfully deleted: ",
+              data: JSON.stringify({
+                'Faculty Identity': registrationWithAuthData.facultyIdentity,
+                'Roles': registrationWithAuthData.roles,
+                'Faculty Statuses': registrationWithAuthData.facultyStatus
+              })
+            }));
+            dispatch(showSuccessAlert());
+          }
+          dispatch(hideSpinner());
+        },
+
+        errorResponse => {
+          dispatch(updateError({
+            message: errorResponse.status.text
+          }));
+          dispatch(hideSpinner());
+        });
+  };
+}
+
+export function addRegistration(registrationWithAuthData, userAccount) {
+  return dispatch => {
+    showSpinnerAndHideAlerts(dispatch);
+
+    client({
+      method: 'POST',
+      path: 'http://localhost:8082/v1/registrations',
+      entity: registrationWithAuthData
+    })
+      .then(
+        response => {
+          if (response.status.code !== 200) {
+            Utility.handleResponseCodeNot200(response, dispatch);
+          } else {
+            dispatch(fetchRegistrations(userAccount));
+            dispatch(hideAddRegistrationForm());
+            dispatch(updateSuccess({
+              message: "A new registration has been added: ",
+              data: JSON.stringify({
+                'Faculty Identity': registrationWithAuthData.facultyIdentity,
+                'Roles': registrationWithAuthData.roles,
+                'Faculty Statuses': registrationWithAuthData.facultyStatus
+              })
+            }));
+            dispatch(showSuccessAlert());
           }
           dispatch(hideSpinner());
         },
@@ -48,7 +106,8 @@ export function addRegistration(registration, userAccount) {
 
 export function fetchRoles(userAccount) {
   return dispatch => {
-    dispatch(showSpinner());
+    showSpinnerAndHideAlerts(dispatch);
+
     client({
       method: 'GET',
       path: 'http://localhost:8082/v1/roles',
@@ -80,7 +139,8 @@ export function fetchRoles(userAccount) {
 
 export function fetchRegistrations(userAccount) {
   return dispatch => {
-    dispatch(showSpinner());
+    showSpinnerAndHideAlerts(dispatch);
+
     client({
       method: 'GET',
       path: 'http://localhost:8082/v1/registrations',
@@ -110,7 +170,7 @@ export function fetchRegistrations(userAccount) {
 
 export function registerIdentity(accountData) {
   return dispatch => {
-    dispatch(showSpinner());
+    showSpinnerAndHideAlerts(dispatch);
     dispatch(hideIdentityConfirmationForm());
 
     client({
@@ -138,9 +198,11 @@ export function registerIdentity(accountData) {
   }
 }
 
+
 export function confirmIdentity(accountData, confirmIdentityPayload) {
   return dispatch => {
-    dispatch(showSpinner());
+    showSpinnerAndHideAlerts(dispatch);
+
     client({
       method: 'PUT',
       path: 'http://localhost:8082/v1/register/identity',

@@ -11,7 +11,9 @@ import {
   addRegistrationFormRole,
   removeRegistrationFormRole,
   updateRegistrationFormFacultyIdentity,
-  updateRegistrationFormFacultyStatuses
+  updateRegistrationFormFacultyStatuses,
+  showSuccessAlert,
+  hideSuccessAlert
 } from '../actions/actions';
 
 import {
@@ -23,6 +25,7 @@ let AddRegistrationForm = React.createClass({
 
   handleRegistrationSubmit() {
     this.props.hideDangerAlert();
+    this.props.hideSuccessAlert();
     this.props.addRegistration({
       roles: this.props.addRegistrationForm.roles.map(role => role.title),
       facultyIdentity: this.props.addRegistrationForm.facultyIdentity,
@@ -36,6 +39,7 @@ let AddRegistrationForm = React.createClass({
   handleAddRole() {
     const roleTitle = this.refs.role.value;
     this.props.hideDangerAlert();
+    this.props.hideSuccessAlert();
 
     if (roleTitle == undefined || roleTitle.length < 1) {
       this.props.updateError({
@@ -194,6 +198,12 @@ const mapDispatchToProps = (dispatch) => {
     },
     hideDangerAlert: () => {
       dispatch(hideDangerAlert());
+    },
+    showSuccessAlert: () => {
+      dispatch(showSuccessAlert());
+    },
+    hideSuccessAlert: () => {
+      dispatch(hideSuccessAlert());
     },
     updateError: (errorData) => {
       dispatch(updateError(errorData));

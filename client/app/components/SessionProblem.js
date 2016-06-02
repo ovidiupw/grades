@@ -17,14 +17,14 @@ let SessionProblem = React.createClass({
       <div className="container-fluid">
         <blockquote>
           <div className="well" style={{fontSize:"0.8em"}}>
-          <p>
-            There was a problem with your session. Please go to the
-            <a href="#" onClick={e => this.transitionToHomePage()} style={{marginLeft:5, marginRight:5}}>
-              home page
-            </a>
-            and try to login again.
-          </p>
-            </div>
+            <p>
+              There was a problem with your session. Please go to the
+              <a href="#" onClick={e => this.transitionToHomePage()} style={{marginLeft:5, marginRight:5}}>
+                home page
+              </a>
+              and try to login again.
+            </p>
+          </div>
         </blockquote>
       </div>
     )

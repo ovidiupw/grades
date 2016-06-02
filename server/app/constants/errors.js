@@ -135,9 +135,12 @@ const Errors = {
     id: 27,
     message: 'Error: The request header is invalid.',
     data: undefined
+  },
+  OWN_FACULTY_IDENTITY: {
+    id: 28,
+    message: 'Error: The supplied faculty identity is identical with your own faculty identity.',
+    data: undefined
   }
-
-
 };
 
 module.exports = Errors;

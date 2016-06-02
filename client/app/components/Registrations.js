@@ -13,10 +13,13 @@ import {
   hideAddRegistrationForm,
   showDangerAlert,
   hideDangerAlert,
+  showSuccessAlert,
+  hideSuccessAlert
 } from '../actions/actions';
 
 import {
-  fetchRegistrations
+  fetchRegistrations,
+  deleteRegistration
 } from '../actions/thunks';
 
 let Registrations = React.createClass({
@@ -28,6 +31,17 @@ let Registrations = React.createClass({
       this.props.hideAddRegistrationForm();
     }
   },
+
+  handleRemoveRegistration(registration){
+    this.props.deleteRegistration({
+      facultyIdentity: registration.facultyIdentity,
+
+      apiKey: this.props.userAccount.apiKey,
+      user: this.props.userAccount.user
+    }, this.props.userAccount);
+  },
+
+  /************************************/
 
   contextTypes: {
     router: React.PropTypes.func.isRequired
@@ -59,16 +73,29 @@ let Registrations = React.createClass({
         </ul>
         <AddRegistrationForm style={{marginTop:20}}/>
 
-        <table className="table table-striped" style={{marginTop:20}}>
-          <thead>
-          <TableHeader columns={REGISTRATIONS_COLUMNS} columnNames={REGISTRATIONS_COLUMN_NAMES}/>
-          </thead>
-          <tbody>
-          {this.props.registrations.items.map((registration, i) => {
-            return <TableRow key={i} columns={REGISTRATIONS_COLUMNS} columnData={registration}/>
-          })}
-          </tbody>
-        </table>
+        <br/>
+        <Alert type="success" display={this.props.successAlert.display} onClick={e => this.props.hideSuccessAlert()}
+               content={[
+          {payload: this.props.success.message},
+          {payload: <br/>},
+          {payload: this.props.success.data}
+        ]}/>
+
+        <div className="table-responsive">
+          <table className="table table-striped" style={{marginTop:20, textAlign:"center"}}>
+            <thead>
+            <TableHeader style={{textAlign:"center"}}
+                         columns={REGISTRATIONS_COLUMNS} columnNames={REGISTRATIONS_COLUMN_NAMES}/>
+            </thead>
+            <tbody>
+            {this.props.registrations.items.map((registration, i) => {
+              return <TableRow key={i}
+                               columns={REGISTRATIONS_COLUMNS} columnData={registration}
+                               deleteButtonHandler={e => this.handleRemoveRegistration(registration)}/>
+            })}
+            </tbody>
+          </table>
+        </div>
       </div>
     )
   }
@@ -82,6 +109,8 @@ const mapStateToProps = (state) => {
     spinner: state.reducers.spinner,
     dangerAlert: state.reducers.dangerAlert,
     error: state.reducers.error,
+    success: state.reducers.success,
+    successAlert: state.reducers.successAlert
   }
 };
 
@@ -102,6 +131,15 @@ const mapDispatchToProps = (dispatch) => {
     hideDangerAlert: () => {
       dispatch(hideDangerAlert());
     },
+    showSuccessAlert: () => {
+      dispatch(showSuccessAlert());
+    },
+    hideSuccessAlert: () => {
+      dispatch(hideSuccessAlert());
+    },
+    deleteRegistration: (registration, userAccount) => {
+      dispatch(deleteRegistration(registration, userAccount));
+    }
   }
 };
 
