@@ -100,7 +100,7 @@ let Registration = (function () {
     });
   };
 
-  _schema.statics.findByUser = function (fid, success, error) {
+  _schema.statics.findByFacultyIdentity = function (fid, success, error) {
     process.nextTick(() => {
       this.findOne({
         facultyIdentity: fid
