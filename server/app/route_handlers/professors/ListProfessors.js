@@ -21,20 +21,83 @@ let PredefinedErrors = require('../../modules/predefined-errors');
  */
 let ListProfessors = (function () {
 
+    let _validateRequest = function (req, errCallback) {
+
+        process.nextTick(() => {
+            if (!RequestValidator.headerIsValid(req.headers)) {
+                return errCallback(PredefinedErrors.getInvalidHeaderError());
+            }
+            if (!RequestValidator.requestHeaderContainsAuthenticationData(req)) {
+                return errCallback(PredefinedErrors.getAuthorizationDataNotFoundError());
+            }
+
+            return errCallback(null);
+        });
+    };
+
+    let _findUser = function (req, callback) {
+        User.model.findByUser(req.headers['user'],
+            function (foundUser) {
+                return callback(null, req, foundUser);
+            },
+            function (error) {
+                return callback(PredefinedErrors.getDatabaseOperationFailedError(error));
+            }
+        );
+    };
+
+    let _validateApiKey = function (req, foundUser, callback) {
+        RequestValidator.validateApiKey(foundUser, req.headers['apikey'], function (apiKeyExpired) {
+            if (apiKeyExpired) {
+                return callback(apiKeyExpired);
+            } else {
+                return callback(null, foundUser);
+            }
+        });
+    };
+
+    let _validateAccessRights = function (user, callback) {
+        RequestValidator.validateAccessRights(
+            user, RouteNames.PROFESSORS, HttpVerbs.GET,
+            function (error) {
+                if (error) {
+                    /* In case user does not have permissions to access this resource */
+                    return callback(error);
+                } else {
+                    return callback(null);
+                }
+            });
+    };
+
+    let _listProfessors = function (callback) {
+        Professor.model.find({}, function (getProfessorsError, professors) {
+            if (getProfessorsError) {
+                callback(PredefinedErrors.getDatabaseOperationFailedError(getProfessorsError));
+            } else {
+                callback(null, professors)
+            }
+        });
+    };
+
     let _invoke = function (req, res) {
         async.waterfall([
+
             function (callback) {
-                Professor.model.find({}, function(getProfessorsError, professors) {
-                    if(getProfessorsError){
-                        callback(PredefinedErrors.getDatabaseOperationFailedError(getProfessorsError));
-                    }else{
-                        callback(null,professors)
+                _validateRequest(req, function (invalidRequestError) {
+                    if (invalidRequestError) {
+                        return callback(invalidRequestError);
+                    } else {
+                        return callback(null, req);
                     }
                 });
-
-
             },
-            function (professors,callback) {
+
+            _findUser,
+            _validateApiKey,
+            _validateAccessRights,
+            _listProfessors,
+
+            function (professors, callback) {
                 /* If it reaches this, the request succeeded. */
                 res.status(200);
                 res.send(professors);
@@ -48,7 +111,11 @@ let ListProfessors = (function () {
     };
 
     return {
-        invoke: _invoke
+        invoke: _invoke,
+        findUser: _findUser,
+        validateApiKey: _validateApiKey,
+        validateAccessRights: _validateAccessRights,
+        listProfessors: _listProfessors
     }
 })();
 
