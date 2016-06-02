@@ -5,7 +5,7 @@ const Schema = Mongoose.Schema;
 
 let Grade = (function () {
 
-  const _SCHEMA_NAME = 'Grade';
+  const _SCHEMA_NAME = 'Grades';
   /**
    * The 'Grades' collection schema.
    */

@@ -1,25 +1,26 @@
 /**
- * Created by dryflo on 5/18/2016.
+ * Created by dryflo on 5/29/2016.
  */
 'use strict';
 
 let async = require('async');
 let RequestValidator = require('../../modules/request-validator');
 
+let PredefinedErrors = require('../../modules/predefined-errors');
+
 const RouteNames = require('../../constants/routes');
 const HttpVerbs = require('../../constants/http-verbs');
 
 let User = require('../../entities/user');
-let Professor = require('../../entities/professor');
+let Course = require('../../entities/course');
 
-let PredefinedErrors = require('../../modules/predefined-errors');
 /**
- * Use invoke() method of this closure to GET a list
- * of professors currently in the database.
+ * Use invoke() method of this closure to list (GET) 
+ * courses from the database.
  *
  * @type {{invoke}}
  */
-let ListProfessors = (function () {
+let ListCourses = (function () {
 
     let _validateRequest = function (req, errCallback) {
 
@@ -58,7 +59,7 @@ let ListProfessors = (function () {
 
     let _validateAccessRights = function (user, callback) {
         RequestValidator.validateAccessRights(
-            user, RouteNames.PROFESSORS, HttpVerbs.GET,
+            user, RouteNames.COURSES, HttpVerbs.GET,
             function (error) {
                 if (error) {
                     /* In case user does not have permissions to access this resource */
@@ -69,16 +70,15 @@ let ListProfessors = (function () {
             });
     };
 
-    let _listProfessors = function (callback) {
-        Professor.model.find({}, function (getProfessorsError, professors) {
-            if (getProfessorsError) {
-                callback(PredefinedErrors.getDatabaseOperationFailedError(getProfessorsError));
-            } else {
-                callback(null, professors)
+    let _listCourses = function (callback) {
+        Course.model.find({}, function(getCoursesErr, courses) {
+            if(getCoursesErr){
+                callback(PredefinedErrors.getDatabaseOperationFailedError(getCoursesErr));
+            }else{
+                callback(null,courses)
             }
         });
     };
-
     let _invoke = function (req, res) {
         async.waterfall([
 
@@ -95,12 +95,12 @@ let ListProfessors = (function () {
             _findUser,
             _validateApiKey,
             _validateAccessRights,
-            _listProfessors,
-
-            function (professors, callback) {
+            _listCourses,
+            
+            function (courses,callback) {
                 /* If it reaches this, the request succeeded. */
                 res.status(200);
-                res.send(professors);
+                res.send(courses);
             }
         ], function (error, results) {
             if (error) {
@@ -115,8 +115,8 @@ let ListProfessors = (function () {
         findUser: _findUser,
         validateApiKey: _validateApiKey,
         validateAccessRights: _validateAccessRights,
-        listProfessors: _listProfessors
+        listCourses: _listCourses
     }
 })();
 
-module.exports = ListProfessors;
+module.exports = ListCourses;

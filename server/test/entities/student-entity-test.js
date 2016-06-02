@@ -11,119 +11,105 @@ const Student = require('../../app/entities/student');
 
 Mongoose.connect(DB.TEST_DB);
 
-describe('Student entity database operations', function () {
-  describe('Basic Serialization and Deserialization', function () {
+describe('Basic Serialization and Deserialization', function () {
 
-    /* Test preparation */
-    const dateOfBirth = new Date("2012-12-12");
-    const SAMPLE_USER = 'CiucTiberiuConstantin';
-    let studentModel = Student.model;
-    let student = new studentModel({
-      user: SAMPLE_USER,
-      facultyIdentity: "cocojambo@info.uaic.ro",
-      registrationNumber: "y99toesrdyorsdfyto7edtfy6rtfyur6fygu8",
-      birthDate: dateOfBirth,
-      academicYear: "2",
-      academicGroup: "A4"
-    });
+  /* Test preparation */
 
-    let handleRemoveResult = function (err, removeResult) {
+  const DATE_OF_BIRTH = new Date("2012-12-12");
+  const FACULTY_IDENTITY = "prenume.nume@info.uaic.ro";
+  const REGISTRATION_NUMBER = "1234567890";
+  const ACADEMIC_YEAR = "2";
+  const ACADEMIC_GROUP = "A4";
+
+  let studentModel = Student.model;
+  let student = new studentModel({
+    facultyIdentity: FACULTY_IDENTITY,
+    registrationNumber: REGISTRATION_NUMBER,
+    birthDate: DATE_OF_BIRTH,
+    academicYear: ACADEMIC_YEAR,
+    academicGroup: ACADEMIC_GROUP
+  });
+
+  let handleRemoveResult = function (err, removeResult) {
+    if (err) throw err;
+    if (removeResult.result.n !== 0) {
+      console.log(`OK. Removed sample student. Cleanup successful!`);
+    }
+  };
+
+  /* Test execution */
+
+  before(function () {
+    removeSampleStudent(FACULTY_IDENTITY);
+
+    student.save(function (err) {
       if (err) throw err;
-      if (removeResult.result.n !== 0) {
-        console.log(`OK. Removed sample student. Cleanup successful!`);
-      }
-    };
-
-    /* Test execution */
-
-    before(function () {
-      studentModel.remove({
-        user: SAMPLE_USER,
-        facultyIdentity: "cocojambo@info.uaic.ro",
-        registrationNumber: "y99toesrdyorsdfyto7edtfy6rtfyur6fygu8",
-        birthDate: dateOfBirth,
-        academicYear: "2",
-        academicGroup: "A4"
-
-      }, handleRemoveResult);
-
-      student.save(function (err) {
-        if (err) throw err;
-      });
     });
+  });
 
-    /*******************************************************/
+  /*******************************************************/
 
-    it('Finds the student in the database', function (done) {
-      studentModel.findOne({
-        user: SAMPLE_USER
-      }, function (err, foundStudent) {
-        if (err) throw err;
-        assert.equal(foundStudent.user, SAMPLE_USER);
-        done();
-      });
-    });
-
-    /*******************************************************/
-
-    it('Should require at least the user field on insertion', function (done) {
-      /* Test for both null and undefined */
-
-      student.user = undefined;
-      student.save(function (err) {
-        if (!err) {
-          should.fail('User should be required. Check the schema!');
-        }
-      });
-
-      student.user = null;
-      student.save(function (err) {
-        if (!err) {
-          should.fail('User should be required. Check the schema!');
-        }
-      });
-
-      done();
-    });
-
-    /*******************************************************/
-
-    it('Should insert a new record in the databse, just like a login', function (done) {
-      /* Test for both null and undefined */
-      let apiKeyExpiration = new Date();
-      apiKeyExpiration.setHours(apiKeyExpiration.getHours() + 1);
-
-      student = new studentModel({
-        user: SAMPLE_USER,
-        facultyIdentity: "cocojambo@info.uaic.ro",
-        registrationNumber: "y99toesrdyorsdfyto7edtfy6rtfyur6fygu8",
-        birthDate: dateOfBirth,
-        academicYear: "2",
-        academicGroup: "A4"
-
-      });
-
-      student.save(function (err) {
-        if (err) {
-          should.fail('Save to database failed!');
-        }
-      });
-
-      done();
-    });
-
-    /*******************************************************/
-
-    after(function (done) {
-      studentModel.remove({
-        user: SAMPLE_USER
-      }, handleRemoveResult);
-
-      studentModel.remove({
-        user: "ciucalete@facebook"
-      }, handleRemoveResult);
-
+  it('Finds the student in the database', function (done) {
+    studentModel.findOne({
+      facultyIdentity: FACULTY_IDENTITY
+    }, function (err, foundStudent) {
+      if (err) throw err;
+      assert.equal(foundStudent.facultyIdentity, FACULTY_IDENTITY);
       done();
     });
   });
+
+  /*******************************************************/
+
+  it('Should require at least the facultyIdentity field on insertion', function (done) {
+    /* Test for both null and undefined */
+
+    student.facultyIdentity = undefined;
+    student.save(function (err) {
+      if (!err) {
+        done(err);
+      }
+    });
+
+    student.facultyIdentity = null;
+    student.save(function (err) {
+      if (!err) {
+        done(err);
+      }
+    });
+
+    done();
+  });
+
+  /*******************************************************/
+
+  it('Should not validate a facultyIdentity under minimum length.', function (done) {
+
+    student = new studentModel({
+      facultyIdentity: 'ba' /* Should fail when trying to save */
+    });
+
+    student.save(function (err) {
+      if (!err) {
+        done(err);
+      }
+    });
+
+    done();
+  });
+
+  /*******************************************************/
+
+  after(function (done) {
+    removeSampleStudent(FACULTY_IDENTITY);
+
+    done();
+  });
+
+  let removeSampleStudent = function (facultyIdentity) {
+    studentModel.remove({
+      facultyIdentity: facultyIdentity
+    }, handleRemoveResult);
+  };
+
 });

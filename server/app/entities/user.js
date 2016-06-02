@@ -99,16 +99,16 @@ let User = (function () {
       }, function (err, foundUser) {
         if (err) {
           return error(new Error(
-            Errors.DATABASE_ACCESS_ERROR.id,
-            Errors.DATABASE_ACCESS_ERROR.message,
-            err
+              Errors.DATABASE_ACCESS_ERROR.id,
+              Errors.DATABASE_ACCESS_ERROR.message,
+              err
           ));
         }
         if (!foundUser) {
           return error(new Error(
-            Errors.USER_NOT_FOUND.id,
-            Errors.USER_NOT_FOUND.message,
-            "User " + user + " could not be found."
+              Errors.USER_NOT_FOUND.id,
+              Errors.USER_NOT_FOUND.message,
+              "User " + user + " could not be found."
           ));
         } else {
           return success(foundUser);

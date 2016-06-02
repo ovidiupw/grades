@@ -1,6 +1,7 @@
 'use strict';
 
 const Mongoose = require('mongoose');
+const uniqueValidator = require('mongoose-unique-validator');
 const Schema = Mongoose.Schema;
 const SchemaConstraints = require('../constants/schema-constraints');
 const DB = require('../config/database');
@@ -12,7 +13,7 @@ Mongoose.createConnection(DB.TEST_DB);
 
 let Professor = (function () {
 
-  const _SCHEMA_NAME = 'professors';
+  const _SCHEMA_NAME = 'Professors';
   /**
    * The 'professors' collection schema.
    */
@@ -21,9 +22,13 @@ let Professor = (function () {
       type: String,
       minlength: SchemaConstraints.facultyIdentityMinLength,
       maxlength: SchemaConstraints.facultyIdentityMaxLength,
-      required: true
+      required: true,
+      index: {
+        unique: true,
+        dropDups: true
+      }
     },
-    gradDidactic: {
+    didacticGrade: {
       type: String,
       required: true
     },
@@ -36,15 +41,16 @@ let Professor = (function () {
     facultyIdentity: 1
   });
 
+
   _schema.methods.insert = function () {
     this.model(_SCHEMA_NAME).save(function (err) {
       if (err) throw err;
     });
   };
-  _schema.statics.findByUser = function (user, success, error) {
+  _schema.statics.findByFacultyIdentity = function (facultyIdentity, success, error) {
     this.findOne({
-      user: user
-    }, function (err, foundUser) {
+      facultyIdentity: facultyIdentity
+    }, function (err, foundProfessor) {
       if (err) {
         error(new Error(
           Errors.DATABASE_ACCESS_ERROR.id,
@@ -52,14 +58,14 @@ let Professor = (function () {
           err
         ));
       }
-      if (!foundUser) {
+      if (!foundProfessor) {
         error(new Error(
-          Errors.USER_NOT_FOUND.id,
-          Errors.USER_NOT_FOUND.message,
-          "Professor " + user + " could not be found."
+          Errors.PROFESSOR_NOT_FOUND.id,
+          Errors.PROFESSOR_NOT_FOUND.message,
+          "Professor " + facultyIdentity + " could not be found."
         ));
       } else {
-        success(foundUser);
+        success(foundProfessor);
       }
     });
   };

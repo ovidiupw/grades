@@ -11,113 +11,104 @@ const Professor = require('../../app/entities/professor');
 
 Mongoose.connect(DB.TEST_DB);
 
-describe('Professor entity database operations', function () {
-  describe('Basic Serialization and Deserialization', function () {
+describe('Basic Serialization and Deserialization', function () {
 
     /* Test preparation */
-    const SAMPLE_USER = 'Cosmin Varlan';
+
+    const FACULTY_IDENTITY = "prenume.nume@info.uaic.ro";
+    const DIDACTIC_GRADE = "profesor";
+    const COURSES = [{
+        courseId: "1",
+        academicGroups: ["A4", "A3"]
+    }];
+
     let professorModel = Professor.model;
     let professor = new professorModel({
-      user: SAMPLE_USER,
-      facultyIdentity: "vcosmin@info.uaic.ro",
-      gradDidactic: "profesor",
-      courses: [{
-        courseId: "100",
-        academicGroups: ["A4", "A3", "B6"]
-      }]
+        facultyIdentity: FACULTY_IDENTITY,
+        didacticGrade: DIDACTIC_GRADE,
+        courses: COURSES
     });
 
     let handleRemoveResult = function (err, removeResult) {
-      if (err) throw err;
-      if (removeResult.result.n !== 0) {
-        console.log(`OK. Removed sample professor. Cleanup successful!`);
-      }
+        if (err) throw err;
+        if (removeResult.result.n !== 0) {
+            console.log(`OK. Removed sample professor. Cleanup successful!`);
+        }
     };
 
     /* Test execution */
 
     before(function () {
-      professorModel.remove({
-        user: SAMPLE_USER,
-        facultyIdentity: "vcosmin@info.uaic.ro",
-        gradDidactic: "profesor",
-        courses: [{
-          courseId: "100",
-          academicGroups: ["A4", "A3", "B6"]
-        }]
-      }, handleRemoveResult);
+        removeSampleProfessor(FACULTY_IDENTITY);
 
-      professor.save(function (err) {
-        if (err) throw err;
-      });
+        professor.save(function (err) {
+            if (err) throw err;
+        });
     });
 
     /*******************************************************/
 
     it('Finds the professor in the database', function (done) {
-      professorModel.findOne({
-        user: SAMPLE_USER
-      }, function (err, foundProfessor) {
-        if (err) throw err;
-        assert.equal(foundProfessor.user, SAMPLE_USER);
+        professorModel.findOne({
+            facultyIdentity: FACULTY_IDENTITY
+        }, function (err, foundProfessor) {
+            if (err) throw err;
+            assert.equal(foundProfessor.facultyIdentity, FACULTY_IDENTITY);
+            done();
+        });
+    });
+
+    /*******************************************************/
+
+    it('Should require at least the facultyIdentity field on insertion', function (done) {
+        /* Test for both null and undefined */
+
+        professor.facultyIdentity = undefined;
+        professor.save(function (err) {
+            if (!err) {
+                done(err);
+            }
+        });
+
+        professor.facultyIdentity = null;
+        professor.save(function (err) {
+            if (!err) {
+                done(err);
+            }
+        });
+
         done();
-      });
     });
 
     /*******************************************************/
 
-    it('Should require at least the user field on insertion', function (done) {
-      /* Test for both null and undefined */
+    it('Should not validate a facultyIdentity under minimum length.', function (done) {
 
-      professor.user = undefined;
-      professor.save(function (err) {
-        if (!err) {
-          should.fail('User should be required. Check the schema!');
-        }
-      });
+        professor = new professorModel({
+            facultyIdentity: 'ba' /* Should fail when trying to save */
+        });
 
-      professor.user = null;
-      professor.save(function (err) {
-        if (!err) {
-          should.fail('User should be required. Check the schema!');
-        }
-      });
+        professor.save(function (err) {
+            if (!err) {
+                done(err);
+            }
+        });
 
-      done();
-    });
-
-    /*******************************************************/
-
-    it('Should insert a new record in the databse, just like a login', function (done) {
-      /* Test for both null and undefined */
-
-      professor = new professorModel({
-        user: SAMPLE_USER,
-        facultyIdentity: "vcosmin@info.uaic.ro",
-        gradDidactic: "profesor",
-        courses: [{
-          courseId: "100",
-          academicGroups: ["A4", "A3", "B6"]
-        }]
-      });
-
-      professor.save(function (err) {
-        if (err) {
-          should.fail('Save to database failed!');
-        }
-      });
-
-      done();
+        done();
     });
 
     /*******************************************************/
 
     after(function (done) {
-      professorModel.remove({
-        user: SAMPLE_USER
-      }, handleRemoveResult);
+        removeSampleProfessor(FACULTY_IDENTITY);
 
-      done();
+        done();
     });
-  });
+
+    let removeSampleProfessor = function (facultyIdentity) {
+        professorModel.remove({
+            facultyIdentity: facultyIdentity
+        }, handleRemoveResult);
+    };
+
 });

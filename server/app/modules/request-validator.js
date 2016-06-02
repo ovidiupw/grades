@@ -3,6 +3,8 @@
 let async = require('async');
 
 let Errors = require('../constants/errors');
+let Domains = require('../constants/domains');
+let SchemaConstraints = require('../constants/schema-constraints');
 let Error = require('../modules/error');
 let PredefinedErrors = require('../modules/predefined-errors');
 
@@ -14,6 +16,8 @@ const PredefinedRoles = require('../constants/roles');
 
 let util = require('util');
 
+const jsep = require("jsep");
+
 let RequestValidator = (function () {
 
   let _isAllowedAccessBasedOnRoleActions = function (roleActions, resource, verb) {
@@ -23,7 +27,7 @@ let RequestValidator = (function () {
       }
 
       if ((resource === roleActions[actionIndex].resource || RouteNames.ANY === roleActions[actionIndex].resource)
-        && verb === roleActions[actionIndex].verb) {
+          && verb === roleActions[actionIndex].verb) {
 
       }
     }
@@ -31,7 +35,7 @@ let RequestValidator = (function () {
   };
 
   let _registrationHasPredefinedRole = function (registration, predefinedRole) {
-    return registration.roles.indexOf(predefinedRole.title != -1);
+    return registration.roles.indexOf(predefinedRole.title) != -1;
   };
 
   let _roleIsAuthorizedOnResource = function (predefinedRole, resource, verb) {
@@ -39,7 +43,7 @@ let RequestValidator = (function () {
 
     for (let actionIndex in actions) {
       if ((resource === actions[actionIndex].resource || RouteNames.ANY === actions[actionIndex].resource)
-        && verb === actions[actionIndex].verb) {
+          && verb === actions[actionIndex].verb) {
         return true;
       }
     }
@@ -57,29 +61,29 @@ let RequestValidator = (function () {
 
     async.waterfall([
 
-      function(callback) {
+      function (callback) {
         if (user.identityConfirmed == false) {
           return callback(new Error(
-            Errors.IDENTITY_NOT_CONFIRMED.id,
-            Errors.IDENTITY_NOT_CONFIRMED.message
+              Errors.IDENTITY_NOT_CONFIRMED.id,
+              Errors.IDENTITY_NOT_CONFIRMED.message
           ));
         }
         return callback(null);
       },
 
-      function(callback) {
+      function (callback) {
         Registration.model.findByFacultyIdentity(
-          user.facultyIdentity,
-          function (foundRegistration) {
-            return callback(null, foundRegistration);
-          },
-          function (registrationNotFoundError) {
-            return callback(registrationNotFoundError);
-          }
+            user.facultyIdentity,
+            function (foundRegistration) {
+              return callback(null, foundRegistration._doc);
+            },
+            function (registrationNotFoundError) {
+              return callback(registrationNotFoundError);
+            }
         );
       },
 
-      function(registration, callback) {
+      function (registration, callback) {
         if (registration == undefined || registration.roles == undefined) {
           return callback(PredefinedErrors.getNotAuthorizedError("The user has no associated registration or roles."));
         }
@@ -88,11 +92,11 @@ let RequestValidator = (function () {
 
       /* Verify if user is authorized based on PredefinedRoles */
 
-      function(registration, callback) {
-        
+      function (registration, callback) {
+
         for (let predefinedRole in PredefinedRoles) {
-          if (_registrationHasPredefinedRole(registration, PredefinedRoles[predefinedRole]
-              && _roleIsAuthorizedOnResource(PredefinedRoles[predefinedRole], resource, verb))) {
+          if (_registrationHasPredefinedRole(registration, PredefinedRoles[predefinedRole])
+              && _roleIsAuthorizedOnResource(PredefinedRoles[predefinedRole], resource, verb)) {
             return callback(_SUCCESS_BREAK);
           }
         }
@@ -101,9 +105,9 @@ let RequestValidator = (function () {
 
       /* Verify if user is authorized based on roles associated with its registration */
 
-      function(registration, callback) {
+      function (registration, callback) {
         let roles = registration.roles;
-        
+
         for (let roleTitleIndex in roles) {
 
           if (!registration.hasOwnProperty('roles')) {
@@ -111,21 +115,21 @@ let RequestValidator = (function () {
           }
 
           Role.model.findByTitle(
-            roles[roleTitleIndex],
-            function (foundRole) {
-              if (!_isAllowedAccessBasedOnRoleActions(foundRole.actions, resource, verb)) {
-                return callback(PredefinedErrors.getNotAuthorizedError("The user is not allowed to access this resource"));
+              roles[roleTitleIndex],
+              function (foundRole) {
+                if (!_isAllowedAccessBasedOnRoleActions(foundRole.actions, resource, verb)) {
+                  return callback(PredefinedErrors.getNotAuthorizedError("The user is not allowed to access this resource"));
+                }
+                return callback(null);
+              },
+              function (err) {
+                return callback(err);
               }
-              return callback(null);
-            },
-            function (err) {
-              return callback(err);
-            }
           );
         }
       }
 
-    ], function(err, results) {
+    ], function (err, results) {
       if (err === _SUCCESS_BREAK || err == null) {
         return errCallback(null);
       }
@@ -144,6 +148,16 @@ let RequestValidator = (function () {
   };
 
   /**
+   * Validates that the supplied header is valid. Invokes the callback if not.
+   */
+  let _headerIsValid = function (headers) {
+    if (!headers) {
+      return false;
+    }
+    return true;
+  };
+
+  /**
    * Validates that the supplied request is authenticated -
    * The request is authenticated if, for the supplied user,
    * the correct apiKey is provided.
@@ -154,13 +168,101 @@ let RequestValidator = (function () {
 
   };
 
+  let _requestHeaderContainsAuthenticationData = function (req) {
+    /* Assumes the request header is a valid encoding header */
+    return req.headers['user'] != undefined && req.headers['apikey'] != undefined;
+
+  };
+
+  /**
+   * Validates that the supplied request contains a valid faculty identity.
+   */
+  let _requestContainsValidFacultyIdentity = function (req) {
+    var facultyIdentityRegularExpression = new RegExp("[a-z]+\\.[a-z]+@" + Domains.FII + "$");
+    return req.body.facultyIdentity.length > SchemaConstraints.facultyIdentityMinLength &&
+        req.body.facultyIdentity.length < SchemaConstraints.facultyIdentityMaxLength &&
+        facultyIdentityRegularExpression.test(req.body.facultyIdentity);
+  };
+
+  /**
+   * Validates that the supplied request contains a valid birth date.
+   */
+  let _requestContainsValidBirthDate = function (req) {
+    return req.body.birthDate instanceof Date;
+  };
+
+  /**
+   * Validates that a certain course is in a list of courses.
+   */
+  let _requestContainsValidCreatedByIdentity = function (req, courses, errCallback) {
+    process.nextTick(() => {
+      for (let i = 0; i < courses.length; i++) {
+        if (courses[i].courseId === req.body.courseId) {
+          return errCallback(null);
+        }
+      }
+      return errCallback(new Error(
+          Errors.PROFESSOR_MODULE_COURSE_MISMATCH.id,
+          Errors.PROFESSOR_MODULE_COURSE_MISMATCH.message,
+          Errors.PROFESSOR_MODULE_COURSE_MISMATCH.data
+      ));
+    });
+  };
+
+  /**
+   * Array of modules (identifiers) from the tree.
+   */
+  let identifiers = [];
+
+  /**
+   * Gets the modules (identifiers) from the tree.
+   */
+  let _getIdentifiers = function (items, level) {
+    for (var key in items) {
+      if (items.hasOwnProperty(key)) {
+
+        if (key === 'name') {
+          identifiers.push(items[key]);
+        }
+
+        if (items[key] != null && typeof items[key] === "object") {
+          _getIdentifiers(items[key], level + 1);
+        }
+      }
+    }
+  };
+
+  /**
+   * Checks if the formula from the request is valid.
+   */
+  let _requestContainsValidFormula = function (req, modules, errCallback) {
+    process.nextTick(() => {
+      let parse_tree = jsep(req.body.formula);
+
+      _getIdentifiers(parse_tree, 0);
+
+      if (identifiers.length > 0) {
+        for (let i = 0; i < identifiers.length; i++) {
+          if (modules.indexOf(identifiers[i]) == -1) {
+            return errCallback(new Error(
+                Errors.INVALID_FORMULA.id,
+                Errors.INVALID_FORMULA.message,
+                Errors.INVALID_FORMULA.data
+            ));
+          }
+        }
+      }
+      return errCallback(null);
+    });
+  };
+
   let _validateApiKey = function (user, requestKey, errCallback) {
     process.nextTick(() => {
       if (user.apiKey !== requestKey) {
         return errCallback(new Error(
-          Errors.API_KEY_INVALID.id,
-          Errors.API_KEY_INVALID.message,
-          Errors.API_KEY_INVALID.data
+            Errors.API_KEY_INVALID.id,
+            Errors.API_KEY_INVALID.message,
+            Errors.API_KEY_INVALID.data
         ));
       }
 
@@ -169,9 +271,9 @@ let RequestValidator = (function () {
 
       if (currentDate >= expirationDate) {
         return errCallback(new Error(
-          Errors.API_KEY_EXPIRED.id,
-          Errors.API_KEY_EXPIRED.message,
-          Errors.API_KEY_EXPIRED.data
+            Errors.API_KEY_EXPIRED.id,
+            Errors.API_KEY_EXPIRED.message,
+            Errors.API_KEY_EXPIRED.data
         ));
       }
       return errCallback(null);
@@ -182,7 +284,13 @@ let RequestValidator = (function () {
     validateApiKey: _validateApiKey,
     validateAccessRights: _validateAccessRights,
     bodyIsValid: _bodyIsValid,
-    requestContainsAuthenticationData: _requestContainsAuthenticationData
+    headerIsValid: _headerIsValid,
+    requestContainsAuthenticationData: _requestContainsAuthenticationData,
+    requestContainsValidFacultyIdentity: _requestContainsValidFacultyIdentity,
+    requestContainsValidBirthDate: _requestContainsValidBirthDate,
+    requestContainsValidCreatedByIdentity: _requestContainsValidCreatedByIdentity,
+    requestContainsValidFormula: _requestContainsValidFormula,
+    requestHeaderContainsAuthenticationData: _requestHeaderContainsAuthenticationData
   });
 })();
 

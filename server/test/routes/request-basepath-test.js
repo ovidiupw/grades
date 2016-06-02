@@ -5,11 +5,16 @@ const should = require('should');
 const chai = require('chai');
 const supertest_request = require('supertest');
 
+const DB = require('../../app/config/database');
+const Mongoose = require('mongoose');
+
 let request = supertest_request('http://localhost:8082');
 
 const RouteNames = require('../../app/constants/routes');
 
-describe(RouteNames.ROOT, function () {
+Mongoose.connect(DB.TEST_DB);
+
+ describe(RouteNames.ROOT, function () {
   it('Responds with the api version and last update time in a json', function (done) {
     request.get(RouteNames.ROOT)
       .set('Accept', 'application/json')

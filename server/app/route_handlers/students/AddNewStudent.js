@@ -50,7 +50,7 @@ let AddNewStudent = (function () {
       },
 
       function (callback) {
-        User.model.findByUser(req.body.user,
+        User.model.findByFacultyIdentity(req.body.user,
           function (foundUser) {
             return callback(null, foundUser);
           },
