@@ -16,7 +16,7 @@ let ListRegistrations = (function () {
   let _validateRequest = function (req, errCallback) {
 
     process.nextTick(() => {
-      if (!RequestValidator.headerIsValid(req.header)) {
+      if (!RequestValidator.headerIsValid(req.headers)) {
         return errCallback(PredefinedErrors.getInvalidHeaderError());
       }
       if (!RequestValidator.requestHeaderContainsAuthenticationData(req)) {
@@ -41,7 +41,7 @@ let ListRegistrations = (function () {
       },
 
       function (callback) {
-        User.model.findByUser(req.header.user,
+        User.model.findByUser(req.headers['user'],
           function (foundUser) {
             return callback(null, foundUser);
           },
@@ -52,7 +52,7 @@ let ListRegistrations = (function () {
       },
 
       function (foundUser, callback) {
-        RequestValidator.validateApiKey(foundUser, req.header.apiKey, function (apiKeyExpired) {
+        RequestValidator.validateApiKey(foundUser, req.headers['apikey'], function (apiKeyExpired) {
           if (apiKeyExpired) {
             return callback(apiKeyExpired);
           } else {

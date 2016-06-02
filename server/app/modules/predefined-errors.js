@@ -4,7 +4,7 @@ let Errors = require('../constants/errors');
 let Error = require('../modules/error');
 
 let PredefinedErrors = {
-  
+
   getAuthorizationDataNotFoundError: function () {
     return new Error(
       Errors.AUTHORIZATION_DATA_NOT_FOUND.id,
@@ -12,7 +12,7 @@ let PredefinedErrors = {
       undefined
     );
   },
-  
+
   getInvalidBodyError: function(data) {
     return new Error(
       Errors.REQ_BODY_INVALID.id,
@@ -20,7 +20,7 @@ let PredefinedErrors = {
       data
     );
   },
-  
+
   getNotAuthorizedError: function(data) {
     return new Error(
       Errors.NOT_AUTHORIZED.id,
@@ -28,7 +28,7 @@ let PredefinedErrors = {
       data
     );
   },
-  
+
   getDatabaseOperationFailedError: function(data) {
     return new Error(
       Errors.INVALID_REQUEST_FIELDS.id,
@@ -36,7 +36,7 @@ let PredefinedErrors = {
       data
     )
   },
-  
+
   getIdentityConfirmationError: function(data) {
     return new Error(
       Errors.IDENTITY_CONFIRMATION_FAILED.id,
@@ -92,7 +92,7 @@ let PredefinedErrors = {
       data
     )
   }
-  
+
 };
 
 module.exports = PredefinedErrors;

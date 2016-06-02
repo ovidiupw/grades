@@ -20,6 +20,20 @@ const jsep = require("jsep");
 
 let RequestValidator = (function () {
 
+  let _requestDoesNotContainOwnFacultyIdentity = function (facultyIdentity, req, errCallback) {
+    process.nextTick(() => {
+      if (facultyIdentity === req.body.facultyIdentity) {
+        return errCallback(new Error(
+          Errors.OWN_FACULTY_IDENTITY.id,
+          Errors.OWN_FACULTY_IDENTITY.message,
+          Errors.OWN_FACULTY_IDENTITY.data
+        ));
+      } else {
+        return errCallback(null);
+      }
+    });
+  };
+
   let _isAllowedAccessBasedOnRoleActions = function (roleActions, resource, verb) {
     for (let actionIndex in roleActions) {
       if (!roleActions[actionIndex].hasOwnProperty('resource') || !roleActions[actionIndex].hasOwnProperty('verb')) {
@@ -61,7 +75,7 @@ let RequestValidator = (function () {
 
     async.waterfall([
 
-      function (callback) {
+      function(callback) {
         if (user.identityConfirmed == false) {
           return callback(new Error(
             Errors.IDENTITY_NOT_CONFIRMED.id,
@@ -72,7 +86,7 @@ let RequestValidator = (function () {
       },
 
       function (callback) {
-        Registration.model.findByUser(
+        Registration.model.findByFacultyIdentity(
           user.facultyIdentity,
           function (foundRegistration) {
             return callback(null, foundRegistration._doc);
@@ -83,7 +97,7 @@ let RequestValidator = (function () {
         );
       },
 
-      function (registration, callback) {
+      function(registration, callback) {
         if (registration == undefined || registration.roles == undefined) {
           return callback(PredefinedErrors.getNotAuthorizedError("The user has no associated registration or roles."));
         }
@@ -92,11 +106,11 @@ let RequestValidator = (function () {
 
       /* Verify if user is authorized based on PredefinedRoles */
 
-      function (registration, callback) {
-
+      function(registration, callback) {
+        
         for (let predefinedRole in PredefinedRoles) {
           if (_registrationHasPredefinedRole(registration, PredefinedRoles[predefinedRole])
-            && _roleIsAuthorizedOnResource(PredefinedRoles[predefinedRole], resource, verb)) {
+              && _roleIsAuthorizedOnResource(PredefinedRoles[predefinedRole], resource, verb)) {
             return callback(_SUCCESS_BREAK);
           }
         }
@@ -105,9 +119,9 @@ let RequestValidator = (function () {
 
       /* Verify if user is authorized based on roles associated with its registration */
 
-      function (registration, callback) {
+      function(registration, callback) {
         let roles = registration.roles;
-
+        
         for (let roleTitleIndex in roles) {
 
           if (!registration.hasOwnProperty('roles')) {
@@ -129,7 +143,7 @@ let RequestValidator = (function () {
         }
       }
 
-    ], function (err, results) {
+    ], function(err, results) {
       if (err === _SUCCESS_BREAK || err == null) {
         return errCallback(null);
       }
@@ -150,8 +164,8 @@ let RequestValidator = (function () {
   /**
    * Validates that the supplied header is valid. Invokes the callback if not.
    */
-  let _headerIsValid = function (header) {
-    if (!header) {
+  let _headerIsValid = function (headers) {
+    if (!headers) {
       return false;
     }
     return true;
@@ -170,7 +184,7 @@ let RequestValidator = (function () {
 
   let _requestHeaderContainsAuthenticationData = function (req) {
     /* Assumes the request header is a valid encoding header */
-    return req.header.user != undefined && req.header.apiKey != undefined;
+    return req.headers['user'] != undefined && req.headers['apikey'] != undefined;
 
   };
 
@@ -178,10 +192,10 @@ let RequestValidator = (function () {
    * Validates that the supplied request contains a valid faculty identity.
    */
   let _requestContainsValidFacultyIdentity = function (req) {
-    var facultyIdentityRegularExpression = new RegExp("[a-z]+\\.[a-z]+@" + Domains.FII + "$");
+    //var facultyIdentityRegularExpression = new RegExp("[a-z]+\\.[a-z]+@" + Domains.FII + "$");
     return req.body.facultyIdentity.length > SchemaConstraints.facultyIdentityMinLength &&
-      req.body.facultyIdentity.length < SchemaConstraints.facultyIdentityMaxLength &&
-      facultyIdentityRegularExpression.test(req.body.facultyIdentity);
+      req.body.facultyIdentity.length < SchemaConstraints.facultyIdentityMaxLength ;
+      //&& facultyIdentityRegularExpression.test(req.body.facultyIdentity);
   };
 
   /**
@@ -253,20 +267,6 @@ let RequestValidator = (function () {
         }
       }
       return errCallback(null);
-    });
-  };
-
-  let _requestDoesNotContainOwnFacultyIdentity = function (facultyIdentity, req, errCallback) {
-    process.nextTick(() => {
-      if (facultyIdentity === req.body.facultyIdentity) {
-        return errCallback(new Error(
-          Errors.OWN_FACULTY_IDENTITY.id,
-          Errors.OWN_FACULTY_IDENTITY.message,
-          Errors.OWN_FACULTY_IDENTITY.data
-        ));
-      } else {
-        return errCallback(null);
-      }
     });
   };
 

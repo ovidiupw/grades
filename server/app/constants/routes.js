@@ -10,6 +10,7 @@ const BasePaths = {
 const Routes = {
   ANY: `/${BasePaths.API_V1}/*`,
   ROOT: `/${BasePaths.API_V1}`,
+  API_RESOURCES: `/${BasePaths.API_V1}/resources`,
   
   REGISTER_IDENTITY: `/${BasePaths.API_V1}/register/identity`,
   

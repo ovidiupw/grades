@@ -7,12 +7,9 @@ const RouteNames = require('../../constants/routes');
 const HttpVerbs = require('../../constants/http-verbs');
 
 let User = require('../../entities/user');
-let Role = require('../../entities/role');
-
 let PredefinedErrors = require('../../modules/predefined-errors');
-let PredefinedRoles = require('../../constants/roles');
 
-let ListRoles = (function () {
+let ListApiResources = (function () {
 
   let _validateRequest = function (req, errCallback) {
 
@@ -46,8 +43,8 @@ let ListRoles = (function () {
           function (foundUser) {
             return callback(null, foundUser);
           },
-          function (error) {
-            return callback(PredefinedErrors.getDatabaseOperationFailedError(error));
+          function (userFindError) {
+            return callback(PredefinedErrors.getDatabaseOperationFailedError(userFindError));
           }
         );
       },
@@ -67,7 +64,7 @@ let ListRoles = (function () {
 
       function (user, callback) {
         RequestValidator.validateAccessRights(
-          user, RouteNames.ROLES, HttpVerbs.GET,
+          user, RouteNames.API_RESOURCES, HttpVerbs.GET,
           function (error) {
             if (error) {
               /* In case user does not have permissions to access this resource */
@@ -79,33 +76,23 @@ let ListRoles = (function () {
       },
 
       function (callback) {
-        Role.model.find({}, function (err, roles) {
-          if (err) {
-            return callback(err);
-          } else {
-            return callback(null, roles);
-          }
-        });
-      },
-
-      function(roles, callback) {
-        for (let predefinedRole in PredefinedRoles) {
-          if (PredefinedRoles.hasOwnProperty(predefinedRole)) {
-            roles.push(PredefinedRoles[predefinedRole]);
+        let apiResources = [];
+        for (let routeName in RouteNames) {
+          if (RouteNames.hasOwnProperty(routeName)) {
+            apiResources.push(RouteNames[routeName]);
           }
         }
-        callback(null, roles);
-      },
 
-      function (roles, callback) {
-        res.status(200);
-        res.send(roles);
+        callback(null, apiResources)
       }
 
-    ], function (err, results) {
+    ], function (err, apiResources) {
       if (err) {
         res.status(400);
         res.send(err);
+      } else {
+        res.status(200);
+        res.send(apiResources)
       }
     });
 
@@ -116,4 +103,4 @@ let ListRoles = (function () {
   }
 })();
 
-module.exports = ListRoles;
+module.exports = ListApiResources;

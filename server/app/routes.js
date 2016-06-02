@@ -7,6 +7,7 @@ const RouteNames = require('./constants/routes');
 
 const RegisterIdentity = require('./route_handlers/registrations/RegisterIdentity');
 const AddNewRole = require('./route_handlers/roles/AddNewRole');
+const ListRoles = require('./route_handlers/roles/ListRoles');
 const AddNewStudent = require('./route_handlers/students/AddNewStudent');
 const DeleteStudent = require('./route_handlers/students/DeleteStudent');
 const ListStudents = require('./route_handlers/students/ListStudents');
@@ -16,6 +17,7 @@ const ListProfessors = require('./route_handlers/professors/ListProfessors');
 const ConfirmIdentity = require('./route_handlers/registrations/ConfirmIdentity');
 const AddNewRegistration = require('./route_handlers/registrations/AddNewRegistration');
 const DeleteRegistration = require('./route_handlers/registrations/DeleteRegistration');
+const ListApiResources = require('./route_handlers/resources/ListApiResources');
 const ListRegistrations = require('./route_handlers/registrations/ListRegistrations');
 const AddNewModule = require('./route_handlers/modules/AddNewModule');
 const DeleteModule = require('./route_handlers/modules/DeleteModule');
@@ -32,17 +34,39 @@ let Routes = function (app, passport) {
   });
 
   /**
-   * This function handles creating a new registration in the database.
+   * This function handles deleting a registration from the database.
    */
-  app.post(RouteNames.REGISTRATIONS, function (req, res) {
-    AddNewRegistration.invoke(req, res);
+  app.get(RouteNames.API_RESOURCES, function(req, res) {
+    ListApiResources.invoke(req, res);
   });
+
 
   /**
    * This function handles deleting a registration from the database.
    */
-  app.delete(RouteNames.REGISTRATIONS, function (req, res) {
+  app.delete(RouteNames.REGISTRATIONS, function(req, res) {
     DeleteRegistration.invoke(req, res);
+  });
+
+  /**
+   * This function handles listing all registrations from the database.
+   */
+  app.get(RouteNames.REGISTRATIONS, function(req, res) {
+    ListRegistrations.invoke(req, res);
+  });
+
+  /**
+   * This function handles creating a new registration in the database.
+   */
+  app.post(RouteNames.REGISTRATIONS, function (req, res) {    
+    AddNewRegistration.invoke(req, res);
+  });
+
+  /**
+   * This function handles listing all roles from the database.
+   */
+  app.get(RouteNames.ROLES, function(req, res) {
+    ListRoles.invoke(req, res);
   });
 
   /**

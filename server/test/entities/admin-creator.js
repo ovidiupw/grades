@@ -15,17 +15,17 @@ Mongoose.connect(DB.PRODUCTION_DB);
 
 describe('Configuration of admin account', function () {
   it('Creates admin faculty identity (registration) with roles', function (done) {
+
     let adminRegistration = new Registration.model({
       facultyIdentity: "ovidiu.pricop@info.uaic.ro",
-      facultyStatus: RegistrationClasses.DEVELOPER,
+      facultyStatus: [RegistrationClasses.DEVELOPER],
       roles: [PredefinedRoles.administrator.title]
     });
 
     adminRegistration.save(function (err) {
-      if (err) done(err);
+      if (err) return done(err);
+      return done();
     });
-
-    done();
   });
 });
 
