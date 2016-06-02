@@ -19,7 +19,8 @@ describe('Basic Serialization and Deserialization', function () {
 
   let moduleModel = Module.model;
   let module = new moduleModel({
-    moduleId: SAMPLE_MODULE_ID
+    moduleId: SAMPLE_MODULE_ID,
+    courseId: 123
   });
 
   let handleRemoveResult = function (err, removeResult) {
