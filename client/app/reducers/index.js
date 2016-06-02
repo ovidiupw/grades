@@ -1,8 +1,30 @@
 import { combineReducers } from 'redux'
-import {todoItems} from './reducers'
+import {
+  dangerAlert,
+  successAlert,
+  userAccount,
+  error,
+  success,
+  spinner,
+  identityConfirmationForm,
+  registrations,
+  roles,
+  addRegistrationForm,
+  addRoleForm
+} from './reducers'
 
 const reducers = combineReducers({
-  todoItems
+  dangerAlert,
+  successAlert,
+  userAccount,
+  error,
+  success,
+  spinner,
+  identityConfirmationForm,
+  registrations,
+  roles,
+  addRegistrationForm,
+  addRoleForm
 });
 
 export default reducers

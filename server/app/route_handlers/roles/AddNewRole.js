@@ -9,6 +9,7 @@ const HttpVerbs = require('../../constants/http-verbs');
 let User = require('../../entities/user');
 let Role = require('../../entities/role');
 let Roles = require('../../constants/roles');
+let Utility = require('../../modules/utility');
 
 let PredefinedErrors = require('../../modules/predefined-errors');
 
@@ -88,7 +89,7 @@ let AddNewRole = (function () {
   let _objectContainsValidHttpVerb = function(actionObject) {
     for (let httpVerb in HttpVerbs) {
       if (HttpVerbs.hasOwnProperty(httpVerb)) {
-        if (actionObject[Roles.VERB] === httpVerb) return true;
+        if (actionObject[Utility.PATH.VERB] === httpVerb) return true;
       }
     }
     return false;
@@ -97,7 +98,7 @@ let AddNewRole = (function () {
   let _objectContainsValidHttpRoute = function(actionObject) {
     for (let routeName in RouteNames) {
       if (RouteNames.hasOwnProperty(routeName)) {
-        if (actionObject[Roles.RESOURCE] === RouteNames[routeName]) return true;
+        if (actionObject[Utility.PATH.RESOURCE] === RouteNames[routeName]) return true;
       }
     }
     return false;

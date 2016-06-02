@@ -18,7 +18,7 @@ let Mailer = (function() {
         return successCallback(message);
       }
     })
-  }
+  };
 
   return ({
     sendEmail: _sendEmail

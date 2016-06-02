@@ -34,7 +34,7 @@ let AddNewProfessor = (function () {
             if (!RequestValidator.requestContainsAuthenticationData(req)) {
                 return errCallback(PredefinedErrors.getAuthorizationDataNotFoundError());
             }
-            if (req.body.facultyIdentity == undefined ||
+            if (req.body.facultyIdentity == undefined || 
                 req.body.didacticGrade == undefined ||
                 req.body.courses == undefined) {
                 return errCallback(new Error(

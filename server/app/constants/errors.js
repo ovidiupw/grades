@@ -130,6 +130,16 @@ const Errors = {
     id: 26,
     message: 'Error: A course with the supplied courseId does not exist.',
     data: undefined
+  },
+  REQ_HEADER_INVALID: {
+    id: 27,
+    message: 'Error: The request header is invalid.',
+    data: undefined
+  },
+  OWN_FACULTY_IDENTITY: {
+    id: 28,
+    message: 'Error: The supplied faculty identity is identical with your own faculty identity.',
+    data: undefined
   }
 };
 

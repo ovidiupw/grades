@@ -26,7 +26,7 @@ let Grade = (function () {
     },
     grades: [{
       value: {
-        type: Double
+        type: Number
       },
       date: {
         type: Date

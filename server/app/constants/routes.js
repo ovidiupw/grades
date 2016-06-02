@@ -1,8 +1,5 @@
 'use strict';
 
-const Utility = require('../modules/utility');
-const bdsok = Utility.buildDelimiterSeparatedObjectKeys;
-
 const BasePaths = {
   STUDENTS: 'students',
   PROFESSORS: 'professors',
@@ -14,6 +11,7 @@ const BasePaths = {
 const Routes = {
   ANY: `/${BasePaths.API_V1}/*`,
   ROOT: `/${BasePaths.API_V1}`,
+  API_RESOURCES: `/${BasePaths.API_V1}/resources`,
   
   REGISTER_IDENTITY: `/${BasePaths.API_V1}/register/identity`,
   
@@ -21,6 +19,7 @@ const Routes = {
   AUTH_FACEBOOK_CALLBACK: `/${BasePaths.API_V1}/auth/facebook/callback`,
   
   ROLES: `/${BasePaths.API_V1}/roles`,
+  MODULES: `/${BasePaths.API_V1}/modules`,
   PROFESSORS: `/${BasePaths.API_V1}/${BasePaths.PROFESSORS}`,
   REGISTRATIONS: `/${BasePaths.API_V1}/registrations`,
   STUDENTS: `/${BasePaths.API_V1}/${BasePaths.STUDENTS}`,

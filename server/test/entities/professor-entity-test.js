@@ -45,8 +45,9 @@ describe('Basic Serialization and Deserialization', function () {
             if (err) throw err;
         });
     });
+  });
 
-    /*******************************************************/
+  /*******************************************************/
 
     it('Finds the professor in the database', function (done) {
         professorModel.findOne({
@@ -57,6 +58,7 @@ describe('Basic Serialization and Deserialization', function () {
             done();
         });
     });
+  });
 
     /*******************************************************/
 
@@ -80,7 +82,7 @@ describe('Basic Serialization and Deserialization', function () {
         done();
     });
 
-    /*******************************************************/
+   
 
     it('Should not validate a facultyIdentity under minimum length.', function (done) {
 
@@ -97,7 +99,7 @@ describe('Basic Serialization and Deserialization', function () {
         done();
     });
 
-    /*******************************************************/
+    
 
     after(function (done) {
         removeSampleProfessor(FACULTY_IDENTITY);

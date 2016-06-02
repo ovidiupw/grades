@@ -26,6 +26,9 @@ let DeleteStudent = (function () {
         return errCallback(PredefinedErrors.getInvalidBodyError(
           "Required parameter is not supplied. Please add 'facultyIdentity'."));
       }
+      if (!RequestValidator.requestContainsValidFacultyIdentity(req)) {
+        return errCallback(PredefinedErrors.getFacultyIdentityError());
+      }
 
       return errCallback(null);
     });

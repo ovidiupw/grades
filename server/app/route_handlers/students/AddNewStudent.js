@@ -8,6 +8,7 @@ const HttpVerbs = require('../../constants/http-verbs');
 
 let User = require('../../entities/user');
 let Student = require('../../entities/student');
+let Registration = require('../../entities/registration');
 
 let PredefinedErrors = require('../../modules/predefined-errors');
 
@@ -30,6 +31,12 @@ let AddNewStudent = (function () {
         return errCallback(PredefinedErrors.getInvalidBodyError(
           "Required parameters not supplied. Please add " +
           "'facultyIdentity', 'registrationNumber', 'birthDate', 'academicYear' and 'academicGroup' to your request."));
+      }
+      if (!RequestValidator.requestContainsValidFacultyIdentity(req)) {
+        return errCallback(PredefinedErrors.getFacultyIdentityError());
+      }
+      if (!RequestValidator.requestContainsValidBirthDate(req)) {
+        return errCallback(PredefinedErrors.getBirthDateError());
       }
 
       return errCallback(null);

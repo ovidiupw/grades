@@ -4,6 +4,8 @@
   "dependencies": {
     "async": "^2.0.0-rc.3",
     "body-parser": "1.0.2",
+    "cors": "^2.7.1",
+    "emailjs": "^1.0.4",
     "express": "4.0.0",
     "gulp": "3.9.1",
     "jsep": "^0.3.0",
@@ -12,8 +14,7 @@
     "nodemailer": "^2.3.2",
     "passport": "^0.3.2",
     "passport-facebook": "^2.1.0",
-    "randomstring": "^1.1.4",
-    "emailjs": "^1.0.4"
+    "randomstring": "^1.1.4"
   },
   "devDependencies": {
     "babel-eslint": "^6.0.0",

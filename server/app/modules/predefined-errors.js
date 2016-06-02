@@ -91,6 +91,54 @@ let PredefinedErrors = {
         Errors.REQ_HEADER_INVALID.message,
         data
     )
+  },
+
+  getAddNewRegistrationError: function(data) {
+    return new Error(
+      Errors.USER_REGISTRATION_ERROR.id,
+      Errors.USER_REGISTRATION_ERROR.message,
+      data
+    )
+  },
+
+  getFacultyIdentityError: function(data) {
+    return new Error(
+      Errors.INVALID_FACULTY_IDENTITY.id,
+      Errors.INVALID_FACULTY_IDENTITY.message,
+      data
+    )
+  },
+
+  getBirthDateError: function(data) {
+    return new Error(
+      Errors.INVALID_BIRTH_DATE.id,
+      Errors.INVALID_BIRTH_DATE.message,
+      data
+    )
+  },
+
+  getProfessorFacultyIdentityError: function(data) {
+    return new Error(
+      Errors.PROFESSOR_NOT_FOUND.id,
+      Errors.PROFESSOR_NOT_FOUND.message,
+      data
+    )
+  },
+
+  getCourseIdError: function(data) {
+    return new Error(
+      Errors.COURSE_NOT_FOUND.id,
+      Errors.COURSE_NOT_FOUND.message,
+      data
+    )
+  },
+
+  getInvalidHeaderError: function(data) {
+    return new Error(
+      Errors.REQ_HEADER_INVALID.id,
+      Errors.REQ_HEADER_INVALID.message,
+      data
+    )
   }
 
 };

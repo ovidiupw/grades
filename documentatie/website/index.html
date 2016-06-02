@@ -507,7 +507,7 @@
               </tr>
                <tr>
                 <td>facultyStatus</td>
-                <td>Object</td>
+                <td>Array of String</td>
                 <td>
             		camp utilizat pentru a realiza o delimitare clara a claselor de utilizatori (actorii sistemului). Au fost identificate trei clase de utilizatori:
             		<ul>
@@ -942,7 +942,9 @@
           sale, utilizatorul poate folosi anumite resurse ale API-ului pus la dispozitie de aplicatia Grades. Caracterul ierarhic al asumarii raspunderilor in cadrul facultatii presupune ca, in fiecare caz, rolurile unui utilizator sa fie stabilite de
           catre un superior - superiorul este si cel care il adauga pe utilizator in aplicatie (ex: secretariatul adauga studenti, decanul adauga profesori).
         </p>
-        <h5>Drepturi asupra configurarii permisiunilor</h5>
+        <p>
+        	Sistemul de permisiuni va evita susceptibilitatea la atacurile care urmaresc atasarea drepturilor depline unui cont/inregistrari, desi cel care ataseaza aceste drepturi nu le are pe contul sau. Acest lucru se va realiza prin restrictionarea posibilitatii asocierii unor roluri cu un cont nou, atat timp cat persoana care asociaza aceste roluri nu le are, ea insasi, asociate propriului cont. Spre exemplu, atunci cand un secretar cu permisiuni doar pe resursele "studenti" si "note" va incerca sa adauge un utilizator cu drepturi pe resursa "profesori", acesta nu va putea, deoarece nici contul de pe care se incearca asignarea permisiunilor nu detine acea permisiune (pe resursa "profesori").
+        </p>
 
 
       </section>

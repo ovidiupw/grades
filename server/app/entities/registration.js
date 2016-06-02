@@ -16,29 +16,35 @@ let randomstring = require("randomstring");
 let Registration = (function () {
 
   let _assertAtLeastOneFacultyStatusExists = {
-    validator: function(facultyStatuses) {
+    validator: function (facultyStatuses) {
       return facultyStatuses.length >= 1;
     },
-    message: `Please supply at least one faculty status from the following: ${ Utility.buildDelimiterSeparatedObjectKeys(RegistrationClasses, ',')}`
+    message: 'Please supply an array containing at least one faculty' +
+    'status (as a string) from the following: ' +
+    `${ Utility.buildDelimiterSeparatedObjectKeys(RegistrationClasses, ',')}`
   };
 
   let _validateFacultyStatus = {
-    validator: function(status) {
+    validator: function (facultyStatus) {
+
       for (let registrationClass in RegistrationClasses) {
         if (RegistrationClasses.hasOwnProperty(registrationClass)) {
-          if (status === RegistrationClasses[registrationClass]) {
+          if (facultyStatus.toLowerCase() === RegistrationClasses[registrationClass]) {
             return true;
           }
         }
+
       }
       return false;
     },
-    message: `The supplied facultyStatus was invalid. Please supply one of the following: ${ Utility.buildDelimiterSeparatedObjectKeys(RegistrationClasses, ',')}`
+    message: 'One of the supplied facultyStatuses was invalid. Please supply ' +
+    'one of the following statuses: ' +
+    `${ Utility.buildDelimiterSeparatedObjectKeys(RegistrationClasses, ',')}`
   };
 
   const _SCHEMA_NAME = 'Registrations';
   /**
-   * The 'Registrations' collection schema.
+   * The 'Roles' collection schema.
    */
   const _schema = new Schema({
     facultyIdentity: {
@@ -72,11 +78,11 @@ let Registration = (function () {
   });
 
   _schema.methods.generateIdentitySecret = function (errCallback, successCallback) {
-    let _generatedIdentitySecret =  randomstring.generate({
+    let _generatedIdentitySecret = randomstring.generate({
       length: 6,
       charset: 'numeric'
     });
-      
+
     process.nextTick(() => {
       this.model(_SCHEMA_NAME).update({
         _id: this._id
@@ -110,7 +116,7 @@ let Registration = (function () {
           return error(new Error(
             Errors.REGISTRATION_NOT_FOUND.id,
             Errors.REGISTRATION_NOT_FOUND.message,
-            "Registration with facultyIdentity '" + fid + "' could not be found."
+            "Registration with facultyIdentity #" + fid + "# could not be found."
           ));
         } else {
           return success(foundRegistration);

@@ -1,7 +1,7 @@
 'use strict';
 
 const RegistrationClasses = {
-  DEVELOPER: "developer", // TODO remove
+  DEVELOPER: "developer",
   ADMINISTRATOR: "administrator",
   PROFESSOR: "professor",
   STUDENT: "student"
