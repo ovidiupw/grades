@@ -6,9 +6,17 @@ import {SESSION_PROBLEM} from '../constants/routes'
 import React from 'react'
 import * as InitialStates from '../constants/initialStates'
 
-import {DEVELOPER} from '../constants/facultyStatuses';
+import {DEVELOPER, STUDENT, PROFESSOR, SECRETARY} from '../constants/facultyStatuses';
 
 let Utility = {
+  initFacebook: function() {
+    FB.init({
+      appId: '848873811924114', 
+      cookie: true,
+      version: 'v2.4'
+    });
+  },
+
   userAccountIsComplete: function (authResponse) {
     if (authResponse.facultyIdentity == undefined)
       return false;
@@ -21,6 +29,7 @@ let Utility = {
   handleResponseCodeNot200: function (response, dispatch) {
     if (response.status.code === 400) {
       let data = response.entity.data;
+
       if (response.entity.code === 6 || response.entity.code === 7) {
         data = "Go to home-screen by clicking the top left 'Grades' logo and login again."
       }
@@ -32,7 +41,7 @@ let Utility = {
       }
 
       dispatch(updateError({
-        message: response.entity.message + " - " + data
+        message: response.entity.message + " - " + JSON.stringify(data)
       }));
     } else {
       dispatch(updateError({
@@ -43,8 +52,17 @@ let Utility = {
   },
 
   getRedirectLocation: function (facultyStatuses) {
+    if (facultyStatuses.indexOf(SECRETARY) != -1) {
+      return "/secretary/home";
+    }
     if (facultyStatuses.indexOf(DEVELOPER) != -1) {
       return "/developer/home";
+    }
+    if (facultyStatuses.indexOf(PROFESSOR) != -1) {
+      return "/professor/home";
+    }
+    if (facultyStatuses.indexOf(STUDENT) != -1) {
+      return "/student/home";
     }
   },
 
@@ -91,53 +109,8 @@ let Utility = {
       console.log(err);
       return InitialStates.addRoleForm;
     }
-  },
-
-  getFormattedActions: function (actions) {
-
-    return actions.map(action => {
-      let verbColor;
-      switch (action.verb.toUpperCase()) {
-        case "POST":
-          verbColor = "#13c20f";
-          break;
-        case "GET":
-          verbColor = "#2392f7";
-          break;
-        case "PUT":
-          verbColor = "#ff9000";
-          break;
-        case "DELETE":
-          verbColor = "#e30012";
-          break;
-        case "PATCH":
-          verbColor = "#af01d9";
-          break;
-        default:
-          verbColor = "black";
-      }
-
-      let style = {
-        backgroundColor: verbColor,
-        color: "white",
-        borderRadius: 4,
-        padding: 3,
-        marginTop: 5,
-        marginLeft:5,
-        overflowWrap: "break-word"
-      };
-      return (
-        <span style={style}>
-            <strong>
-              {action.verb.toUpperCase()}
-            </strong>
-          <span style={{marginLeft:10, marginRight:5}}>
-            {action.resource}
-          </span>
-        </span>
-      );
-    })
   }
+  
 };
 
 export default Utility;

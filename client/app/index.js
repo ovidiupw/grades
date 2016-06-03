@@ -21,10 +21,15 @@ import LoginRedirect from './components/LoginRedirect'
 import RegisterAccount from './components/RegisterAccount'
 import DeveloperDashboard from './containers/DeveloperDashboard'
 import DeveloperHome from './components/DeveloperHome'
+import SecretaryDashboard from './containers/SecretaryDashboard'
+import SecretaryHome from './components/SecretaryHome'
 import Registrations from './components/Registrations'
 import Roles from './components/Roles'
 import Authorization from './modules/authorization'
 import SessionProblem from './components/SessionProblem'
+import Students from './components/Students'
+
+Utility.initFacebook();
 
 const gradesApp = combineReducers({
   reducers,
@@ -64,6 +69,11 @@ ReactDOM.render(
         <Route path={Routes.HOME} component={Home}/>
         <Route path={Routes.LOGIN_REDIRECT} component={LoginRedirect}/>
         <Route path={Routes.REGISTER_ACCOUNT} component={RegisterAccount}/>
+
+        <Route component={SecretaryDashboard}>
+          <Route path={Routes.SECRETARY_HOME} component={SecretaryHome} />
+          <Route path={Routes.SECRETARY_STUDENTS} component={Students} />
+        </Route>
 
         <Route component={DeveloperDashboard}>
           <Route path={Routes.DEVELOPER_HOME} component={DeveloperHome} />

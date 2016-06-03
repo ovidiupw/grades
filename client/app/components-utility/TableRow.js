@@ -1,6 +1,7 @@
 import {connect} from 'react-redux'
 import React, {PropTypes} from 'react';
 import {SpecialColumns} from '../constants/tables';
+import Action from '../components-utility/Action'
 
 let TableRow = React.createClass({
 
@@ -16,11 +17,11 @@ let TableRow = React.createClass({
       );
     }
 
-    if (this.props.actionsFormatter != undefined && this.props.actionsFormatterColumnName != undefined) {
+    if (this.props.actionsFormatterColumnName != undefined) {
       if (columnName === this.props.actionsFormatterColumnName) {
         return (
           <td>
-            {this.props.actionsFormatter(this.props.columnData[columnName])}
+            {this.props.columnData[columnName].map(action => <Action action={action} />)}
           </td>
         );
       }

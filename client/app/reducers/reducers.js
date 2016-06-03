@@ -62,7 +62,7 @@ export function userAccount(state = {
 
 export function success(state = {
   message: undefined,
-  data: undefined,
+  data: undefined
 }, action) {
   switch (action.type) {
 
@@ -165,6 +165,20 @@ export function roles(state = {
   }
 }
 
+export function apiResources(state = {
+  items: []
+}, action) {
+  switch (action.type) {
+    case ActionTypes.SET_API_RESOURCES:
+      return Object.assign({}, state, {
+        items: action.apiResources
+      });
+
+    default:
+      return state;
+  }
+}
+
 export function addRoleForm(state = InitialStates.addRoleForm
   , action) {
   switch (action.type) {
@@ -176,8 +190,8 @@ export function addRoleForm(state = InitialStates.addRoleForm
 
     case ActionTypes.POP_ADD_ROLE_FORM_ACTION:
       return Object.assign({}, state, {
-        actions: state.actions.filter(action =>
-          action.verb !== action.action.verb || action.resource !== action.action.resource)
+        actions: state.actions.filter(currentAction =>
+        currentAction.verb !== action.action.verb || currentAction.resource !== action.action.resource)
       });
 
     case ActionTypes.PUSH_ADD_ROLE_FORM_ACTION:

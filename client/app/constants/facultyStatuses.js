@@ -1,5 +1,11 @@
-const DEVELOPER = "developer"
+const DEVELOPER = "developer";
+const STUDENT = "student";
+const PROFESSOR = "professor";
+const SECRETARY = "secretary";
 
 export {
-  DEVELOPER
+  DEVELOPER,
+  STUDENT,
+  PROFESSOR,
+  SECRETARY
 }

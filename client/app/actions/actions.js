@@ -1,5 +1,12 @@
 import * as Actions from '../constants/actionTypes'
 
+export function setApiResources(apiResources) {
+  return {
+    type: Actions.SET_API_RESOURCES,
+    apiResources: apiResources
+  }
+}
+
 export function updateRegistrationFormFacultyStatuses(facultyStatuses) {
   return {
     type: Actions.UPDATE_ADD_REGISTRATION_FORM_FACULTY_STATUSES,

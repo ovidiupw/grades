@@ -20,6 +20,22 @@ let Authorization = {
       keyExpires: localStorage.getItem('keyExpires'),
       facultyStatus: localStorage.getItem('facultyStatus')
     }
+  },
+  
+  removeCredentialsFromLocalStorage: function() {
+
+    localStorage.removeItem('user');
+    localStorage.removeItem('apiKey');
+    localStorage.removeItem('keyExpires');
+    localStorage.removeItem('facultyStatus');
+    
+    return {
+      user: undefined,
+      apiKey: undefined,
+      keyExpires: undefined,
+      facultyIdentity: undefined,
+      facultyStatus: undefined
+    }
   }
 };
 

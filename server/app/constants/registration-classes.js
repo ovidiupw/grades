@@ -4,7 +4,9 @@ const RegistrationClasses = {
   DEVELOPER: "developer",
   ADMINISTRATOR: "administrator",
   PROFESSOR: "professor",
-  STUDENT: "student"
+  STUDENT: "student",
+  SECRETARY: "secretary",
+  PRINCIPAL: "principal"
 };
 
 module.exports = RegistrationClasses;

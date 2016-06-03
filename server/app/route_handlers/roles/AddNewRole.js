@@ -44,13 +44,7 @@ let AddNewRole = (function () {
     });
   };
 
-  let _validateRequestActions = function (actionsJSON) {
-    let actions;
-    try {
-      actions = JSON.parse(actionsJSON);
-    } catch (ignored) {
-      return PredefinedErrors.getInvalidBodyError("Invalid parameter type for 'actions'. Expected an array.");
-    }
+  let _validateRequestActions = function (actions) {
 
     if (!util.isArray(actions)) {
       return PredefinedErrors.getInvalidBodyError("Invalid parameter type for 'actions'. Expected an array.");
@@ -157,7 +151,7 @@ let AddNewRole = (function () {
       /* User has permission to access the resource at this point - authorized */
 
       function (callback) {
-        let actions = JSON.parse(req.body.actions); // function catch should have been verified earlier
+        let actions =req.body.actions;
 
         let newRole = new Role.model({
           title: req.body.title,

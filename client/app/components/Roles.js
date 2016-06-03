@@ -81,7 +81,6 @@ let Roles = React.createClass({
             {this.props.roles.items.map((role, i) => {
               return <TableRow key={i}
                                columns={ROLES_COLUMNS} columnData={role}
-                               actionsFormatter={Utility.getFormattedActions}
                                actionsFormatterColumnName="actions"/>
             })}
             </tbody>
