@@ -2,6 +2,8 @@
 
 let async = require('async');
 let RequestValidator = require('../../modules/request-validator');
+let ActionValidator = require('../../modules/action-validator');
+let AuthorizationHelper = require('../../modules/authorization');
 
 const RouteNames = require('../../constants/routes');
 const HttpVerbs = require('../../constants/http-verbs');
@@ -12,8 +14,6 @@ let Roles = require('../../constants/roles');
 let Utility = require('../../modules/utility');
 
 let PredefinedErrors = require('../../modules/predefined-errors');
-
-let util = require('util');
 
 /**
  * Use invoke() method of this closure to create (POST) a new role.
@@ -35,7 +35,7 @@ let AddNewRole = (function () {
           "'title' and 'actions' to your request."));
       }
 
-      let err = _validateRequestActions(req.body.actions);
+      let err = ActionValidator.validateRequestActions(req.body.actions);
       if (err != null) {
         return errCallback(err);
       }
@@ -44,145 +44,76 @@ let AddNewRole = (function () {
     });
   };
 
-  let _validateRequestActions = function (actions) {
-
-    if (!util.isArray(actions)) {
-      return PredefinedErrors.getInvalidBodyError("Invalid parameter type for 'actions'. Expected an array.");
-    }
-
-    if (actions.length < 1) {
-      return PredefinedErrors.getInvalidBodyError("Actions array must have at least one element.");
-    }
-
-    for (let actionIndex in actions) {
-      if (!util.isObject(actions[actionIndex])
-        || actions[actionIndex].verb == undefined
-        || actions[actionIndex].resource == undefined) {
-
-        return PredefinedErrors.getInvalidBodyError("One of the supplied actions had an invalid format. " +
-          "Each action must be an object with fields {verb, resource}.");
+  let _validateRequest_waterfall = function (callback) {
+    _validateRequest(_receivedRequest, function (invalidRequestError) {
+      if (invalidRequestError) {
+        return callback(invalidRequestError);
+      } else {
+        return callback(null, _receivedRequest.body.user);
       }
-
-      if (!_isActionObjectValid(actions[actionIndex])) {
-        return PredefinedErrors.getInvalidBodyError("Invalid action object specified: "
-          + JSON.stringify(actions[actionIndex]));
-      }
-    }
-
-    return null;
+    });
   };
 
-  let _isActionObjectValid = function(actionObject) {
-    if (Object.keys(actionObject).length !== 2) return false;
-    if (!_objectContainsValidHttpVerb(actionObject)) return false;
-    if (!_objectContainsValidHttpRoute(actionObject)) return false;
+  let _saveRole_waterfall = function(ignored, callback) {
+    let newRole = new Role.model({
+      title: _receivedRequest.body.title,
+      actions: _receivedRequest.body.actions
+    });
 
-    return true;
-  };
-
-  let _objectContainsValidHttpVerb = function(actionObject) {
-    for (let httpVerb in HttpVerbs) {
-      if (HttpVerbs.hasOwnProperty(httpVerb)) {
-        if (actionObject[Utility.PATH.VERB] === httpVerb) return true;
+    newRole.save(function (roleSaveError) {
+      if (roleSaveError) {
+        callback(PredefinedErrors.getDatabaseOperationFailedError(roleSaveError));
+      } else {
+        callback(null);
       }
-    }
-    return false;
+    });
   };
 
-  let _objectContainsValidHttpRoute = function(actionObject) {
-    for (let routeName in RouteNames) {
-      if (RouteNames.hasOwnProperty(routeName)) {
-        if (actionObject[Utility.PATH.RESOURCE] === RouteNames[routeName]) return true;
-      }
-    }
-    return false;
+  let _receivedRequest;
+  let _setReceivedRequest = function(req) {
+    _receivedRequest = req;
   };
-
+  
   let _invoke = function (req, res) {
+    _receivedRequest = req;
+
+    AuthorizationHelper.setUserAndApiKey({
+      user: req.body.user,
+      apiKey: req.body.apiKey
+    });
+
+    AuthorizationHelper.setCurrentResourceAndVerb({
+      resource: RouteNames.ROLES,
+      verb: HttpVerbs.POST
+    });
+
     async.waterfall([
-
-      function (callback) {
-        _validateRequest(req, function (invalidRequestError) {
-          if (invalidRequestError) {
-            return callback(invalidRequestError);
-          } else {
-            return callback(null);
-          }
-        });
-      },
-
-      function (callback) {
-        User.model.findByUser(req.body.user,
-          function (foundUser) {
-            return callback(null, foundUser);
-          },
-          function (error) {
-            return callback(PredefinedErrors.getDatabaseOperationFailedError(error));
-          }
-        );
-      },
-
-      function (foundUser, callback) {
-        RequestValidator.validateApiKey(foundUser, req.body.apiKey, function (apiKeyExpired) {
-          if (apiKeyExpired) {
-            return callback(apiKeyExpired);
-          } else {
-            return callback(null, foundUser);
-          }
-        });
-      },
-
-      /* User credentials are valid at this point - authentication succeeded */
-      /* Now verify user access rights - authorization step */
-
-      function (user, callback) {
-        RequestValidator.validateAccessRights(
-          user, RouteNames.ROLES, HttpVerbs.POST,
-          function (error) {
-            if (error) {
-              /* In case user does not have permissions to access this resource */
-              return callback(error);
-            } else {
-              return callback(null);
-            }
-          });
-      },
-
-      /* User has permission to access the resource at this point - authorized */
-
-      function (callback) {
-        let actions =req.body.actions;
-
-        let newRole = new Role.model({
-          title: req.body.title,
-          actions: actions
-        });
-
-        newRole.save(function (roleSaveError) {
-          if (roleSaveError) {
-            callback(PredefinedErrors.getDatabaseOperationFailedError(roleSaveError));
-          } else {
-            callback(null);
-          }
-        });
-      },
-
-      function (callback) {
-        res.status(200);
-        res.send();
-      }
+      
+      _validateRequest_waterfall,
+      AuthorizationHelper.findUserInDatabase,
+      AuthorizationHelper.validateUserApiKey,
+      AuthorizationHelper.validateAccessRights,
+      _saveRole_waterfall
 
     ], function (err, results) {
       if (err) {
         res.status(400);
         res.send(err);
+      } else {
+        res.status(200);
+        res.send();
       }
     });
 
   };
 
   return {
-    invoke: _invoke
+    invoke: _invoke,
+
+    _validateRequest: _validateRequest,
+    _validateRequest_waterfall: _validateRequest_waterfall,
+    _saveRole_waterfall: _saveRole_waterfall,
+    _setReceivedRequest: _setReceivedRequest
   }
 })();
 

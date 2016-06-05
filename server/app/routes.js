@@ -166,18 +166,21 @@ let Routes = function (app, passport) {
   });
 
   /* Authentication via facebook */
-  app.get(RouteNames.AUTH_FACEBOOK,
+  app.get(RouteNames.AUTH_FACEBOOK, function(req, res) {
     passport.authenticate('facebook', {
       authType: 'rerequest',
-      session: false
-    })
-  );
+      session: false,
+      state: req.query.redirectUrl
+    })(req, res)
+  });
 
-  let getAuthResponse = function (urlPayload) {
+
+  let getAuthResponse = function (redirectUrl, urlPayload) {
+    let windowOpenerLocation = redirectUrl + '?' + urlPayload;
     return `
     <html><body>
       <script>
-      window.opener.location = 'http://localhost:3000/login-redirect?${urlPayload}';
+      window.opener.location = '${windowOpenerLocation}';
       </script>
     </body></html>
     `;
@@ -189,8 +192,24 @@ let Routes = function (app, passport) {
     }),
     function (req, res) {
       // Authentication succeeded, send auth data to user.
-      res.status(200);
-      res.send(getAuthResponse(JSON.stringify(req.user)));
+      if (req.user.redirectUrl == undefined) {
+        res.status(400);
+        res.send(new Error(
+          Errors.AUTHENTICATION_ERROR.id,
+          Errors.AUTHENTICATION_ERROR.message,
+          'A redirect url was not supplied.'
+        ));
+      } /*else if (req.user.redirectUrl.substr(0,6) != 'https://') {
+        res.status(400);
+        res.send(new Error(
+          Errors.AUTHENTICATION_ERROR.id,
+          Errors.AUTHENTICATION_ERROR.message,
+          'The redirect url must be a https:// address.'
+        ));
+      } */else {
+        res.status(200);
+        res.send(getAuthResponse(req.user.redirectUrl, JSON.stringify(req.user)));
+      }
     },
     function (err, req, res, next) {
       if (err) {

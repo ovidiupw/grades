@@ -16,9 +16,10 @@ let FacebookAuth = (function () {
       clientID: ConfigAuth.facebookAuth.appId,
       clientSecret: ConfigAuth.facebookAuth.appSecret,
       callbackURL: ConfigAuth.facebookAuth.callbackURL,
-      profileFields: ['id', 'name', 'verified'] /* get only these fields from profile */
+      profileFields: ['id', 'name', 'verified'], /* get only these fields from profile */
+      passReqToCallback: true
     },
-    function (accessToken, refreshToken, profile, done) {
+    function (req, accessToken, refreshToken, profile, done) {
 
       process.nextTick(() => {
         if (profile._json.verified === false) {
@@ -33,7 +34,7 @@ let FacebookAuth = (function () {
         apiKeyExpiration.setHours(apiKeyExpiration.getHours() + 1);
         let userIdentity = profile._json.id + '@' + profile.provider;
 
-        return _createOrUpdateUser(userIdentity, accessToken, apiKeyExpiration, done)
+        return _createOrUpdateUser(req, userIdentity, accessToken, apiKeyExpiration, done)
       });
     });
 
@@ -75,7 +76,7 @@ let FacebookAuth = (function () {
     });
   };
 
-  let _createOrUpdateUser = function (userIdentity, accessToken, apiKeyExpiration, done) {
+  let _createOrUpdateUser = function (req, userIdentity, accessToken, apiKeyExpiration, done) {
 
     async.waterfall([
 
@@ -167,7 +168,7 @@ let FacebookAuth = (function () {
       if (err) {
         return done(err)
       } else {
-        return done(null, result);
+        return done(null, Object.assign({}, result, {redirectUrl: req.query.state}));
       }
     });
 

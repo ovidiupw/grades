@@ -42,7 +42,7 @@ let RequestValidator = (function () {
 
       if ((resource === roleActions[actionIndex].resource || RouteNames.ANY === roleActions[actionIndex].resource)
         && verb === roleActions[actionIndex].verb) {
-
+        return true;
       }
     }
     return false;

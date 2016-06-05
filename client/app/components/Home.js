@@ -11,7 +11,8 @@ import {
 let Home = React.createClass({
 
   handleAuthViaFacebook() {
-    window.open('http://localhost:8082/v1/auth/facebook', '_self')
+    window.open('http://localhost:8082/v1/auth/facebook' +
+      '?redirectUrl=http://localhost:3000/login-redirect', '_self')
   },
   
   componentDidMount() {
