@@ -36,10 +36,10 @@ let DeleteProfessor = (function () {
             }
             if (req.body.facultyIdentity == undefined) {
                 return errCallback(new Error(
-                    Errors.REQ_BODY_INVALID.id,
-                    Errors.REQ_BODY_INVALID.message,
-                    "Required parameters not supplied. Please add " +
-                    "'faculty identity' to your request."
+                  Errors.REQ_BODY_INVALID.id,
+                  Errors.REQ_BODY_INVALID.message,
+                  "Required parameters not supplied. Please add " +
+                  "'faculty identity' to your request."
                 ));
             }
 
@@ -49,12 +49,12 @@ let DeleteProfessor = (function () {
 
     let _findUser = function (req,callback) {
         User.model.findByUser(req.body.user,
-            function (foundUser) {
-                return callback(null,req,foundUser);
-            },
-            function (userFindError) {
-                return callback(userFindError);
-            }
+          function (foundUser) {
+              return callback(null,req,foundUser);
+          },
+          function (userFindError) {
+              return callback(userFindError);
+          }
         );
     };
 
@@ -70,15 +70,15 @@ let DeleteProfessor = (function () {
 
     let _validateAccessRights = function (req,user, callback) {
         RequestValidator.validateAccessRights(
-            user, RouteNames.PROFESSORS, HttpVerbs.DELETE,
-            function (error) {
-                if (error) {
-                    /* In case user does not have permissions to access this resource */
-                    return callback(error);
-                } else {
-                    return callback(null,req);
-                }
-            });
+          user, RouteNames.PROFESSORS, HttpVerbs.DELETE,
+          function (error) {
+              if (error) {
+                  /* In case user does not have permissions to access this resource */
+                  return callback(error);
+              } else {
+                  return callback(null,req);
+              }
+          });
     };
 
     let _deleteProfessor = function (req,callback) {
@@ -130,6 +130,7 @@ let DeleteProfessor = (function () {
 
     return {
         invoke: _invoke,
+        validateRequest: _validateRequest,
         findUser: _findUser,
         validateApiKey: _validateApiKey,
         validateAccessRights: _validateAccessRights,

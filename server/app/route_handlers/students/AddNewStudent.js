@@ -6,11 +6,10 @@ let RequestValidator = require('../../modules/request-validator');
 const RouteNames = require('../../constants/routes');
 const HttpVerbs = require('../../constants/http-verbs');
 
+let PredefinedErrors = require('../../modules/predefined-errors');
+
 let User = require('../../entities/user');
 let Student = require('../../entities/student');
-let Registration = require('../../entities/registration');
-
-let PredefinedErrors = require('../../modules/predefined-errors');
 
 let AddNewStudent = (function () {
 
@@ -30,17 +29,69 @@ let AddNewStudent = (function () {
         req.body.academicGroup == undefined) {
         return errCallback(PredefinedErrors.getInvalidBodyError(
           "Required parameters not supplied. Please add " +
-          "'facultyIdentity', 'registrationNumber', 'birthDate', 'academicYear' and 'academicGroup' to your request."));
+          "'facultyIdentity', 'registrationNumber', 'courses', 'birthDate', 'academicYear' and 'academicGroup' to your request."));
       }
       if (!RequestValidator.requestContainsValidFacultyIdentity(req)) {
         return errCallback(PredefinedErrors.getFacultyIdentityError());
       }
-      if (!RequestValidator.requestContainsValidBirthDate(req)) {
-        return errCallback(PredefinedErrors.getBirthDateError());
-      }
 
       return errCallback(null);
     });
+  };
+
+  let _findUser = function (req, callback) {
+    User.model.findByUser(req.body.user,
+      function (foundUser) {
+        return callback(null, req, foundUser);
+      },
+      function (userFindError) {
+        return callback(userFindError);
+      }
+    );
+  };
+
+  let _validateApiKey = function (req, foundUser, callback) {
+    RequestValidator.validateApiKey(foundUser, req.body.apiKey, function (apiKeyExpired) {
+      if (apiKeyExpired) {
+        return callback(apiKeyExpired);
+      } else {
+        return callback(null, req, foundUser);
+      }
+    });
+  };
+
+  let _validateAccessRights = function (req, user, callback) {
+    RequestValidator.validateAccessRights(
+      user, RouteNames.STUDENTS, HttpVerbs.POST,
+      function (error) {
+        if (error) {
+          /* In case user does not have permissions to access this resource */
+          return callback(error);
+        } else {
+          return callback(null, req);
+        }
+      });
+  };
+
+  let _addStudent = function (req, callback) {
+    let newStudent = new Student.model({
+      facultyIdentity: req.body.facultyIdentity,
+      registrationNumber: req.body.registrationNumber,
+      courses: req.body.courses,
+      birthDate: req.body.birthDate,
+      academicYear: req.body.academicYear,
+      academicGroup: req.body.academicGroup
+    });
+
+    newStudent.save(
+      function (studentSavedErr) {
+        if (studentSavedErr) {
+          callback(PredefinedErrors.getDatabaseOperationFailedError(studentSavedErr));
+        } else {
+          callback(null);
+        }
+      });
+
   };
 
   let _invoke = function (req, res) {
@@ -51,68 +102,23 @@ let AddNewStudent = (function () {
           if (invalidRequestError) {
             return callback(invalidRequestError);
           } else {
-            return callback(null);
+            return callback(null, req);
           }
         });
       },
 
-      function (callback) {
-        User.model.findByUser(req.body.user,
-          function (foundUser) {
-            return callback(null, foundUser);
-          },
-          function (error) {
-            return callback(PredefinedErrors.getDatabaseOperationFailedError(error));
-          }
-        );
-      },
+      _findUser,
 
-      function (foundUser, callback) {
-        RequestValidator.validateApiKey(foundUser, req.body.apiKey, function (apiKeyExpired) {
-          if (apiKeyExpired) {
-            return callback(apiKeyExpired);
-          } else {
-            return callback(null, foundUser);
-          }
-        });
-      },
+      _validateApiKey,
 
       /* User credentials are valid at this point - authentication succeeded */
       /* Now verify user access rights - authorization step */
 
-      function (user, callback) {
-        RequestValidator.validateAccessRights(
-          user, RouteNames.STUDENTS, HttpVerbs.POST,
-          function (error) {
-            if (error) {
-              /* In case user does not have permissions to access this resource */
-              return callback(error);
-            } else {
-              return callback(null);
-            }
-          });
-      },
+      _validateAccessRights,
 
       /* User has permission to access the resource at this point - authorized */
 
-      function (callback) {
-
-        let newStudent = new Student.model({
-          facultyIdentity: req.body.facultyIdentity,
-          registrationNumber: req.body.registrationNumber,
-          birthDate: req.body.birthDate,
-          academicYear: req.body.academicYear,
-          academicGroup: req.body.academicGroup
-        });
-
-        newStudent.save(function (studentSaveError) {
-          if (studentSaveError) {
-            callback(PredefinedErrors.getDatabaseOperationFailedError(studentSaveError));
-          } else {
-            callback(null);
-          }
-        });
-      },
+      _addStudent,
 
       function (callback) {
         res.status(200);
@@ -129,7 +135,12 @@ let AddNewStudent = (function () {
   };
 
   return {
-    invoke: _invoke
+    invoke: _invoke,
+    validateRequest: _validateRequest,
+    findUser: _findUser,
+    validateApiKey: _validateApiKey,
+    validateAccessRights: _validateAccessRights,
+    addStudent: _addStudent
   }
 })();
 

@@ -27,6 +27,50 @@ let ListStudents = (function () {
     });
   };
 
+  let _findUser = function (req, callback) {
+    User.model.findByUser(req.headers['user'],
+      function (foundUser) {
+        return callback(null, req, foundUser);
+      },
+      function (userFindError) {
+        return callback(userFindError);
+      }
+    );
+  };
+
+  let _validateApiKey = function (req, foundUser, callback) {
+    RequestValidator.validateApiKey(foundUser, req.headers['apikey'], function (apiKeyExpired) {
+      if (apiKeyExpired) {
+        return callback(apiKeyExpired);
+      } else {
+        return callback(null, req, foundUser);
+      }
+    });
+  };
+
+  let _validateAccessRights = function (req, user, callback) {
+    RequestValidator.validateAccessRights(
+      user, RouteNames.STUDENTS, HttpVerbs.GET,
+      function (error) {
+        if (error) {
+          /* In case user does not have permissions to access this resource */
+          return callback(error);
+        } else {
+          return callback(null, req);
+        }
+      });
+  };
+
+  let _listStudents = function (req, callback) {
+    Student.model.find({}, function (err, students) {
+      if (err) {
+        return callback(err);
+      } else {
+        return callback(null, students);
+      }
+    });
+  };
+
   let _invoke = function (req, res) {
     async.waterfall([
 
@@ -35,57 +79,21 @@ let ListStudents = (function () {
           if (invalidRequestError) {
             return callback(invalidRequestError);
           } else {
-            return callback(null);
+            return callback(null, req);
           }
         });
       },
 
-      function (callback) {
-        User.model.findByUser(req.headers['user'],
-          function (foundUser) {
-            return callback(null, foundUser);
-          },
-          function (error) {
-            return callback(PredefinedErrors.getDatabaseOperationFailedError(error));
-          }
-        );
-      },
+      _findUser,
 
-      function (foundUser, callback) {
-        RequestValidator.validateApiKey(foundUser, req.headers['apikey'], function (apiKeyExpired) {
-          if (apiKeyExpired) {
-            return callback(apiKeyExpired);
-          } else {
-            return callback(null, foundUser);
-          }
-        });
-      },
+      _validateApiKey,
 
       /* User credentials are valid at this point - authentication succeeded */
       /* Now verify user access rights - authorization step */
 
-      function (user, callback) {
-        RequestValidator.validateAccessRights(
-          user, RouteNames.STUDENTS, HttpVerbs.GET,
-          function (error) {
-            if (error) {
-              /* In case user does not have permissions to access this resource */
-              return callback(error);
-            } else {
-              return callback(null);
-            }
-          });
-      },
+      _validateAccessRights,
 
-      function (callback) {
-        Student.model.find({}, function (err, students) {
-          if (err) {
-            return callback(err);
-          } else {
-            return callback(null, students);
-          }
-        });
-      },
+      _listStudents,
 
       function (students, callback) {
         res.status(200);
@@ -102,7 +110,12 @@ let ListStudents = (function () {
   };
 
   return {
-    invoke: _invoke
+    invoke: _invoke,
+    validateRequest: _validateRequest,
+    findUser: _findUser,
+    validateApiKey: _validateApiKey,
+    validateAccessRights: _validateAccessRights,
+    listStudents: _listStudents
   }
 })();
 

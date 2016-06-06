@@ -41,6 +41,103 @@ let AddNewModule = (function () {
     });
   };
 
+  let _findProfessorById = function (req, callback) {
+    Professor.model.findByFacultyIdentity(req.body.createdBy,
+      function (foundProfessor) {
+        return callback(null, req, foundProfessor);
+      },
+      function (error) {
+        return callback(PredefinedErrors.getProfessorFacultyIdentityError(error));
+      }
+    );
+  };
+
+  let _isProfessorAbleToAddModule = function (req, foundProfessor, callback) {
+    RequestValidator.requestContainsValidCreatedByIdentity(req, foundProfessor.courses, function (courseError) {
+      if (courseError) {
+        return callback(courseError);
+      } else {
+        return callback(null, req);
+      }
+    });
+  };
+
+  let _isCourseValid = function (req, callback) {
+    Course.model.findByCourseId(req.body.courseId,
+      function (foundCourse) {
+        return callback(null, req, foundCourse);
+      },
+      function (error) {
+        return callback(PredefinedErrors.getCourseIdError(error));
+      }
+    );
+  };
+
+  let _isFormulaValid = function (req, foundCourse, callback) {
+    RequestValidator.requestContainsValidFormula(req, foundCourse.modules, function (invalidFormula) {
+      if (invalidFormula) {
+        return callback(invalidFormula);
+      } else {
+        return callback(null, req);
+      }
+    });
+  };
+
+  let _findUser = function (req, callback) {
+    User.model.findByUser(req.body.user,
+      function (foundUser) {
+        return callback(null, req, foundUser);
+      },
+      function (error) {
+        return callback(PredefinedErrors.getDatabaseOperationFailedError(error));
+      }
+    );
+  };
+
+  let _validateApiKey = function (req, foundUser, callback) {
+    RequestValidator.validateApiKey(foundUser, req.body.apiKey, function (apiKeyExpired) {
+      if (apiKeyExpired) {
+        return callback(apiKeyExpired);
+      } else {
+        return callback(null, req, foundUser);
+      }
+    });
+  };
+
+  let _validateAccessRights = function (req, user, callback) {
+    RequestValidator.validateAccessRights(
+      user, RouteNames.MODULES, HttpVerbs.POST,
+      function (error) {
+        if (error) {
+          /* In case user does not have permissions to access this resource */
+          return callback(error);
+        } else {
+          return callback(null, req);
+        }
+      });
+  };
+
+  let _addModule = function (req, callback) {
+    let newModule = new Module.model({
+      moduleId: req.body.moduleId,
+      title: req.body.title,
+      createdBy: req.body.createdBy,
+      minToPromote: req.body.minToPromote,
+      formula: req.body.formula,
+      min: req.body.min,
+      max: req.body.max,
+      courseId: req.body.courseId
+    });
+
+    newModule.save(function (moduleSaveError) {
+      if (moduleSaveError) {
+        callback(PredefinedErrors.getDatabaseOperationFailedError(moduleSaveError));
+      } else {
+        callback(null);
+      }
+    });
+  };
+
   let _invoke = function (req, res) {
     async.waterfall([
 
@@ -51,7 +148,7 @@ let AddNewModule = (function () {
           if (invalidRequestError) {
             return callback(invalidRequestError);
           } else {
-            return callback(null);
+            return callback(null, req);
           }
         });
       },
@@ -59,113 +156,53 @@ let AddNewModule = (function () {
       /* We check if there exists a professor with the facultyIdentity
        equal to the value of the createdBy field from the request. */
 
-      function (callback) {
-        Professor.model.findByUser(req.body.createdBy,
-          function (foundProfessor) {
-            return callback(null, foundProfessor);
-          },
-          function (error) {
-            return callback(PredefinedErrors.getProfessorFacultyIdentityError(error));
-          }
-        );
-      },
+      _findProfessorById,
 
       /* Now we have to check if the professor can create this module. */
 
-      function (foundProfessor, callback) {
-        RequestValidator.requestContainsValidCreatedByIdentity(req, foundProfessor.courses, function (courseError) {
-          if (courseError) {
-            return callback(courseError);
-          } else {
-            return callback(null);
-          }
-        });
-      },
+      _isProfessorAbleToAddModule,
 
       /* We also have to check if the course exists. */
 
-      function (callback) {
-        Course.model.findByCourseId(req.body.courseId,
-          function (foundCourse) {
-            return callback(null, foundCourse);
-          },
-          function (error) {
-            return callback(PredefinedErrors.getCourseIdError(error));
-          }
-        );
-      },
+      _isCourseValid,
 
       /* We check if the formula is valid. */
 
-      function (foundCourse, callback) {
-        RequestValidator.requestContainsValidFormula(req, foundCourse.modules, function (invalidFormula) {
-          if (invalidFormula) {
-            return callback(invalidFormula);
-          } else {
-            return callback(null);
-          }
-        });
-      },
+      _isFormulaValid,
 
-      function (callback) {
-        User.model.findByUser(req.body.user,
-          function (foundUser) {
-            return callback(null, foundUser);
-          },
-          function (error) {
-            return callback(PredefinedErrors.getDatabaseOperationFailedError(error));
-          }
-        );
-      },
+      _findUser,
 
-      function (foundUser, callback) {
-        RequestValidator.validateApiKey(foundUser, req.body.apiKey, function (apiKeyExpired) {
-          if (apiKeyExpired) {
-            return callback(apiKeyExpired);
-          } else {
-            return callback(null, foundUser);
-          }
-        });
-      },
+      _validateApiKey,
 
       /* User credentials are valid at this point - authentication succeeded */
       /* Now verify user access rights - authorization step */
 
-      function (user, callback) {
-        RequestValidator.validateAccessRights(
-          user, RouteNames.MODULES, HttpVerbs.POST,
-          function (error) {
-            if (error) {
-              /* In case user does not have permissions to access this resource */
-              return callback(error);
-            } else {
-              return callback(null);
-            }
-          });
-      },
+      _validateAccessRights,
 
       /* User has permission to add the module at this point - authorized */
 
+      _addModule,
+
       function (callback) {
-
-        let newModule = new Module.model({
-          moduleId: req.body.moduleId,
-          title: req.body.title,
-          createdBy: req.body.createdBy,
-          minToPromote: req.body.minToPromote,
-          formula: req.body.formula,
-          min: req.body.min,
-          max: req.body.max
-        });
-
-        newModule.save(function (moduleSaveError) {
-          if (moduleSaveError) {
-            callback(PredefinedErrors.getDatabaseOperationFailedError(moduleSaveError));
+        let module = {moduleId: req.body.moduleId};
+        Course.model.update({"courseId": req.body.courseId}, {"$push": {"modules": module}}, function (courseUpdateErr) {
+          if (courseUpdateErr) {
+            return callback(PredefinedErrors.getDatabaseOperationFailedError(courseUpdateErr));
           } else {
-            callback(null);
+            Course.model.findOne({courseId: req.body.courseId},
+              function (courseNotFoundErr, foundCourse) {
+                if (courseNotFoundErr || foundCourse == null) {
+                  return callback(PredefinedErrors.getDatabaseOperationFailedError(courseNotFoundErr));
+                }
+                if (foundCourse.evaluation == "undefined") {
+                  Course.model.update({courseId: req.body.courseId}, {$set: {evaluation: req.body.moduleId}},
+                    {upsert: true}, function (err) {
+                    });
+                }
+                return callback(null);
+              });
           }
         });
-
       },
 
       function (callback) {
@@ -183,7 +220,16 @@ let AddNewModule = (function () {
   };
 
   return {
-    invoke: _invoke
+    invoke: _invoke,
+    validateRequest: _validateRequest,
+    findProfessorById: _findProfessorById,
+    isProfessorAbleToAddModule: _isProfessorAbleToAddModule,
+    isCourseValid: _isCourseValid,
+    isFormulaValid: _isFormulaValid,
+    findUser: _findUser,
+    validateApiKey: _validateApiKey,
+    validateAccessRights: _validateAccessRights,
+    addModule: _addModule
   }
 })();
 

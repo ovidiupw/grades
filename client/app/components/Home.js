@@ -1,8 +1,8 @@
-import { connect } from 'react-redux'
-import React, { PropTypes } from 'react';
+import {connect} from 'react-redux'
+import React, {PropTypes} from 'react';
 
-import { 
-  textCenter 
+import {
+  textCenter
 } from '../styles/generic-styles'
 
 /**
@@ -14,7 +14,7 @@ let Home = React.createClass({
     window.open('http://localhost:8082/v1/auth/facebook' +
       '?redirectUrl=http://localhost:3000/login-redirect', '_self')
   },
-  
+
   componentDidMount() {
     if (window.localStorage == undefined)
       alert('Your browser needs local-storage support! Please update your browser');
@@ -33,9 +33,29 @@ let Home = React.createClass({
                href="#"
                role="button"
                onClick={e => this.handleAuthViaFacebook()}>
-              Login and use the app
+              Authenticate
             </a>
           </p>
+        </div>
+        <div className="container-fluid" style={{marginBottom:50}}>
+          <div className="row">
+            <div className="col-md-2">
+            </div>
+            <div className="col-md-8" style={{textAlign:'center'}}>
+              <hr/>
+              <p>
+                Grades is an education-oriented web platform designed for managing student evaluation.
+                Grades comes to rescue the traditional problem of having no centralized place to
+                view, add and manage student university grades.
+              </p>
+              <a href="http://students.info.uaic.ro/~ovidiu.pricop/index.html"
+                 target="_blank">
+                Learn more about Grades
+              </a>
+            </div>
+            <div className="col-md-2">
+            </div>
+          </div>
         </div>
       </div>
     )
@@ -43,13 +63,11 @@ let Home = React.createClass({
 });
 
 const mapStateToProps = (state) => {
-  return {
-  }
+  return {}
 };
 
 const mapDispatchToProps = (dispatch) => {
-  return {
-  }
+  return {}
 };
 
 Home = connect(

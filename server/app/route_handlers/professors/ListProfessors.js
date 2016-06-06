@@ -37,12 +37,12 @@ let ListProfessors = (function () {
 
     let _findUser = function (req, callback) {
         User.model.findByUser(req.headers['user'],
-            function (foundUser) {
-                return callback(null, req, foundUser);
-            },
-            function (error) {
-                return callback(PredefinedErrors.getDatabaseOperationFailedError(error));
-            }
+          function (foundUser) {
+              return callback(null, req, foundUser);
+          },
+          function (error) {
+              return callback(PredefinedErrors.getDatabaseOperationFailedError(error));
+          }
         );
     };
 
@@ -58,15 +58,15 @@ let ListProfessors = (function () {
 
     let _validateAccessRights = function (user, callback) {
         RequestValidator.validateAccessRights(
-            user, RouteNames.PROFESSORS, HttpVerbs.GET,
-            function (error) {
-                if (error) {
-                    /* In case user does not have permissions to access this resource */
-                    return callback(error);
-                } else {
-                    return callback(null);
-                }
-            });
+          user, RouteNames.PROFESSORS, HttpVerbs.GET,
+          function (error) {
+              if (error) {
+                  /* In case user does not have permissions to access this resource */
+                  return callback(error);
+              } else {
+                  return callback(null);
+              }
+          });
     };
 
     let _listProfessors = function (callback) {

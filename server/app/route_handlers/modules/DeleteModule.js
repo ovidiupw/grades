@@ -7,6 +7,7 @@ const RouteNames = require('../../constants/routes');
 const HttpVerbs = require('../../constants/http-verbs');
 
 let User = require('../../entities/user');
+let Course = require('../../entities/course');
 let Module = require('../../entities/module');
 
 let PredefinedErrors = require('../../modules/predefined-errors');
@@ -27,7 +28,53 @@ let DeleteModule = (function () {
           "Required parameter is not supplied. Please add 'moduleId'."));
       }
 
-      return errCallback(null);
+      return errCallback(null, req);
+    });
+  };
+
+  let _findUser = function (req, callback) {
+    User.model.findByUser(req.body.user,
+      function (foundUser) {
+        return callback(null, req, foundUser);
+      },
+      function (userFindError) {
+        return callback(userFindError);
+      }
+    );
+  };
+
+  let _validateApiKey = function (req, foundUser, callback) {
+    RequestValidator.validateApiKey(foundUser, req.body.apiKey, function (apiKeyExpired) {
+      if (apiKeyExpired) {
+        return callback(apiKeyExpired);
+      } else {
+        return callback(null, req, foundUser);
+      }
+    });
+  };
+
+  let _validateAccessRights = function (req, user, callback) {
+    RequestValidator.validateAccessRights(
+      user, RouteNames.MODULES, HttpVerbs.DELETE,
+      function (error) {
+        if (error) {
+          /* In case user does not have permissions to access this resource */
+          return callback(error);
+        } else {
+          return callback(null, req);
+        }
+      });
+  };
+
+  let _deleteModule = function (req, callback) {
+    Module.model.findOneAndRemove({
+      moduleId: req.body.moduleId
+    }, function (moduleRemoveErr) {
+      if (moduleRemoveErr) {
+        callback(PredefinedErrors.getDatabaseOperationFailedError(moduleRemoveErr));
+      } else {
+        callback(null);
+      }
     });
   };
 
@@ -44,54 +91,39 @@ let DeleteModule = (function () {
         });
       },
 
-      function (callback) {
-        User.model.findByUser(req.body.user,
-          function (foundUser) {
-            return callback(null, foundUser);
-          },
-          function (error) {
-            return callback(PredefinedErrors.getDatabaseOperationFailedError(error));
-          }
-        );
-      },
-
-      function (foundUser, callback) {
-        RequestValidator.validateApiKey(foundUser, req.body.apiKey, function (apiKeyExpired) {
-          if (apiKeyExpired) {
-            return callback(apiKeyExpired);
-          } else {
-            return callback(null, foundUser);
-          }
-        });
-      },
+      _validateApiKey,
 
       /* User credentials are valid at this point - authentication succeeded */
       /* Now verify user access rights - authorization step */
 
-      function (user, callback) {
-        RequestValidator.validateAccessRights(
-          user, RouteNames.MODULES, HttpVerbs.DELETE,
-          function (error) {
-            if (error) {
-              /* In case user does not have permissions to access this resource */
-              return callback(error);
-            } else {
-              return callback(null);
-            }
-          });
-      },
+      _validateAccessRights,
 
       /* User has permission to delete the module at this point - authorized */
 
-      function (callback) {
+      _deleteModule,
 
-        Module.model.findOneAndRemove({moduleId: req.body.moduleId}, function (moduleRemoveError) {
-          if (moduleRemoveError) {
-            callback(PredefinedErrors.getDatabaseOperationFailedError(moduleRemoveError));
-          } else {
-            callback(null);
-          }
-        });
+      function (callback) {
+        let module = {moduleId: req.body.moduleId};
+        Course.model.update({courseId: req.body.courseId}, {$pull: {modules: module}},
+          function (courseUpdateError) {
+            if (courseUpdateError) {
+              return callback(PredefinedErrors.getDatabaseOperationFailedError(courseUpdateError));
+            } else {
+              Course.model.findOne({courseId: req.body.courseId},
+                function (courseNotFoundErr, foundCourse) {
+                  if (courseNotFoundErr || foundCourse == null) {
+                    return callback(PredefinedErrors.getDatabaseOperationFailedError(courseNotFoundErr));
+                  }
+                  if (foundCourse.evaluation == req.body.moduleId) {
+                    Course.model.update({courseId: req.body.courseId}, {$set: {evaluation: "undefined"}},
+                      {upsert: true}, function (err) {
+                      });
+                  }
+                  return callback(null);
+                });
+
+            }
+          });
       },
 
       function (callback) {
@@ -109,7 +141,11 @@ let DeleteModule = (function () {
   };
 
   return {
-    invoke: _invoke
+    invoke: _invoke,
+    validateRequest: _validateRequest,
+    validateApiKey: _validateApiKey,
+    validateAccessRights: _validateAccessRights,
+    deleteModule: _deleteModule
   }
 })();
 
