@@ -15,7 +15,7 @@ let User = require('../../entities/user');
 let Course = require('../../entities/course');
 
 /**
- * Use invoke() method of this closure to list (GET) 
+ * Use invoke() method of this closure to list (GET)
  * courses from the database.
  *
  * @type {{invoke}}
@@ -38,12 +38,12 @@ let ListCourses = (function () {
 
     let _findUser = function (req, callback) {
         User.model.findByUser(req.headers['user'],
-            function (foundUser) {
-                return callback(null, req, foundUser);
-            },
-            function (error) {
-                return callback(PredefinedErrors.getDatabaseOperationFailedError(error));
-            }
+          function (foundUser) {
+              return callback(null, req, foundUser);
+          },
+          function (error) {
+              return callback(PredefinedErrors.getDatabaseOperationFailedError(error));
+          }
         );
     };
 
@@ -59,15 +59,15 @@ let ListCourses = (function () {
 
     let _validateAccessRights = function (user, callback) {
         RequestValidator.validateAccessRights(
-            user, RouteNames.COURSES, HttpVerbs.GET,
-            function (error) {
-                if (error) {
-                    /* In case user does not have permissions to access this resource */
-                    return callback(error);
-                } else {
-                    return callback(null);
-                }
-            });
+          user, RouteNames.COURSES, HttpVerbs.GET,
+          function (error) {
+              if (error) {
+                  /* In case user does not have permissions to access this resource */
+                  return callback(error);
+              } else {
+                  return callback(null);
+              }
+          });
     };
 
     let _listCourses = function (callback) {
@@ -96,7 +96,7 @@ let ListCourses = (function () {
             _validateApiKey,
             _validateAccessRights,
             _listCourses,
-            
+
             function (courses,callback) {
                 /* If it reaches this, the request succeeded. */
                 res.status(200);
@@ -112,6 +112,7 @@ let ListCourses = (function () {
 
     return {
         invoke: _invoke,
+        validateRequest: _validateRequest,
         findUser: _findUser,
         validateApiKey: _validateApiKey,
         validateAccessRights: _validateAccessRights,

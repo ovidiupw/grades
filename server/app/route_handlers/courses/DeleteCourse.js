@@ -36,10 +36,10 @@ let DeleteCourse = (function () {
             }
             if (req.body.courseId == undefined) {
                 return errCallback(new Error(
-                    Errors.REQ_BODY_INVALID.id,
-                    Errors.REQ_BODY_INVALID.message,
-                    "Required parameters not supplied. Please add " +
-                    "'courseId' to your request."
+                  Errors.REQ_BODY_INVALID.id,
+                  Errors.REQ_BODY_INVALID.message,
+                  "Required parameters not supplied. Please add " +
+                  "'courseId' to your request."
                 ));
             }
 
@@ -49,12 +49,12 @@ let DeleteCourse = (function () {
 
     let _findUser = function (req, callback) {
         User.model.findByUser(req.body.user,
-            function (foundUser) {
-                return callback(null, req, foundUser);
-            },
-            function (userFindError) {
-                return callback(userFindError);
-            }
+          function (foundUser) {
+              return callback(null, req, foundUser);
+          },
+          function (userFindError) {
+              return callback(userFindError);
+          }
         );
     };
 
@@ -70,17 +70,17 @@ let DeleteCourse = (function () {
 
     let _validateAccessRights = function (req, foundUser, callback) {
         RequestValidator.validateAccessRights(
-            foundUser, RouteNames.COURSES, HttpVerbs.DELETE,
-            function (error) {
-                if (error) {
-                    /* In case user does not have permissions to access this resource */
-                    return callback(error);
-                } else {
-                    return callback(null,req);
-                }
-            });
+          foundUser, RouteNames.COURSES, HttpVerbs.DELETE,
+          function (error) {
+              if (error) {
+                  /* In case user does not have permissions to access this resource */
+                  return callback(error);
+              } else {
+                  return callback(null,req);
+              }
+          });
     };
-    
+
     let _deleteCourse = function (req,callback) {
         Course.model.findOneAndRemove({
             courseId: req.body.courseId
@@ -114,7 +114,7 @@ let DeleteCourse = (function () {
             _validateAccessRights,
 
             _deleteCourse,
-            
+
             function (callback) {
                 /* If it reaches this, the request succeeded. */
                 res.status(200);
@@ -130,6 +130,7 @@ let DeleteCourse = (function () {
 
     return {
         invoke: _invoke,
+        validateRequest: _validateRequest,
         findUser: _findUser,
         validateApiKey: _validateApiKey,
         validateAccessRights: _validateAccessRights,

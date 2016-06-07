@@ -9,21 +9,21 @@ const Mongoose = require('mongoose');
 
 const User = require('../../../app/entities/user');
 const Registration = require('../../../app/entities/registration');
-const Professor = require('../../../app/entities/professor');
 
-const AddNewProfessor = require('../../../app/route_handlers/professors/AddNewProfessor');
+const ListCourses = require('../../../app/route_handlers/courses/ListCourses');
 
 Mongoose.connect(DB.TEST_DB);
 
-describe('Add New Professor Test', function () {
+describe('List courses Test', function () {
 
     /* Test preparation */
 
     const USER = "1271496582861963@facebook";
+    const BAD_USER = "1276582861963@facebook";
 
     const API_KEY = "EAAMEC9YE1JIBAItTofZBRVz4uBEyT7hSIhFMwWocBEbCtHsXFs2ZBk" +
-      "BPmZAFrdKwoZBQMUw7dSKhxlQkrYcWDrx4TiVAxXcljoG316cPKfuEYCduT0EVjicvoyV" +
-      "bKzyoLyFBxbTDPZCBPHa3LLOmdv0x3ZAi5OEiBCQMq1LxwAthds8TJxdzGcxuYMf6NHWKgZD";
+        "BPmZAFrdKwoZBQMUw7dSKhxlQkrYcWDrx4TiVAxXcljoG316cPKfuEYCduT0EVjicvoyV" +
+        "bKzyoLyFBxbTDPZCBPHa3LLOmdv0x3ZAi5OEiBCQMq1LxwAthds8TJxdzGcxuYMf6NHWKgZD";
 
     const USER_FACULTY_IDENTITY = "ovidiu.pricop@info.uaic.ro";
 
@@ -31,20 +31,16 @@ describe('Add New Professor Test', function () {
     const ROLES = ["administrator"];
     const IDENTITY_SECRET = "874703";
 
-    const FACULTY_IDENTITY = "prenume.nume@info.uaic.ro";
-    const DIDACTIC_GRADE = "profesor";
-    const COURSES = [
-        {
-            courseId: "10",
-            academicGroups: ["A4", "A3"]
-        }
-    ];
-
     let userModel = User.model;
     let user = new userModel({
         user: USER,
         facultyIdentity: USER_FACULTY_IDENTITY,
         apiKey: API_KEY,
+        keyExpires: "2017-06-03 11:12:34.714Z",
+        identityConfirmed: true
+    });
+    let badUser = new userModel({
+        user: BAD_USER,
         keyExpires: "2017-06-03 11:12:34.714Z",
         identityConfirmed: true
     });
@@ -57,8 +53,6 @@ describe('Add New Professor Test', function () {
         identitySecret: IDENTITY_SECRET
     });
 
-    let professorModel = Professor.model;
-
     let handleRemoveResult = function (err, removeResult) {
         if (err) throw err;
         if (removeResult.result.n !== 0) {
@@ -67,12 +61,14 @@ describe('Add New Professor Test', function () {
     };
 
     let req = {
-        body: {
+        headers: {
             user: USER,
-            apiKey: API_KEY,
-            facultyIdentity: FACULTY_IDENTITY,
-            didacticGrade: DIDACTIC_GRADE,
-            courses: COURSES
+            apikey: API_KEY
+        }
+    };
+    let badReq = {
+        headers: {
+            user: BAD_USER
         }
     };
 
@@ -93,7 +89,7 @@ describe('Add New Professor Test', function () {
     /*******************************************************/
 
     it('Should validate the request', function (done) {
-        AddNewProfessor.validateRequest(req, function (errCallback) {
+        ListCourses.validateRequest(req, function (errCallback) {
             if (errCallback) {
                 done(errCallback);
             } else {
@@ -104,8 +100,8 @@ describe('Add New Professor Test', function () {
 
     /*******************************************************/
 
-    it('Should fail if the course in courses array does not exists', function (done) {
-        AddNewProfessor.validateCourse(req, function (errCallback) {
+    it('Should fail to validate the request, apiKey should be required', function (done) {
+        ListCourses.validateRequest(badReq, function (errCallback) {
             if (!errCallback) {
                 done(errCallback);
             } else {
@@ -116,8 +112,8 @@ describe('Add New Professor Test', function () {
 
     /*******************************************************/
 
-    it('Should check if there are duplicate academic groups', function (done) {
-        AddNewProfessor.checkDuplicateAcademicGroups(req, function (errCallback) {
+    it('Should find the user that wants to list the courses', function (done) {
+        ListCourses.findUser(req, function (errCallback) {
             if (errCallback) {
                 done(errCallback);
             } else {
@@ -128,8 +124,20 @@ describe('Add New Professor Test', function () {
 
     /*******************************************************/
 
-    it('Should find the user that wants to add a new professor', function (done) {
-        AddNewProfessor.findUser(req, function (errCallback) {
+    it('Should fail to find the user that wants to list the courses', function (done) {
+        ListCourses.findUser(badReq, function (errCallback) {
+            if (!errCallback) {
+                done(errCallback);
+            } else {
+                done();
+            }
+        });
+    });
+
+    /*******************************************************/
+
+    it('Should validate the apikey', function (done) {
+        ListCourses.validateApiKey(req, user, function (errCallback) {
             if (errCallback) {
                 done(errCallback);
             } else {
@@ -141,8 +149,8 @@ describe('Add New Professor Test', function () {
     /*******************************************************/
 
     it('Should validate the apikey', function (done) {
-        AddNewProfessor.validateApiKey(req, user, function (errCallback) {
-            if (errCallback) {
+        ListCourses.validateApiKey(badReq, badUser, function (errCallback) {
+            if (!errCallback) {
                 done(errCallback);
             } else {
                 done();
@@ -153,7 +161,7 @@ describe('Add New Professor Test', function () {
     /*******************************************************/
 
     it('Should validate the access rights', function (done) {
-        AddNewProfessor.validateAccessRights(req, user, function (errCallback) {
+        ListCourses.validateAccessRights(user, function (errCallback) {
             if (errCallback) {
                 done(errCallback);
             } else {
@@ -164,8 +172,20 @@ describe('Add New Professor Test', function () {
 
     /*******************************************************/
 
-    it('Should add the professor', function (done) {
-        AddNewProfessor.addProfessor(req, function (errCallback) {
+    it('Should fail to validate the access rights', function (done) {
+        ListCourses.validateAccessRights(badUser, function (errCallback) {
+            if (!errCallback) {
+                done(errCallback);
+            } else {
+                done();
+            }
+        });
+    });
+
+    /*******************************************************/
+
+    it('Should list the courses', function (done) {
+        ListCourses.listCourses( function (errCallback) {
             if (errCallback) {
                 done(errCallback);
             } else {
@@ -179,7 +199,6 @@ describe('Add New Professor Test', function () {
     after(function (done) {
         removeSampleUser(USER);
         removeSampleRegistration(USER_FACULTY_IDENTITY);
-        removeSampleProfessor(FACULTY_IDENTITY);
 
         done();
     });
@@ -191,11 +210,6 @@ describe('Add New Professor Test', function () {
     };
     let removeSampleRegistration = function (fid) {
         registrationModel.remove({
-            facultyIdentity: fid
-        }, handleRemoveResult);
-    };
-    let removeSampleProfessor = function (fid) {
-        professorModel.remove({
             facultyIdentity: fid
         }, handleRemoveResult);
     };

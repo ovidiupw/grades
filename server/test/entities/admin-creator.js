@@ -17,7 +17,7 @@ describe('Configuration of admin account', function () {
   it('Creates admin faculty identity (registration) with roles', function (done) {
 
     let adminRegistration = new Registration.model({
-      facultyIdentity: "ovidiu.pricop@info.uaic.ro",
+      facultyIdentity: "ovidiu.pricop@gmail.com",
       facultyStatus: [RegistrationClasses.DEVELOPER],
       roles: [PredefinedRoles.administrator.title]
     });

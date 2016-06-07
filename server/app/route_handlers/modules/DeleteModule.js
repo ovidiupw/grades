@@ -73,11 +73,22 @@ let DeleteModule = (function () {
       if (moduleRemoveErr) {
         callback(PredefinedErrors.getDatabaseOperationFailedError(moduleRemoveErr));
       } else {
-        callback(null);
+        callback(null, req);
       }
     });
   };
 
+  let _updateModuleInCourses = function (req, callback) {
+    let module = {moduleId: req.body.moduleId};
+    Course.model.update({courseId: req.body.courseId}, {$pull: {modules: module}},
+      function (courseUpdateError) {
+        if (courseUpdateError) {
+          return callback(PredefinedErrors.getDatabaseOperationFailedError(courseUpdateError));
+        } else {
+          return callback(null);
+        }
+      });
+  };
   let _invoke = function (req, res) {
     async.waterfall([
 
@@ -86,10 +97,12 @@ let DeleteModule = (function () {
           if (invalidRequestError) {
             return callback(invalidRequestError);
           } else {
-            return callback(null);
+            return callback(null,req);
           }
         });
       },
+
+      _findUser,
 
       _validateApiKey,
 
@@ -102,29 +115,9 @@ let DeleteModule = (function () {
 
       _deleteModule,
 
-      function (callback) {
-        let module = {moduleId: req.body.moduleId};
-        Course.model.update({courseId: req.body.courseId}, {$pull: {modules: module}},
-          function (courseUpdateError) {
-            if (courseUpdateError) {
-              return callback(PredefinedErrors.getDatabaseOperationFailedError(courseUpdateError));
-            } else {
-              Course.model.findOne({courseId: req.body.courseId},
-                function (courseNotFoundErr, foundCourse) {
-                  if (courseNotFoundErr || foundCourse == null) {
-                    return callback(PredefinedErrors.getDatabaseOperationFailedError(courseNotFoundErr));
-                  }
-                  if (foundCourse.evaluation == req.body.moduleId) {
-                    Course.model.update({courseId: req.body.courseId}, {$set: {evaluation: "undefined"}},
-                      {upsert: true}, function (err) {
-                      });
-                  }
-                  return callback(null);
-                });
+      /* Now update the module id from modules array in courses collection */
 
-            }
-          });
-      },
+      _updateModuleInCourses,
 
       function (callback) {
         res.status(200);
@@ -145,7 +138,8 @@ let DeleteModule = (function () {
     validateRequest: _validateRequest,
     validateApiKey: _validateApiKey,
     validateAccessRights: _validateAccessRights,
-    deleteModule: _deleteModule
+    deleteModule: _deleteModule,
+    updateModuleInCourses: _updateModuleInCourses
   }
 })();
 

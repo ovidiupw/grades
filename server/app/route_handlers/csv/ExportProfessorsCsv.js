@@ -1,6 +1,3 @@
-/**
- * Created by dryflo on 5/18/2016.
- */
 'use strict';
 
 let async = require('async');
@@ -8,19 +5,20 @@ let RequestValidator = require('../../modules/request-validator');
 
 const RouteNames = require('../../constants/routes');
 const HttpVerbs = require('../../constants/http-verbs');
+const jsonExport = require('jsonexport');
 
 let User = require('../../entities/user');
 let Professor = require('../../entities/professor');
 
 let PredefinedErrors = require('../../modules/predefined-errors');
 
-/**
- * Use invoke() method of this closure to GET a list
- * of professors currently in the database.
- *
- * @type {{invoke}}
- */
-let ListProfessors = (function () {
+const FILE_NAME = 'ProfessorsExport.csv';
+const headers = {
+    'Content-Type': 'text/csv',
+    'Content-disposition': 'attachment;filename=' + FILE_NAME
+}
+
+let ExportProfessorsCsv = (function () {
 
     let _validateRequest = function (req, errCallback) {
 
@@ -36,59 +34,63 @@ let ListProfessors = (function () {
         });
     };
 
-    let _findUser = function (req, callback) {
+    let _findUser = function (req, res, callback) {
         User.model.findByUser(req.headers['user'],
-          function (foundUser) {
-              return callback(null, req, foundUser);
-          },
-          function (error) {
-              return callback(PredefinedErrors.getDatabaseOperationFailedError(error));
-          }
+            function (foundUser) {
+                return callback(null, req, res, foundUser);
+            },
+            function (error) {
+                return callback(PredefinedErrors.getDatabaseOperationFailedError(error));
+            }
         );
     };
 
-    let _validateApiKey = function (req, foundUser, callback) {
+    let _validateApiKey = function (req, res, foundUser, callback) {
         RequestValidator.validateApiKey(foundUser, req.headers['apikey'], function (apiKeyExpired) {
             if (apiKeyExpired) {
                 return callback(apiKeyExpired);
             } else {
-                return callback(null, foundUser);
+                return callback(null, req, res, foundUser);
             }
         });
     };
 
-    let _validateAccessRights = function (user, callback) {
+    let _validateAccessRights = function (req, res, user, callback) {
         RequestValidator.validateAccessRights(
-          user, RouteNames.PROFESSORS, HttpVerbs.GET,
-          function (error) {
-              if (error) {
-                  /* In case user does not have permissions to access this resource */
-                  return callback(error);
-              } else {
-                  return callback(null);
-              }
-          });
+            user, RouteNames.PROFESSORS_CSV, HttpVerbs.GET,
+            function (error) {
+                if (error) {
+                    /* In case user does not have permissions to access this resource */
+                    return callback(error);
+                } else {
+                    return callback(null, req, res);
+                }
+            });
     };
 
-    let _listProfessors = function (callback) {
-        Professor.model.find({}, function(getProfessorsError, professors) {
-            if(getProfessorsError){
-                callback(PredefinedErrors.getDatabaseOperationFailedError(getProfessorsError));
-            }else{
-                callback(null,professors)
+    let _streamToClient = function (req, res, callback) {
+
+        var professorsFromDatabase = Professor.model.find({}, function (professorsListErr, result) {
+            if (professorsListErr) {
+                return callback(PredefinedErrors.getDatabaseOperationFailedError(professorsListErr));
             }
-        });
+            jsonExport(result, function (err, csv) {
+                if (err) return callback(err);
+                return callback(null, csv);
+            });
+        }).lean().select('-_id -__v -courses._id');
+
     };
+
 
     let _invoke = function (req, res) {
         async.waterfall([
-
             function (callback) {
                 _validateRequest(req, function (invalidRequest) {
                     if (invalidRequest) {
                         return callback(invalidRequest);
                     } else {
-                        return callback(null,req);
+                        return callback(null, req, res);
                     }
                 });
             },
@@ -96,29 +98,28 @@ let ListProfessors = (function () {
             _findUser,
             _validateApiKey,
             _validateAccessRights,
-            _listProfessors,
+            _streamToClient,
 
-            function (professors,callback) {
+            function (result, callback) {
                 /* If it reaches this, the request succeeded. */
                 res.status(200);
-                res.send(professors);
+                res.writeHead(headers);
+                res.end(result);
             }
-        ], function (error, results) {
-            if (error) {
+        ], function (err, results) {
+            if (err) {
                 res.status(400);
-                res.send(error);
+                res.send(err);
             }
         });
-    };
-
+    }
     return {
         invoke: _invoke,
-        validateRequest: _validateRequest,
         findUser: _findUser,
         validateApiKey: _validateApiKey,
         validateAccessRights: _validateAccessRights,
-        listProfessors: _listProfessors
+        streamToClient: _streamToClient
     }
 })();
 
-module.exports = ListProfessors;
+module.exports = ExportProfessorsCsv;

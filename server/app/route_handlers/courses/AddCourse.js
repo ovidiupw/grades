@@ -35,14 +35,14 @@ let AddNewCourse = (function () {
                 return errCallback(PredefinedErrors.getAuthorizationDataNotFoundError());
             }
             if (req.body.courseId == undefined ||
-                req.body.title == undefined ||
-                req.body.year == undefined ||
-                req.body.semester == undefined) {
+              req.body.title == undefined ||
+              req.body.year == undefined ||
+              req.body.semester == undefined) {
                 return errCallback(new Error(
-                    Errors.REQ_BODY_INVALID.id,
-                    Errors.REQ_BODY_INVALID.message,
-                    "Required parameters not supplied. Please add " +
-                    "'courseId' , 'title' , 'year' , 'semester' to your request."
+                  Errors.REQ_BODY_INVALID.id,
+                  Errors.REQ_BODY_INVALID.message,
+                  "Required parameters not supplied. Please add " +
+                  "'courseId' , 'title' , 'year' , 'semester' to your request."
                 ));
             }
 
@@ -52,12 +52,12 @@ let AddNewCourse = (function () {
 
     let _findUser = function (req, callback) {
         User.model.findByUser(req.body.user,
-            function (foundUser) {
-                return callback(null, req, foundUser);
-            },
-            function (userFindError) {
-                return callback(userFindError);
-            }
+          function (foundUser) {
+              return callback(null, req, foundUser);
+          },
+          function (userFindError) {
+              return callback(userFindError);
+          }
         );
     };
 
@@ -73,15 +73,15 @@ let AddNewCourse = (function () {
 
     let _validateAccessRights = function (req, foundUser, callback) {
         RequestValidator.validateAccessRights(
-            foundUser, RouteNames.COURSES, HttpVerbs.POST,
-            function (error) {
-                if (error) {
-                    /* In case user does not have permissions to access this resource */
-                    return callback(error);
-                } else {
-                    return callback(null,req);
-                }
-            });
+          foundUser, RouteNames.COURSES, HttpVerbs.POST,
+          function (error) {
+              if (error) {
+                  /* In case user does not have permissions to access this resource */
+                  return callback(error);
+              } else {
+                  return callback(null,req);
+              }
+          });
     };
 
     let _addCourse = function (req,callback) {
@@ -94,13 +94,13 @@ let AddNewCourse = (function () {
         });
 
         courseModel.save(
-            function (courseAddErr) {
-                if (courseAddErr) {
-                    callback(PredefinedErrors.getDatabaseOperationFailedError(courseAddErr));
-                } else {
-                    callback(null);
-                }
-            });
+          function (courseAddErr) {
+              if (courseAddErr) {
+                  callback(PredefinedErrors.getDatabaseOperationFailedError(courseAddErr));
+              } else {
+                  callback(null);
+              }
+          });
 
     };
 
@@ -140,6 +140,7 @@ let AddNewCourse = (function () {
 
     return {
         invoke: _invoke,
+        validateRequest: _validateRequest,
         findUser: _findUser,
         validateApiKey: _validateApiKey,
         validateAccessRights: _validateAccessRights,

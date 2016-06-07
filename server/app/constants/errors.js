@@ -140,6 +140,11 @@ const Errors = {
     id: 28,
     message: 'Error: The supplied faculty identity is identical with your own faculty identity.',
     data: undefined
+  },
+  DUPLICATE_ACADEMIC_GROUP_FOUND: {
+    id: 29,
+    message: 'Error: The supplied academic groups are invalid. There should be no duplicates.',
+    data: undefined
   }
 };
 

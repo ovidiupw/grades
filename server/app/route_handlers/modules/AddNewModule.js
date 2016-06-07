@@ -133,7 +133,18 @@ let AddNewModule = (function () {
       if (moduleSaveError) {
         callback(PredefinedErrors.getDatabaseOperationFailedError(moduleSaveError));
       } else {
-        callback(null);
+        callback(null, req);
+      }
+    });
+  };
+
+  let _updateModuleInCourses = function (req, callback) {
+    let module = {moduleId: req.body.moduleId};
+    Course.model.update({"courseId": req.body.courseId}, {"$push": {"modules": module}}, function (courseUpdateErr) {
+      if (courseUpdateErr) {
+        return callback(PredefinedErrors.getDatabaseOperationFailedError(courseUpdateErr));
+      } else {
+        return callback(null);
       }
     });
   };
@@ -183,27 +194,9 @@ let AddNewModule = (function () {
 
       _addModule,
 
-      function (callback) {
-        let module = {moduleId: req.body.moduleId};
-        Course.model.update({"courseId": req.body.courseId}, {"$push": {"modules": module}}, function (courseUpdateErr) {
-          if (courseUpdateErr) {
-            return callback(PredefinedErrors.getDatabaseOperationFailedError(courseUpdateErr));
-          } else {
-            Course.model.findOne({courseId: req.body.courseId},
-              function (courseNotFoundErr, foundCourse) {
-                if (courseNotFoundErr || foundCourse == null) {
-                  return callback(PredefinedErrors.getDatabaseOperationFailedError(courseNotFoundErr));
-                }
-                if (foundCourse.evaluation == "undefined") {
-                  Course.model.update({courseId: req.body.courseId}, {$set: {evaluation: req.body.moduleId}},
-                    {upsert: true}, function (err) {
-                    });
-                }
-                return callback(null);
-              });
-          }
-        });
-      },
+      /* Now update the module id from modules array in courses collection */
+
+      _updateModuleInCourses,
 
       function (callback) {
         res.status(200);
@@ -229,7 +222,8 @@ let AddNewModule = (function () {
     findUser: _findUser,
     validateApiKey: _validateApiKey,
     validateAccessRights: _validateAccessRights,
-    addModule: _addModule
+    addModule: _addModule,
+    updateModuleInCourses: _updateModuleInCourses
   }
 })();
 

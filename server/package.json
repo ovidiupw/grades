@@ -14,7 +14,11 @@
     "nodemailer": "^2.3.2",
     "passport": "^0.3.2",
     "passport-facebook": "^2.1.0",
-    "randomstring": "^1.1.4"
+    "randomstring": "^1.1.4",
+    "json2csv": "~2.2.1",
+    "json2csv-stream": "0.1.2",
+    "jsonexport": "1.1.0",
+    "csvtojson": "0.5.14"
   },
   "devDependencies": {
     "babel-eslint": "^6.0.0",

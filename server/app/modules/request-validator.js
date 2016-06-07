@@ -3,7 +3,6 @@
 let async = require('async');
 
 let Errors = require('../constants/errors');
-let Domains = require('../constants/domains');
 let SchemaConstraints = require('../constants/schema-constraints');
 let Error = require('../modules/error');
 let PredefinedErrors = require('../modules/predefined-errors');
@@ -11,6 +10,7 @@ let PredefinedErrors = require('../modules/predefined-errors');
 const RouteNames = require('../constants/routes');
 
 const Role = require('../entities/role');
+const Course = require('../entities/course');
 const Registration = require('../entities/registration');
 const PredefinedRoles = require('../constants/roles');
 
@@ -36,12 +36,12 @@ let RequestValidator = (function () {
 
   let _isAllowedAccessBasedOnRoleActions = function (roleActions, resource, verb) {
     for (let actionIndex in roleActions) {
-      if (!roleActions[actionIndex].hasOwnProperty('resource') || !roleActions[actionIndex].hasOwnProperty('verb')) {
+      if (!roleActions[actionIndex]._doc.hasOwnProperty('resource') || !roleActions[actionIndex]._doc.hasOwnProperty('verb')) {
         return false;
       }
 
-      if ((resource === roleActions[actionIndex].resource || RouteNames.ANY === roleActions[actionIndex].resource)
-        && verb === roleActions[actionIndex].verb) {
+      if ((resource === roleActions[actionIndex]._doc.resource || RouteNames.ANY === roleActions[actionIndex]._doc.resource)
+        && verb === roleActions[actionIndex]._doc.verb) {
         return true;
       }
     }
@@ -251,23 +251,31 @@ let RequestValidator = (function () {
    */
   let _requestContainsValidFormula = function (req, modules, errCallback) {
     process.nextTick(() => {
-      let parse_tree = jsep(req.body.formula);
+        let parse_tree = jsep(req.body.formula);
 
-      _getIdentifiers(parse_tree, 0);
+        _getIdentifiers(parse_tree, 0);
 
-      if (identifiers.length > 0) {
-        for (let i = 0; i < identifiers.length; i++) {
-          if (modules.indexOf(identifiers[i]) == -1) {
-            return errCallback(new Error(
-              Errors.INVALID_FORMULA.id,
-              Errors.INVALID_FORMULA.message,
-              Errors.INVALID_FORMULA.data
-            ));
+        if (identifiers.length > 0) {
+          for (let i = 0; i < identifiers.length; i++) {
+            let found = false;
+            for (let j = 0; i < modules.length; j++) {
+              if (modules[j].moduleId == identifiers[i]) {
+                found = true;
+                break;
+              }
+            }
+            if (found == false) {
+              return errCallback(new Error(
+                Errors.INVALID_FORMULA.id,
+                Errors.INVALID_FORMULA.message,
+                Errors.INVALID_FORMULA.data
+              ));
+            }
           }
         }
+        return errCallback(null);
       }
-      return errCallback(null);
-    });
+    );
   };
 
   let _validateApiKey = function (user, requestKey, errCallback) {
@@ -294,6 +302,39 @@ let RequestValidator = (function () {
     });
   };
 
+  let _searchForCourse = function (currentCourse,coursesArray,req,errCallback) {
+    if (currentCourse < coursesArray.length) {
+      Course.model.findByCourseId(coursesArray[currentCourse].courseId,
+        function (foundCourse) {
+          if (currentCourse == coursesArray.length - 1) {
+            return errCallback(null, req);
+          }
+          _searchForCourse(currentCourse + 1);
+        },
+        function (err) {
+          return errCallback(err);
+        });
+    }
+  };
+
+
+  let _checkForDuplicatesDuplicates = function checkForDuplicatesDuplicates(currentCourse,coursesArray,req,errCallback) {
+    if((new Set(coursesArray[currentCourse].academicGroups)).size !== coursesArray[currentCourse].academicGroups.length){
+      return errCallback(new Error(
+        Errors.DUPLICATE_ACADEMIC_GROUP_FOUND.id,
+        Errors.DUPLICATE_ACADEMIC_GROUP_FOUND.message,
+        "A duplicate academic group was found "+coursesArray[currentCourse].academicGroups
+      ));
+    }else{
+      if(currentCourse == coursesArray.length -1){
+        return errCallback(null,req);
+      }else{
+        _checkForDuplicatesDuplicates(currentCourse +1);
+      }
+    }
+  };
+
+
   return ({
     validateApiKey: _validateApiKey,
     validateAccessRights: _validateAccessRights,
@@ -305,7 +346,9 @@ let RequestValidator = (function () {
     requestContainsValidCreatedByIdentity: _requestContainsValidCreatedByIdentity,
     requestContainsValidFormula: _requestContainsValidFormula,
     requestHeaderContainsAuthenticationData: _requestHeaderContainsAuthenticationData,
-    requestDoesNotContainOwnFacultyIdentity: _requestDoesNotContainOwnFacultyIdentity
+    requestDoesNotContainOwnFacultyIdentity: _requestDoesNotContainOwnFacultyIdentity,
+    searchForCourse: _searchForCourse,
+    checkForDuplicatesDuplicates: _checkForDuplicatesDuplicates
   });
 })();
 

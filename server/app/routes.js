@@ -26,6 +26,11 @@ const ListRegistrations = require('./route_handlers/registrations/ListRegistrati
 const AddNewModule = require('./route_handlers/modules/AddNewModule');
 const DeleteModule = require('./route_handlers/modules/DeleteModule');
 
+const ExportStudentsCsv = require('./route_handlers/csv/ExportStudentsCsv');
+const ExportProfessorsCsv = require('./route_handlers/csv/ExportProfessorsCsv');
+const ImportStudentsCsv = require('./route_handlers/csv/ImportStudentsCsv');
+const ImportProfessorsCsv = require('./route_handlers/csv/ImportProfessorsCsv');
+
 let Routes = function (app, passport) {
 
   app.get(RouteNames.ROOT, function (req, res) {
@@ -35,6 +40,34 @@ let Routes = function (app, passport) {
     };
     res.status(200);
     res.send(response);
+  });
+
+  /**
+   * This function handles csv export from students collection.
+   */
+  app.get(RouteNames.STUDENTS_CSV, function(req, res) {
+    ExportStudentsCsv.invoke(req, res);
+  });
+
+  /**
+   * This function handles csv export from professors collection.
+   */
+  app.get(RouteNames.PROFESSORS_CSV, function(req, res) {
+    ExportProfessorsCsv.invoke(req, res);
+  });
+
+  /**
+   * This function handles csv import to students collection.
+   */
+  app.post(RouteNames.STUDENTS_CSV, function(req, res) {
+    ImportStudentsCsv.invoke(req, res);
+  });
+
+  /**
+   * This function handles csv import to professors collection.
+   */
+  app.post(RouteNames.PROFESSORS_CSV, function(req, res) {
+    ImportProfessorsCsv.invoke(req, res);
   });
 
   /**
