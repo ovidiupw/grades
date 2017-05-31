@@ -2,6 +2,7 @@ const rest = require('rest');
 const mime = require('rest/interceptor/mime');
 
 import Utility from '../modules/utility';
+import * as Hostnames from '../constants/hostnames'
 
 import {
   showSpinner,
@@ -36,7 +37,7 @@ export function addRole(role, userAccount) {
 
     client({
       method: 'POST',
-      path: 'http://localhost:8082/v1/roles',
+      path: Hostnames.BACKEND_HOSTNAME + 'v1/roles',
       entity: {
         title: role.title,
         actions: role.actions,
@@ -78,7 +79,7 @@ export function fetchApiResources(userAccount) {
 
     client({
       method: 'GET',
-      path: 'http://localhost:8082/v1/resources',
+      path: Hostnames.BACKEND_HOSTNAME + 'v1/resources',
       headers: {
         user: userAccount.user,
         apiKey: userAccount.apiKey
@@ -109,7 +110,7 @@ export function deleteRegistration(registrationWithAuthData, userAccount) {
 
     client({
       method: 'DELETE',
-      path: 'http://localhost:8082/v1/registrations',
+      path: Hostnames.BACKEND_HOSTNAME + 'v1/registrations',
       entity: registrationWithAuthData
     })
       .then(
@@ -147,7 +148,7 @@ export function addRegistration(registrationWithAuthData, userAccount) {
 
     client({
       method: 'POST',
-      path: 'http://localhost:8082/v1/registrations',
+      path: Hostnames.BACKEND_HOSTNAME + 'v1/registrations',
       entity: registrationWithAuthData
     })
       .then(
@@ -185,7 +186,7 @@ export function fetchRoles(userAccount) {
 
     client({
       method: 'GET',
-      path: 'http://localhost:8082/v1/roles',
+      path: Hostnames.BACKEND_HOSTNAME + 'v1/roles',
       headers: {
         'user' : userAccount.user,
         'apiKey' : userAccount.apiKey
@@ -218,7 +219,7 @@ export function fetchRegistrations(userAccount) {
 
     client({
       method: 'GET',
-      path: 'http://localhost:8082/v1/registrations',
+      path: Hostnames.BACKEND_HOSTNAME + 'v1/registrations',
       headers: {
         'user' : userAccount.user,
         'apiKey' : userAccount.apiKey
@@ -250,7 +251,7 @@ export function registerIdentity(accountData) {
 
     client({
       method: 'POST',
-      path: 'http://localhost:8082/v1/register/identity',
+      path: Hostnames.BACKEND_HOSTNAME + 'v1/register/identity',
       entity: accountData
     })
       .then(
@@ -280,7 +281,7 @@ export function confirmIdentity(accountData, confirmIdentityPayload) {
 
     client({
       method: 'PUT',
-      path: 'http://localhost:8082/v1/register/identity',
+      path: Hostnames.BACKEND_HOSTNAME + 'v1/register/identity',
       entity: confirmIdentityPayload
     })
       .then(
@@ -288,8 +289,8 @@ export function confirmIdentity(accountData, confirmIdentityPayload) {
           if (response.status.code !== 200) {
             Utility.handleResponseCodeNot200(response, dispatch);
           } else {
-            window.open('http://localhost:8082/v1/auth/facebook' +
-              '?redirectUrl=http://localhost:3000/login-redirect', '_self');
+            window.open(BACKEND_HOSTNAME + 'v1/auth/facebook' +
+              '?redirectUrl=' + FRONTEND_HOSTNAME + 'login-redirect', '_self');
           }
           dispatch(hideSpinner());
         },

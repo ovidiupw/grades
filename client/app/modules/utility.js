@@ -11,10 +11,12 @@ import {DEVELOPER, STUDENT, PROFESSOR, SECRETARY} from '../constants/facultyStat
 let Utility = {
   initFacebook: function() {
     FB.init({
-      appId: '848873811924114', 
-      cookie: true,
-      version: 'v2.4'
-    });
+        appId      : '339198119829864',
+        cookie     : false,
+        xfbml      : true,
+        version    : 'v2.8'
+      });
+    FB.AppEvents.logPageView();
   },
 
   userAccountIsComplete: function (authResponse) {
@@ -110,7 +112,7 @@ let Utility = {
       return InitialStates.addRoleForm;
     }
   }
-  
+
 };
 
 export default Utility;
