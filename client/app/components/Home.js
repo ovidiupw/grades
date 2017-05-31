@@ -1,5 +1,6 @@
 import {connect} from 'react-redux'
 import React, {PropTypes} from 'react';
+import * as Constants from '../constants/hostnames'
 
 import {
   textCenter
@@ -11,8 +12,8 @@ import {
 let Home = React.createClass({
 
   handleAuthViaFacebook() {
-    window.open('http://localhost:8082/v1/auth/facebook' +
-      '?redirectUrl=http://localhost:3000/login-redirect', '_self')
+    window.open(Constants.BACKEND_HOSTNAME + 'v1/auth/facebook' +
+      '?redirectUrl=' + Constants.FRONTEND_HOSTNAME + 'login-redirect', '_self')
   },
 
   componentDidMount() {
